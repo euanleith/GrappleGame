@@ -36,6 +36,8 @@ public abstract class EnemyCombat : MonoBehaviour
     public Vector2 currentDecelVelocity;
     public Vector2 collisionNormal;
     public Vector2 moveRange = new Vector2(3, 0);
+    public Movement idleMovement;
+    public Movement aggroMovement;
     
     [HideInInspector] public Vector2 direction = new Vector2(1, 1);
 
@@ -48,6 +50,9 @@ public abstract class EnemyCombat : MonoBehaviour
         rb.bodyType = RigidbodyType2D.Kinematic;
         rb.useFullKinematicContacts = true;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+        // todo these will be different for each enemy
+        idleMovement = new PingPongMovement(speed, startPos, moveRange); 
+        aggroMovement = new FollowPlayerMovement(speed, player);
     }
 
     // Update is called once per frame
@@ -59,11 +64,11 @@ public abstract class EnemyCombat : MonoBehaviour
             } else currentDecelVelocity = Vector2.zero;
         } 
         else if (rb.bodyType == RigidbodyType2D.Kinematic) {
-            if (!ProcessCollisions(currentDecelVelocity, collisionNormal)) {
+            if (!ProcessCollisions(currentDecelVelocity, collisionNormal)) { // todo wrong, right now if it collides with the ground itll stop following player
                 if (WithinPlayerRange()) {
-                    MoveAggro(currentDecelVelocity, collisionNormal);
+                    aggroMovement.Move(direction, transform.position, currentDecelVelocity, rb);
                 } else {
-                    MoveIdle(currentDecelVelocity);
+                    direction = idleMovement.Move(direction, transform.position, currentDecelVelocity, rb);
                 }
             }
         }
