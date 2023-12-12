@@ -118,7 +118,7 @@ public class GrapplingGun : MonoBehaviour
                         springJoint.connectedAnchor = grapplePoint;
                     }
                     if (hit.transform.gameObject.layer == 8) { // todo maybe also only if transform launch?
-                        hit.transform.gameObject.GetComponent<EnemyCombat>().OnCollisionEnterWithGrapple();
+                        hit.transform.gameObject.GetComponent<Enemy>().movementController.OnCollisionEnterWithGrapple();
                     }
                 }
             }
@@ -172,7 +172,7 @@ public class GrapplingGun : MonoBehaviour
         springJoint.enabled = false;
         springJoint.connectedBody = null;
         if (hit.transform.gameObject.layer == 8) {
-            hit.transform.gameObject.GetComponent<EnemyCombat>().OnCollisionExitWithGrapple();
+            hit.transform.gameObject.GetComponent<Enemy>().movementController.OnCollisionExitWithGrapple();
         }
         gunHolder.GetComponent<Rigidbody2D>().gravityScale = 1;
     }

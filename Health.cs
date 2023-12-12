@@ -43,10 +43,11 @@ public class Health : MonoBehaviour
             foreach (VisualElement heart in ui.rootVisualElement.ElementAt(0).Children()) {
                 heart.visible = true;
             }
-            for (int i = 0; i < enemies.childCount; i++) 
-            {
-                enemies.GetChild(i).gameObject.SetActive(true);
-            }
+            // todo add this back after adding room logic to enemies
+            //for (int i = 0; i < enemies.childCount; i++) 
+            //{
+            //    enemies.GetChild(i).gameObject.SetActive(true);
+            //}
         }
         if (currentIFrames != maxIFrames) {
             currentIFrames -= Time.deltaTime;
@@ -67,10 +68,10 @@ public class Health : MonoBehaviour
                 Respawn(roomSpawnPoint.position); // respawn at start of room for each platforming death
                 break;
             case 11:
-                GetHit(collision.transform.parent.gameObject.GetComponent<EnemyCombat>().damage, new Vector2(0, 1));
+                GetHit(collision.transform.parent.gameObject.GetComponent<Enemy>().combatController.damage, new Vector2(0, 1));
                 break;
             case 8:
-                GetHit(collision.gameObject.GetComponent<EnemyCombat>().damage, new Vector2(0, 1));
+                GetHit(collision.gameObject.GetComponent<Enemy>().combatController.damage, new Vector2(0, 1));
                 break;
         }
     }
