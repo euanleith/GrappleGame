@@ -2,13 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Movement
+public abstract class Movement : MonoBehaviour
 {
-    protected Vector2 speed;
-
-    public Movement(Vector2 speed) {
-        this.speed = speed;
-    }
+    public Vector2 speed = new Vector2(2,1);
 
     public abstract Vector2 Move(Vector2 direction, Vector2 position, Vector2 currentDecelVelocity, Rigidbody2D rb);
 }

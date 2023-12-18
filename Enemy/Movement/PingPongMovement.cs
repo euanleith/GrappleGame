@@ -7,9 +7,9 @@ public class PingPongMovement : Movement
     private Vector2 startPos;
     private Vector2 moveRange;
 
-    public PingPongMovement(Vector2 speed, Vector2 startPos, Vector2 moveRange) : base(speed) {
-        this.startPos = startPos;
-        this.moveRange = moveRange;
+    public void Start() {
+        startPos = gameObject.GetComponentInParent<MovementController>().startPos;
+        moveRange = gameObject.GetComponentInParent<MovementController>().moveRange;
     }
 
     public override Vector2 Move(Vector2 direction, Vector2 position, Vector2 currentDecelVelocity, Rigidbody2D rb) 

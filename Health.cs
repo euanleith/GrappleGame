@@ -68,10 +68,10 @@ public class Health : MonoBehaviour
                 Respawn(roomSpawnPoint.position); // respawn at start of room for each platforming death
                 break;
             case 11:
-                GetHit(collision.transform.parent.gameObject.GetComponent<Enemy>().combatController.damage, new Vector2(0, 1));
+                GetHit(collision.gameObject.GetComponent<Enemy>().combatController.GetDamage(), new Vector2(0, 1));
                 break;
             case 8:
-                GetHit(collision.gameObject.GetComponent<Enemy>().combatController.damage, new Vector2(0, 1));
+                GetHit(collision.gameObject.GetComponent<Enemy>().combatController.GetDamage(), new Vector2(0, 1));
                 break;
         }
     }

@@ -116,7 +116,7 @@ public class PlayerCombat : MonoBehaviour
     public void OnTriggerEnter2D(Collider2D collider) {
         switch (collider.gameObject.layer) {
             case 8:
-                collider.gameObject.transform.parent.gameObject.GetComponent<EnemyCombat>().GetHit(damage);
+                collider.gameObject.GetComponent<CombatController>().GetHit(damage);
                 hit = true;
                 break;
             }

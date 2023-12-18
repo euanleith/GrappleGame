@@ -1,39 +1,46 @@
 using System;
 using UnityEngine;
 
-public class EnemyMovement: MonoBehaviour
+public class MovementController: MonoBehaviour
 {
     // todo everything should stop for a second when you grapple an enemy for impact, and to prepare you to hit them when they fly towards you
     // todo problems when grappling enemies;
     //  they go of their set path & can clip into the floor - the problem is that their velocity isn't zero? so what do i do about that? set to 0 after a certain time? add a deceleration?
     //  when pulling them towards you, if you hit them and they dont die, you'll get hurt. so need to have bounce back on hit
 
-    public Vector2 collisionNormal;
-    public Vector2 currentDecelVelocity;
-    public Vector2 direction;
+    // todo make these variables of instantiations of movement - will want different e.g. speeds for idle and aggro, and e.g. moverange is specific to pingpong and similar
+    
+    public Vector2 moveRange = new Vector2(3, 0);
     public Vector2 aggroRange = new Vector2(7, 3);
     public float decelerationSpeed = 1;
-    public Movement idleMovement;
-    public Movement aggroMovement;
-    public Vector2 speed = new Vector2(2, 1);
-    public Vector2 moveRange = new Vector2(3, 0);
-
+    
+    [HideInInspector] public Vector2 collisionNormal;
+    Vector2 currentDecelVelocity;
+    Vector2 direction;
+    [HideInInspector] public Vector2 startPos;
+    
+    Movement idleMovement;
+    Movement aggroMovement;
     Transform transform;
     Transform player;
     Rigidbody2D rb;
 
     public void Start() {
         transform = gameObject.transform;        
+        startPos = transform.position;
         player = GetComponent<Enemy>().player;
+        direction = new Vector2(1, 1);
         rb = GetComponent<Rigidbody2D>();
-        direction = new Vector2(1,1);
         rb.bodyType = RigidbodyType2D.Kinematic;
         rb.useFullKinematicContacts = true;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+        idleMovement = GetComponent<Enemy>().idleMovement;
+        aggroMovement = GetComponent<Enemy>().aggroMovement;
     }
 
     public void FixedUpdate()
     {
+        // todo maybe structuring as state machine would be clearer?
         if (currentDecelVelocity != Vector2.zero) {
             if (!ProcessCollisions(currentDecelVelocity, collisionNormal)) { // todo currently grappling an enemy stops their idle movement, do i want this?
                 currentDecelVelocity = SlowDown(currentDecelVelocity, decelerationSpeed);
@@ -116,7 +123,8 @@ public class EnemyMovement: MonoBehaviour
         }
             
         if (colliding) {
-            rb.MovePosition(currentDecelVelocity.normalized * Time.deltaTime + new Vector2(transform.position.x + (speed.x * direction.x * Time.deltaTime), transform.position.y + (speed.y * direction.y * Time.deltaTime)));
+            // todo currently only using idleMovement.speed, would i ever want to use aggromovement.speed?
+            rb.MovePosition(currentDecelVelocity.normalized * Time.deltaTime + new Vector2(transform.position.x + (idleMovement.speed.x * direction.x * Time.deltaTime), transform.position.y + (idleMovement.speed.y * direction.y * Time.deltaTime)));
         }
         return colliding;
     }
