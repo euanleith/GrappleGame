@@ -45,6 +45,8 @@ public class PlayerControls : MonoBehaviour
 
     public float minSlope = 0.5f; // todo might need to change this for slopes
 
+    Collider2D lastGroundCollision; // need this since OnCollisionExit2D doesn't contain collision info of the exited collision
+
     void Start()
     {
         previousPos = transform.position;
@@ -73,15 +75,21 @@ public class PlayerControls : MonoBehaviour
                 rb.velocity = new Vector2(0, wallClimbSpeed);
             }
             else if (isGrounded) { // moving along ground
-                rb.velocity = new Vector2((moveX * groundSpeed), rb.velocity.y);
-                if (velocityOfGround != null) {
-                    rb.velocity += velocityOfGround;
+                if (moveX != 0) {
+                    if (moveX * velocityOfGround.x > 0) { // not add velocityOfGround.x when moveX is in the opposite direction
+                    rb.velocity = new Vector2((moveX * groundSpeed) + velocityOfGround.x, velocityOfGround.y);
+                    } else {
+                        rb.velocity = new Vector2((moveX * groundSpeed), velocityOfGround.y);
+                    }
+                } 
+                else {
+                    rb.velocity = velocityOfGround; 
                 }
             } else { // moving in air
                 float airSpeedX = moveX * rb.velocity.x > 0 ? forwardAirSpeed : backwardAirSpeed;
                 float airSpeedY;
                 if (hitWallNormal != 0 && moveX * hitWallNormal < 0) {
-                    airSpeedY = moveY < minFastFallThreshold ? wallFastFallSpeed : wallFallSpeed;
+                    airSpeedY = moveY < minFastFallThreshold ? wallFastFallSpeed : wallFallSpeed; 
                 } else {
                     airSpeedY = moveY < minFastFallThreshold ? fastFallSpeed : fallSpeed;
                 }
@@ -104,9 +112,8 @@ public class PlayerControls : MonoBehaviour
         }
     }
 
-    void OnCollisionStay2D(Collision2D collision)
+    void OnCollisionEnter2D(Collision2D collision)
     {
-        // have to do this here since for whatever reason can't access collisions in OnCollisionExit2D, to see if have exited from ground or wall collision
         hitWallNormal = 0f;
         foreach (ContactPoint2D contact in collision.contacts)
         {
@@ -115,21 +122,33 @@ public class PlayerControls : MonoBehaviour
                 hitWallNormal = contact.normal.x;
                 break;
             } else {
-                RaycastHit2D hit = Physics2D.Raycast(boxColliderPlayer.bounds.center, -contact.normal, heightTestPlayer, layerMaskGround); // todo also need to rotate player to make this work, since using box collider
-                if (hit.collider != null && contact.normal.y > minSlope) {
+                if (contact.normal.y > minSlope) {
+                    lastGroundCollision = contact.collider;
                     isGrounded = true;
                     grapple.OnCollisionWithGround();
                 }
+            }
+        }
+    }
 
-                velocityOfGround = GetVelocityOfGround(hit.transform);
+    void OnCollisionStay2D(Collision2D collision) {
+        foreach (ContactPoint2D contact in collision.contacts)
+        {
+            if (Math.Abs(contact.normal.x) <= minWallAngle)
+            {
+                if (contact.normal.y > minSlope) {
+                    velocityOfGround = GetVelocityOfGround(contact.collider.gameObject.transform); // todo would this not mean that it wouldn't be grounded if connected to a non ground platform, even if also connected to a ground platform?
+                }
             }
         }
     }
 
     public Vector2 GetVelocityOfGround(Transform ground) {
         try {
-            Animator anim = ground.gameObject.GetComponent<Animator>();
-            return anim.velocity;
+            return ground.gameObject.GetComponent<Rigidbody2D>().velocity;
+            // todo im pretty sure animations change the velocity, so this should work for both
+            //Animator anim = ground.gameObject.GetComponent<Animator>();
+            //return anim.velocity;
             // todo can i also convert rotation velocity to velocity? https://gamedev.stackexchange.com/questions/167428/how-to-convert-rotatearound-speed-to-directional-speed-in-unity?
         } catch {
             return Vector2.zero;
@@ -144,10 +163,13 @@ public class PlayerControls : MonoBehaviour
         //float distanceToGround = transform.position.y - hit.point.y;
         //Debug.Log(distanceToGround);
         //if (distanceToGround > 3) isGrounded = false; // todo ew, also still doesnt work, but a good way to test SnapToGround by making sure isGrounded is true
-        isGrounded = false;
+        if (lastGroundCollision != null && collision.collider == lastGroundCollision) {
+            isGrounded = false;
+        }
     }
 
     public void Jump() {
+        isGrounded = false;
         // todo theres a better way than if else / switch
         float velocityX = 0f;
         switch (hitWallNormal) {
@@ -161,8 +183,14 @@ public class PlayerControls : MonoBehaviour
                 velocityX = rb.velocity.x + (moveX * forwardAirSpeed * Time.deltaTime);
                 break;
         }
+        float velocityY = jumpSpeed;
+        // todo should i add this?
+        //if (velocityOfGround != Vector2.zero) {
+        //    velocityX = velocityOfGround.x + rb.velocity.x + (moveX * forwardAirSpeed * Time.deltaTime);
+        //    velocityY = velocityOfGround.y + jumpSpeed;
+        //}
         // todo might want to ignore reverse x movement after wall jump for a few seconds?
-        rb.velocity = new Vector2(velocityX, jumpSpeed); // note not adding rb.velocity.y 
+        rb.velocity = new Vector2(velocityX, velocityY); // note not adding rb.velocity.y 
     }
 
     public void Bounce(Vector2 direction) {
