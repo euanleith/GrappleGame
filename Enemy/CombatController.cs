@@ -9,7 +9,8 @@ public class CombatController : MonoBehaviour
     {
         windup,
         attacking,
-        cooldown
+        cooldown, 
+        idle
     }
     public State state;
 
@@ -17,8 +18,8 @@ public class CombatController : MonoBehaviour
 
     Transform transform;
     Transform player;
-    [HideInInspector] public List<Attack> attacks; // todo NonReorderable avoids this bug: https://stackoverflow.com/questions/68812616/unity-public-fields-visible-in-inspector-overlap-eachother
-    Attack currentAttack;
+    [HideInInspector] public List<Attack> attacks;
+    Attack currentAttack; // todo could be int index to save a bit of space
     
     public void Start() {
         state = State.cooldown;
@@ -28,6 +29,12 @@ public class CombatController : MonoBehaviour
         currentAttack = attacks[0]; 
         // todo add functionality for multiple attacks. might need DecideAttack() in Enemy, since deciding which attack to use might not be general to all enemies
         //  another option could be to have a CanAttack function in each attack which runs on cooldown instead if checking if within minAttackRange. Then if one attack CanAttack, that becomes the currentAttack. Otherwise if there's multiple, choose randomly between them?
+        //      although sometimes i might want to prioritise one attack over another... i guess i could add a priority int to each Attack, but ew. 
+        //          or i could use the order of attacks, but that's a bit unclear
+        //          and this prioritisation might be situational, which requires logic
+        //      i still could have subclasses of Enemy, i just want to avoid it if i can, since every other element of each enemy type is defined in the editor
+        //          i guess i could also have a separate attack decider class, which is either random, or defined by me in the editor using the existing attacks
+        //  how do other games do it?
     }
 
 
@@ -35,16 +42,19 @@ public class CombatController : MonoBehaviour
     {
         switch (state)
         {
-            case State.cooldown:
-                if (countdown <= 0 && 
-                    Math.Abs(transform.position.x - player.transform.position.x) < currentAttack.currentHitbox.localScale.x + currentAttack.minAttackRange.x &&
+            case State.idle:
+                if (Math.Abs(transform.position.x - player.transform.position.x) < currentAttack.minAttackRange.x &&
                     Math.Abs(transform.position.y - player.transform.position.y) < currentAttack.minAttackRange.y)
                 {    
                     countdown = currentAttack.windupDuration;
                     GetComponent<SpriteRenderer>().color = Color.red;
                     state = State.windup;
                     currentAttack.SetHitbox(transform, player);
-                    
+                }
+                break;
+            case State.cooldown:
+                if (countdown <= 0) {
+                    state = State.idle;
                 }
                 break;
             case State.attacking:

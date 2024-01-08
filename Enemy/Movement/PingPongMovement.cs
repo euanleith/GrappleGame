@@ -8,19 +8,26 @@ public class PingPongMovement : Movement
     private Vector2 moveRange;
 
     public void Start() {
-        startPos = gameObject.GetComponentInParent<MovementController>().startPos;
+        startPos = gameObject.GetComponentInParent<MovementController>().transform.position;
         moveRange = gameObject.GetComponentInParent<MovementController>().moveRange;
     }
 
     public override Vector2 Move(Vector2 direction, Vector2 position, Vector2 currentDecelVelocity, Rigidbody2D rb) 
     {
-        if (position.x < startPos.x - moveRange.x) {
+        if (moveRange.x == 0) {
+            direction.x = 0;
+        }
+        else if (position.x < startPos.x - moveRange.x) {
             direction.x = 1;
         }
         else if (position.x > startPos.x + moveRange.x) {
             direction.x = -1;
         }
-        if (position.y < startPos.y - moveRange.y) {
+
+        if (moveRange.y == 0) {
+            direction.y = 0;
+        }
+        else if (position.y < startPos.y - moveRange.y) {
             direction.y = 1;
         }
         else if (position.y > startPos.y + moveRange.y) {

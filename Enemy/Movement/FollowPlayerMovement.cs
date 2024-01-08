@@ -18,7 +18,8 @@ public class FollowPlayerMovement : Movement
         else if (position.x > player.transform.position.x + maxDistanceFromPlayer.x) newVel.x = -speed.x;
         if (position.y < player.transform.position.y - maxDistanceFromPlayer.y) newVel.y = speed.y;
         else if (position.y > player.transform.position.y + maxDistanceFromPlayer.y) newVel.y = -speed.y;
-        rb.MovePosition(new Vector2(position.x + newVel.x * Time.deltaTime, position.y + newVel.y * Time.deltaTime));
+        rb.MovePosition(new Vector2(position.x + newVel.x * Time.deltaTime, position.y + newVel.y * Time.deltaTime)); // todo this is probably being overwritten
+        //rb.position = new Vector2(position.x + newVel.x * Time.deltaTime, position.y + newVel.y * Time.deltaTime);
         return direction;
     }
 }

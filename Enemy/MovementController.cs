@@ -10,7 +10,7 @@ public class MovementController: MonoBehaviour
 
     // todo make these variables of instantiations of movement - will want different e.g. speeds for idle and aggro, and e.g. moverange is specific to pingpong and similar
     
-    public Vector2 moveRange = new Vector2(3, 0);
+    public Vector2 moveRange = new Vector2(3, 0); // todo move this to pingpongmovement
     public Vector2 aggroRange = new Vector2(7, 3);
     public float decelerationSpeed = 1;
     
@@ -48,7 +48,7 @@ public class MovementController: MonoBehaviour
         } 
         else if (rb.bodyType == RigidbodyType2D.Kinematic) {
             if (!ProcessCollisions(currentDecelVelocity, collisionNormal)) { // todo wrong, right now if it collides with the ground itll stop following player
-                if (WithinPlayerRange()) {
+                if (WithinPlayerRange() && GetComponent<Enemy>().combatController.state != CombatController.State.cooldown) { // todo currently only aggroing when not in cooldown (for shark), do i always want this?
                     aggroMovement.Move(direction, transform.position, currentDecelVelocity, rb);
                 } else {
                     direction = idleMovement.Move(direction, transform.position, currentDecelVelocity, rb);
@@ -103,6 +103,12 @@ public class MovementController: MonoBehaviour
     // todo name
     //  todo would it be better to normally be a dynamic rb, then change to kinematic when colliding with player?
     public bool ProcessCollisions(Vector2 currentDecelVelocity, Vector2 collisionNormal) {
+        // todo should ignore collision with grapple (if i'm not already...)
+        // todo also i might not always want to bounce
+        //  that might be the issue with jittering?
+        //      yep, this is having issues with followplayer - collides so goes up, but follows player so goes back down and collides again. how do other games do this?
+        //          hollowknight's aspid hatchlings move pretty weirdly. they kinda follow the player, but they have a really bad turning cycle so they usually miss. And when they hit a surface they try to bounce back and in the direction of the player, and my guess is since their turn cycle is so bad they're too slow to have my problem
+        //      i might just leave it for now, seems complicated to fix
         bool colliding = false;
         if (collisionNormal.x == 1) {
             direction.x = 1;
@@ -114,7 +120,7 @@ public class MovementController: MonoBehaviour
         }
         // todo top one isn't working??
         if (collisionNormal.y == 1) {
-            direction.y = 1;
+            direction.y = 1; 
             colliding = true;
         }
         if (collisionNormal.y == -1) {

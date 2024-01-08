@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine;
 
 
+// todo rename PlayerMovement, or just Movement
 public class PlayerControls : MonoBehaviour
 {
     // todo order these
@@ -96,6 +97,7 @@ public class PlayerControls : MonoBehaviour
                 rb.velocity = new Vector2((rb.velocity.x + (moveX * airSpeedX * Time.deltaTime)), rb.velocity.y - (airSpeedY * Time.deltaTime)); // todo is this accelerating fall? i dont want it to - * deltaTime?
             }
         } else {
+            // todo make only possible for transform grapple after reaching original destination? otherwise its weird when e.g. you transform grapple straight down while holding down
             rb.velocity = new Vector2((rb.velocity.x + (Time.deltaTime * moveX * grappleMoveSpeed)), rb.velocity.y);
         }
     }

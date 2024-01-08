@@ -8,7 +8,7 @@ public class Enemy : MonoBehaviour
 
     [HideInInspector] public MovementController movementController;
     [HideInInspector] public CombatController combatController;
-    [NonReorderable] public List<Attack> attacks; // todo NonReorderable avoids this bug: https://stackoverflow.com/questions/68812616/unity-public-fields-visible-in-inspector-overlap-eachother
+    public List<Attack> attacks; 
     public Movement idleMovement;
     public Movement aggroMovement;
 
