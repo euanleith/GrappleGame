@@ -48,7 +48,8 @@ public class MovementController: MonoBehaviour
         } 
         else if (rb.bodyType == RigidbodyType2D.Kinematic) {
             if (!ProcessCollisions(currentDecelVelocity, collisionNormal)) { // todo wrong, right now if it collides with the ground itll stop following player
-                if (WithinPlayerRange() && GetComponent<Enemy>().combatController.state != CombatController.State.cooldown) { // todo currently only aggroing when not in cooldown (for shark), do i always want this?
+                // todo ive made a function Attack.Cooldown, move cooldown state check logic to there
+                if (WithinPlayerRange()) {//} && GetComponent<Enemy>().combatController.state != CombatController.State.cooldown) { // todo currently only aggroing when not in cooldown (for shark), do i always want this?
                     aggroMovement.Move(direction, transform.position, currentDecelVelocity, rb);
                 } else {
                     direction = idleMovement.Move(direction, transform.position, currentDecelVelocity, rb);

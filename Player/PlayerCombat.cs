@@ -117,7 +117,7 @@ public class PlayerCombat : MonoBehaviour
         switch (collider.gameObject.layer) {
             case 8:
             case 19:
-                collider.gameObject.GetComponentInParent<CombatController>().GetHit(damage);
+                collider.gameObject.GetComponentInParent<Enemy>().OnHit(damage);
                 hit = true;
                 break;
             }

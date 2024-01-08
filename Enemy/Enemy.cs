@@ -17,4 +17,18 @@ public class Enemy : MonoBehaviour
         movementController = GetComponent<MovementController>();
         combatController = GetComponent<CombatController>();
     }
+
+    public virtual bool OnHit(int damage) {
+        combatController.health -= damage;
+        //GetComponent<SpriteRenderer>().color = Color.red;
+        // todo get hit animation, and maybe bounce backwards too, and stun both them and player (maybe stun instead of hurt player, or maybe it depends on the enemy?)
+        if (combatController.health <= 0) {
+            Debug.Log("BLEGH!!!!");
+            gameObject.SetActive(false);
+            return false;
+        } else {
+            Debug.Log("ow :(");
+            return true;
+        }
+    }
 }

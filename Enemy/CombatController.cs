@@ -14,12 +14,12 @@ public class CombatController : MonoBehaviour
     }
     public State state;
 
-    float countdown;
+    public float countdown;
 
     Transform transform;
     Transform player;
     [HideInInspector] public List<Attack> attacks;
-    Attack currentAttack; // todo could be int index to save a bit of space
+    [HideInInspector] public Attack currentAttack; // todo could be int index to save a bit of space
     
     public void Start() {
         state = State.cooldown;
@@ -46,15 +46,14 @@ public class CombatController : MonoBehaviour
                 if (Math.Abs(transform.position.x - player.transform.position.x) < currentAttack.minAttackRange.x &&
                     Math.Abs(transform.position.y - player.transform.position.y) < currentAttack.minAttackRange.y)
                 {    
-                    countdown = currentAttack.windupDuration;
-                    GetComponent<SpriteRenderer>().color = Color.red;
-                    state = State.windup;
-                    currentAttack.SetHitbox(transform, player);
+                    StartWindup(currentAttack.windupDuration);
                 }
                 break;
             case State.cooldown:
                 if (countdown <= 0) {
                     state = State.idle;
+                } else {
+                    currentAttack.Cooldown();
                 }
                 break;
             case State.attacking:
@@ -76,6 +75,8 @@ public class CombatController : MonoBehaviour
                     currentAttack.StartAttacking();
                     GetComponent<SpriteRenderer>().color = Color.white;
                     state = State.attacking;
+                } else {
+                    currentAttack.Windup();
                 }
                 break;
         }   
@@ -84,20 +85,14 @@ public class CombatController : MonoBehaviour
         }
     }
 
-    // todo maybe move this elsewhere? Enemy? since would be nice to call this AttackController
-    public void GetHit(int damage) {
-        health -= damage;
-        //GetComponent<SpriteRenderer>().color = Color.red;
-        // todo get hit animation, and maybe bounce backwards too, and stun both them and player (maybe stun instead of hurt player, or maybe it depends on the enemy?)
-        if (health <= 0) {
-            Debug.Log("BLEGH!!!!");
-            gameObject.SetActive(false);
-        } else {
-            Debug.Log("ow :(");
-        }
-    }
-
     public int GetDamage() {
         return currentAttack.damage;
+    }
+
+    public void StartWindup(float windupDuration) {
+        countdown = windupDuration;
+        GetComponent<SpriteRenderer>().color = Color.red;
+        state = State.windup;
+        currentAttack.SetHitbox(transform, player);
     }
 }
