@@ -48,6 +48,8 @@ public class PlayerControls : MonoBehaviour
 
     Collider2D lastGroundCollision; // need this since OnCollisionExit2D doesn't contain collision info of the exited collision
 
+    public bool stunned = false;
+
     void Start()
     {
         previousPos = transform.position;
@@ -60,6 +62,8 @@ public class PlayerControls : MonoBehaviour
 
     void Update()
     {
+        if (stunned) return;
+
         moveX = Input.GetAxis("Horizontal");
         moveY = Input.GetAxis("Vertical");
 
@@ -199,4 +203,15 @@ public class PlayerControls : MonoBehaviour
         rb.velocity = direction * stdBounceSpeed;
     }
 
+    public void StartStun() {
+        stunned = true;
+        rb.velocity = Vector2.zero;
+        GetComponent<SpriteRenderer>().color = Color.cyan;
+        grapple.StopGrappling(); // todo currently this is causing no grapple animation to play
+    }
+
+    public void FinishStun() {
+        stunned = false;
+        GetComponent<SpriteRenderer>().color = Color.white;
+    }
 }

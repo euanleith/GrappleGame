@@ -118,7 +118,7 @@ public class GrapplingGun : MonoBehaviour
                         springJoint.connectedAnchor = grapplePoint;
                     }
                     if (hit.transform.gameObject.layer == 8) { // todo maybe also only if transform launch?
-                        hit.transform.gameObject.GetComponent<Enemy>().movementController.OnCollisionEnterWithGrapple();
+                        hit.transform.gameObject.GetComponent<Enemy>().OnCollisionEnterWithGrapple();
                     }
                 }
             }
@@ -127,21 +127,21 @@ public class GrapplingGun : MonoBehaviour
 
     void UpdateGrapplePoint() {
         // take into account position & rotation of connectedBody
-            if (springJoint.connectedBody != null) {
-                // position
-                Vector2 relocatedGrapplePoint = springJoint.connectedBody.position + relativeGrapplePoint;
-                // rotation
-                Vector2 centre = springJoint.connectedBody.worldCenterOfMass;
-                float rotation = springJoint.connectedBody.rotation;
-                if (rotation < 0) rotation = 360-(-rotation%360); // convert from pos/neg degrees to just pos
-                rotation = MathF.PI * rotation / 180f; // degrees to radians
-                // calculate point along rotation - https://math.stackexchange.com/questions/3935956/calculate-the-new-position-of-a-point-after-rotating-it-around-another-point-2d
-                grapplePoint.x = ((relocatedGrapplePoint.x - centre.x) * MathF.Cos(rotation)) - ((relocatedGrapplePoint.y - centre.y) * MathF.Sin(rotation)) + centre.x;
-                grapplePoint.y = ((relocatedGrapplePoint.x - centre.x) * MathF.Sin(rotation)) + ((relocatedGrapplePoint.y - centre.y) * MathF.Cos(rotation)) + centre.y;
+        if (springJoint.connectedBody != null) {
+            // position
+            Vector2 relocatedGrapplePoint = springJoint.connectedBody.position + relativeGrapplePoint;
+            // rotation
+            Vector2 centre = springJoint.connectedBody.worldCenterOfMass;
+            float rotation = springJoint.connectedBody.rotation;
+            if (rotation < 0) rotation = 360-(-rotation%360); // convert from pos/neg degrees to just pos
+            rotation = MathF.PI * rotation / 180f; // degrees to radians
+            // calculate point along rotation - https://math.stackexchange.com/questions/3935956/calculate-the-new-position-of-a-point-after-rotating-it-around-another-point-2d
+            grapplePoint.x = ((relocatedGrapplePoint.x - centre.x) * MathF.Cos(rotation)) - ((relocatedGrapplePoint.y - centre.y) * MathF.Sin(rotation)) + centre.x;
+            grapplePoint.y = ((relocatedGrapplePoint.x - centre.x) * MathF.Sin(rotation)) + ((relocatedGrapplePoint.y - centre.y) * MathF.Cos(rotation)) + centre.y;
 
-                // todo not moving along with grapple when rotating :( need to take some stuff from grapple? would be nice if just ran it every frame, but thats not working for some reason... maybe want to set grapple distance to the current, and only allow it to change with user input moving up and down?
-                // works differently for transform than physics??
-            }
+            // todo not moving along with grapple when rotating :( need to take some stuff from grapple? would be nice if just ran it every frame, but thats not working for some reason... maybe want to set grapple distance to the current, and only allow it to change with user input moving up and down?
+            // works differently for transform than physics??
+        }
     }
 
     public void Grapple()
@@ -172,7 +172,7 @@ public class GrapplingGun : MonoBehaviour
         springJoint.enabled = false;
         springJoint.connectedBody = null;
         if (hit.transform.gameObject.layer == 8) {
-            hit.transform.gameObject.GetComponent<Enemy>().movementController.OnCollisionExitWithGrapple();
+            hit.transform.gameObject.GetComponent<Enemy>().OnCollisionExitWithGrapple();
         }
         gunHolder.GetComponent<Rigidbody2D>().gravityScale = 1;
     }

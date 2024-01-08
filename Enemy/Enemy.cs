@@ -18,6 +18,8 @@ public class Enemy : MonoBehaviour
         combatController = GetComponent<CombatController>();
     }
 
+    public virtual void Update() {}
+
     public virtual bool OnHit(int damage) {
         combatController.health -= damage;
         //GetComponent<SpriteRenderer>().color = Color.red;
@@ -30,5 +32,13 @@ public class Enemy : MonoBehaviour
             Debug.Log("ow :(");
             return true;
         }
+    }
+
+    public virtual void OnCollisionEnterWithGrapple() {
+        movementController.OnCollisionEnterWithGrapple();
+    }
+
+    public virtual void OnCollisionExitWithGrapple() {
+        movementController.OnCollisionExitWithGrapple();
     }
 }
