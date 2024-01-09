@@ -114,10 +114,15 @@ public class PlayerCombat : MonoBehaviour
 
     // todo something should happen to player after hitting enemy
     public void OnTriggerEnter2D(Collider2D collider) {
+        if (hit) return; // only hit one object per attack
         switch (collider.gameObject.layer) {
             case 8:
             case 19:
-                collider.gameObject.GetComponentInParent<Enemy>().OnHit(damage);
+                if (!collider.gameObject.GetComponent<EnemyLayer>()) {
+                    collider.gameObject.GetComponentInParent<Enemy>().OnHit(damage);
+                } else {
+                    collider.gameObject.GetComponent<EnemyLayer>().OnHit(damage);
+                }
                 hit = true;
                 break;
             }
