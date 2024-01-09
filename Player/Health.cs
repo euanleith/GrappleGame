@@ -49,11 +49,8 @@ public class Health : MonoBehaviour
             //    enemies.GetChild(i).gameObject.SetActive(true);
             //}
         }
-        if (currentIFrames != maxIFrames) {
+        if (currentIFrames >= 0) {
             currentIFrames -= Time.deltaTime;
-            if (currentIFrames <= 0) {
-                currentIFrames = maxIFrames;
-            }
         }
     }
 
@@ -78,7 +75,7 @@ public class Health : MonoBehaviour
 
     public void GetHit(int damage, Vector2 contactNormal) 
     {
-        if (currentIFrames == maxIFrames) // if not already invincible
+        if (currentIFrames <= 0) // if not already invincible
         {
             if (damage > currentHealth) 
             {
@@ -95,6 +92,7 @@ public class Health : MonoBehaviour
                         .ElementAt(currentHealth)
                         .visible = false;
                 }
+                currentIFrames = maxIFrames;
             }
             
         }
