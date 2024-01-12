@@ -116,13 +116,16 @@ public class PlayerCombat : MonoBehaviour
     public void OnTriggerEnter2D(Collider2D collider) {
         if (hit) return; // only hit one object per attack
         switch (collider.gameObject.layer) {
-            case 8:
-            case 19:
+            case 8: // Enemy
+            case 19: // EnemyTraversable
                 if (!collider.gameObject.GetComponent<EnemyLayer>()) {
                     collider.gameObject.GetComponentInParent<Enemy>().OnHit(damage);
                 } else {
                     collider.gameObject.GetComponent<EnemyLayer>().OnHit(damage);
                 }
+                hit = true;
+                break;
+            case 17: // EnemyInvulnerable
                 hit = true;
                 break;
             }

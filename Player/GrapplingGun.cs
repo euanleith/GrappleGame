@@ -100,9 +100,10 @@ public class GrapplingGun : MonoBehaviour
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
         Vector2 distanceVector = ClampDirection(horizontal, vertical);
-        hit = Physics2D.Raycast(firePoint.position, distanceVector.normalized, Mathf.Infinity, ~ignoreRaycast); // todo is there a way to include telephone wires without them having box colliders? or could just exclude player from collision matrix
+        hit = Physics2D.Raycast(firePoint.position, distanceVector.normalized, Mathf.Infinity, ~ignoreRaycast); // todo is there a way to include telephone wires without them having box colliders? or could just exclude player from collision matrix.
         if (hit)
         {
+            // note that hit.collider is the collided object, where hit.transform is the parent collider object
             if (grapplableLayerNumbers.Contains(hit.transform.gameObject.layer) || grappleToAll)
             {
                 if (Vector2.Distance(hit.point, firePoint.position) <= maxDistance)

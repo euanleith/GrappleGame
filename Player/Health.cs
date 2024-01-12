@@ -59,8 +59,9 @@ public class Health : MonoBehaviour
     void OnCollisionEnter2D(Collision2D collision)
     {
         switch (collision.gameObject.layer) {
-            case 6: // todo "Death" or whatever
+            case 6: // todo "Death" or whatever; make these inspector variables
             case 7:
+            case 15:
                 GetHit(1, Vector2.zero); 
                 Respawn(roomSpawnPoint.position); // respawn at start of room for each platforming death
                 break;

@@ -42,34 +42,41 @@ public class MovementController: MonoBehaviour
     {
         // todo maybe structuring as state machine would be clearer?
         if (currentDecelVelocity != Vector2.zero) {
-            if (!ProcessCollisions(currentDecelVelocity, collisionNormal)) { // todo currently grappling an enemy stops their idle movement, do i want this?
+            if (!isColliding()) { // todo currently grappling an enemy stops their idle movement, do i want this?
                 currentDecelVelocity = SlowDown(currentDecelVelocity, decelerationSpeed);
             } else currentDecelVelocity = Vector2.zero;
         } 
         else if (rb.bodyType == RigidbodyType2D.Kinematic) {
-            if (!ProcessCollisions(currentDecelVelocity, collisionNormal)) { // todo wrong, right now if it collides with the ground itll stop following player
-                // todo ive made a function Attack.Cooldown, move cooldown state check logic to there
-                if (WithinPlayerRange()) {//} && GetComponent<Enemy>().combatController.state != CombatController.State.cooldown) { // todo currently only aggroing when not in cooldown (for shark), do i always want this?
-                    aggroMovement.Move(direction, transform.position, currentDecelVelocity, rb);
-                } else {
-                    direction = idleMovement.Move(direction, transform.position, currentDecelVelocity, rb);
-                }
+            if (WithinPlayerRange()) {//} && GetComponent<Enemy>().combatController.state != CombatController.State.cooldown) { // todo currently only aggroing when not in cooldown (for shark), do i always want this?
+                aggroMovement.Move(direction, transform.position, currentDecelVelocity, rb, collisionNormal);
+            } else {
+                direction = idleMovement.Move(direction, transform.position, currentDecelVelocity, rb, collisionNormal);
             }
         }
     }
 
     public void OnCollisionEnter2D(Collision2D collision) {
-        // todo i want to negate the collision for enemies with a weak spot if player also hits the non-weak spot
+        if (collision.gameObject.layer == 2 || collision.gameObject.layer == 12) return;
         collisionNormal = collision.GetContact(0).normal;
+    }
+
+    public void OnCollisionStay2D(Collision2D collision) {
+        if (collision.gameObject.layer == 2 || collision.gameObject.layer == 12) return;
+        collisionNormal = collision.GetContact(0).normal;
+        //if (collisionNormal.x > 0) rb.MovePosition(new Vector2(collision.transform.position.x - collision.transform.localScale.x/2, rb.position.y));
+        //if (collisionNormal.x < 0) rb.MovePosition(new Vector2(collision.transform.position.x + collision.transform.localScale.x/2, rb.position.y));
+        //if (collisionNormal.y > 0) rb.MovePosition(new Vector2(rb.position.x, collision.transform.position.y - collision.transform.localScale.y/2));
+       // if (collisionNormal.y < 0) rb.MovePosition(new Vector2(rb.position.x, collision.transform.position.y + collision.transform.localScale.y/2));
     }
 
     public void OnCollisionExit2D() {
         collisionNormal = Vector2.zero;
     }
 
+    // todo would it be better to normally be a dynamic rb, then change to kinematic when colliding with player?
+    // todo maybe this should only happen with transform grapple, or at least act differently for each type of grapple
     public void OnCollisionEnterWithGrapple() {
         rb.bodyType = RigidbodyType2D.Dynamic;
-        // todo can i stop the jiggling?
     }
 
     public void OnCollisionExitWithGrapple() {
@@ -101,43 +108,12 @@ public class MovementController: MonoBehaviour
         return currentDecelVelocity + decel;
     }
 
-    // todo name
-    //  todo would it be better to normally be a dynamic rb, then change to kinematic when colliding with player?
-    public bool ProcessCollisions(Vector2 currentDecelVelocity, Vector2 collisionNormal) {
-        // todo should ignore collision with grapple (if i'm not already...)
-        // todo also i might not always want to bounce
-        //  that might be the issue with jittering?
-        //      yep, this is having issues with followplayer - collides so goes up, but follows player so goes back down and collides again. how do other games do this?
-        //          hollowknight's aspid hatchlings move pretty weirdly. they kinda follow the player, but they have a really bad turning cycle so they usually miss. And when they hit a surface they try to bounce back and in the direction of the player, and my guess is since their turn cycle is so bad they're too slow to have my problem
-        //      i might just leave it for now, seems complicated to fix
-        bool colliding = false;
-        if (collisionNormal.x == 1) {
-            direction.x = 1;
-            colliding = true;
-        }
-        if (collisionNormal.x == -1) {
-            direction.x = -1;
-            colliding = true;
-        }
-        // todo top one isn't working??
-        if (collisionNormal.y == 1) {
-            direction.y = 1; 
-            colliding = true;
-        }
-        if (collisionNormal.y == -1) {
-            direction.y = -1;
-            colliding = true;
-        }
-            
-        if (colliding) {
-            // todo currently only using idleMovement.speed, would i ever want to use aggromovement.speed?
-            rb.MovePosition(currentDecelVelocity.normalized * Time.deltaTime + new Vector2(transform.position.x + (idleMovement.speed.x * direction.x * Time.deltaTime), transform.position.y + (idleMovement.speed.y * direction.y * Time.deltaTime)));
-        }
-        return colliding;
-    }
-
     public bool WithinPlayerRange() {
         return Math.Abs(transform.position.x - player.transform.position.x) < aggroRange.x &&
             Math.Abs(transform.position.y - player.transform.position.y) < aggroRange.y;
+    }
+
+    public bool isColliding() {
+        return collisionNormal != Vector2.zero;
     }
 }
