@@ -26,6 +26,7 @@ public class PlayerControls : MonoBehaviour
     public float grappleMoveSpeed = 5f;
     public float grappleMoveSpeedY = 100f;
     public float stdBounceSpeed;
+    public Vector2 knockbackSpeed = new Vector2(1, 2);
 
 
     public float moveX;
@@ -49,6 +50,8 @@ public class PlayerControls : MonoBehaviour
     Collider2D lastGroundCollision; // need this since OnCollisionExit2D doesn't contain collision info of the exited collision
 
     public bool stunned = false;
+    public const float stunDuration = 1f;
+    float stunCnt = 0f;
 
     void Start()
     {
@@ -62,7 +65,10 @@ public class PlayerControls : MonoBehaviour
 
     void Update()
     {
-        if (stunned) return;
+        if (stunCnt > 0) {
+            stunCnt -= Time.deltaTime;
+            return;
+        } else if (stunned) FinishStun();
 
         moveX = Input.GetAxis("Horizontal");
         moveY = Input.GetAxis("Vertical");
@@ -203,15 +209,15 @@ public class PlayerControls : MonoBehaviour
         rb.velocity = direction * stdBounceSpeed;
     }
 
-    public void StartStun() {
-        stunned = true;
-        rb.velocity = Vector2.zero;
-        GetComponent<SpriteRenderer>().color = Color.cyan;
-        grapple.StopGrappling(); // todo currently this is causing no grapple animation to play
-    }
-
     public void FinishStun() {
         stunned = false;
         GetComponent<SpriteRenderer>().color = Color.white;
+    }
+
+    public void Stun(float duration = stunDuration, Vector2 collisionNormal = new Vector2()) {
+        stunCnt = duration;
+        rb.velocity = collisionNormal * knockbackSpeed;
+        GetComponent<SpriteRenderer>().color = Color.cyan;
+        grapple.StopGrappling(); // todo currently this is causing no grapple animation to play
     }
 }

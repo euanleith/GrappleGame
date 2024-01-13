@@ -18,6 +18,8 @@ public class MovementController: MonoBehaviour
     Vector2 currentDecelVelocity;
     Vector2 direction;
     [HideInInspector] public Vector2 startPos;
+    float stunCnt = 0f;
+    public float stunDuration = 1f;
     
     Movement idleMovement;
     Movement aggroMovement;
@@ -41,8 +43,12 @@ public class MovementController: MonoBehaviour
     public void FixedUpdate()
     {
         // todo maybe structuring as state machine would be clearer?
-        if (currentDecelVelocity != Vector2.zero) {
-            if (!isColliding()) { // todo currently grappling an enemy stops their idle movement, do i want this?
+        if (stunCnt > 0) {
+            stunCnt -= Time.deltaTime;
+        }
+        else if (currentDecelVelocity != Vector2.zero) {
+            // todo this should just be isCollidingWithGrapple?
+            if (!isCollidingWithGrapple()) { // todo currently grappling an enemy stops their idle movement, do i want this?
                 currentDecelVelocity = SlowDown(currentDecelVelocity, decelerationSpeed);
             } else currentDecelVelocity = Vector2.zero;
         } 
@@ -56,8 +62,11 @@ public class MovementController: MonoBehaviour
     }
 
     public void OnCollisionEnter2D(Collision2D collision) {
-        if (collision.gameObject.layer == 2 || collision.gameObject.layer == 12) return;
-        collisionNormal = collision.GetContact(0).normal;
+        if (collision.gameObject.layer == 2 || collision.gameObject.layer == 12) {
+            Stun();
+        } else {
+            collisionNormal = collision.GetContact(0).normal;
+        }
     }
 
     public void OnCollisionStay2D(Collision2D collision) {
@@ -82,6 +91,10 @@ public class MovementController: MonoBehaviour
     public void OnCollisionExitWithGrapple() {
         currentDecelVelocity = rb.velocity;
         rb.bodyType = RigidbodyType2D.Kinematic;
+    }
+
+    public bool isCollidingWithGrapple() {
+        return rb.bodyType == RigidbodyType2D.Dynamic;
     }
     
     // todo this is the worst code ive ever written
@@ -115,5 +128,10 @@ public class MovementController: MonoBehaviour
 
     public bool isColliding() {
         return collisionNormal != Vector2.zero;
+    }
+
+    public void Stun() {
+        stunCnt = stunDuration;
+        rb.velocity = Vector2.zero;
     }
 }

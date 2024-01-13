@@ -34,14 +34,11 @@ public class FollowPlayerMovement : Movement
     //  could raycast diagonally from corners of enemy?
     // todo just awful code, everywhere :(
     private bool IsMinDistanceFromSurfaceX(Vector2 position, Rigidbody2D rb) {
-        Debug.Log(gameObject.transform.parent.parent.parent.name);
         RaycastHit2D hit = Physics2D.Raycast(new Vector2(position.x + rb.transform.localScale.x/2, position.y), Vector2.right, minDistanceFromSurface.x + 0.01f, ~layerMask);
-        if (hit) Debug.Log("hit right");
         if (hit && CloseEnough(hit.distance, minDistanceFromSurface.x,0.02f)) return true;
         //if (hit && CloseEnough(hit.point.x - (position.x + rb.transform.localScale.x/2), minDistanceFromSurface.x,0.1f)) return true;
         hit = Physics2D.Raycast(new Vector2(position.x - rb.transform.localScale.x/2, position.y), Vector2.left, minDistanceFromSurface.x + 0.01f, ~layerMask);
         //if (hit) Debug.Log(hit.distance + " " +  minDistanceFromSurface.x);
-        if (hit) Debug.Log("hit left");
         if (hit && CloseEnough(hit.distance, minDistanceFromSurface.x,0.02f)) return true;
         //if (hit && CloseEnough((position.x - rb.transform.localScale.x/2) - hit.point.x, minDistanceFromSurface.x,0.1f)) return true;
         return false;
@@ -69,12 +66,9 @@ public class FollowPlayerMovement : Movement
 
     private bool IsMinDistanceFromSurfaceY(Vector2 position, Rigidbody2D rb) {
         RaycastHit2D hit = Physics2D.Raycast(new Vector2(position.x, position.y), Vector2.down, minDistanceFromSurface.y + 0.01f, ~layerMask);
-        Debug.Log(position.y - rb.transform.localScale.y/2 + " " + hit.point + " " + hit.distance + " " +  minDistanceFromSurface.y);
-        if (hit) Debug.Log("hit down");
         if (hit && CloseEnough(hit.distance, minDistanceFromSurface.y,0.02f)) return true;
         //if (hit && CloseEnough((position.y - rb.transform.localScale.y/2) - hit.point.y, minDistanceFromSurface.y,0.01f)) return true;
         hit = Physics2D.Raycast(new Vector2(position.x, position.y + rb.transform.localScale.y/2), Vector2.up, minDistanceFromSurface.y + 0.01f, ~layerMask);
-        if (hit) Debug.Log("hit up");
         if (hit && CloseEnough(hit.distance, minDistanceFromSurface.y,0.02f)) return true;
         //if (hit && CloseEnough(hit.point.y - (position.y + rb.transform.localScale.y/2), minDistanceFromSurface.y,0.01f)) return true;
         return false;

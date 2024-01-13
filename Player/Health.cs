@@ -58,6 +58,7 @@ public class Health : MonoBehaviour
     // todo here only processes collisions with player (not attack hitboxes), since those are onTrigger
     void OnCollisionEnter2D(Collision2D collision)
     {
+        // todo for each contact?
         switch (collision.gameObject.layer) {
             case 6: // todo "Death" or whatever; make these inspector variables
             case 7:
@@ -65,10 +66,11 @@ public class Health : MonoBehaviour
                 GetHit(1, Vector2.zero); 
                 Respawn(roomSpawnPoint.position); // respawn at start of room for each platforming death
                 break;
-            case 11:
-                GetHit(collision.gameObject.GetComponent<Enemy>().combatController.GetDamage(), new Vector2(0, 1));
-                break;
             case 8:
+                GetHit(collision.gameObject.GetComponent<Enemy>().combatController.GetDamage(), new Vector2(0, 1));
+                GetComponent<PlayerControls>().Stun(collisionNormal: collision.GetContact(0).normal);
+                break;
+            case 11:
                 GetHit(collision.gameObject.GetComponent<Enemy>().combatController.GetDamage(), new Vector2(0, 1));
                 break;
         }
