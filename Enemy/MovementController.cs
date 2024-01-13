@@ -5,7 +5,6 @@ public class MovementController: MonoBehaviour
 {
     // todo everything should stop for a second when you grapple an enemy for impact, and to prepare you to hit them when they fly towards you
     // todo problems when grappling enemies;
-    //  they go of their set path & can clip into the floor - the problem is that their velocity isn't zero? so what do i do about that? set to 0 after a certain time? add a deceleration?
     //  when pulling them towards you, if you hit them and they dont die, you'll get hurt. so need to have bounce back on hit
 
     // todo make these variables of instantiations of movement - will want different e.g. speeds for idle and aggro, and e.g. moverange is specific to pingpong and similar
@@ -42,13 +41,11 @@ public class MovementController: MonoBehaviour
 
     public void FixedUpdate()
     {
-        // todo maybe structuring as state machine would be clearer?
         if (stunCnt > 0) {
             stunCnt -= Time.deltaTime;
         }
         else if (currentDecelVelocity != Vector2.zero) {
-            // todo this should just be isCollidingWithGrapple?
-            if (!isCollidingWithGrapple()) { // todo currently grappling an enemy stops their idle movement, do i want this?
+            if (!isCollidingWithGrapple()) {
                 currentDecelVelocity = SlowDown(currentDecelVelocity, decelerationSpeed);
             } else currentDecelVelocity = Vector2.zero;
         } 
@@ -66,6 +63,8 @@ public class MovementController: MonoBehaviour
             Stun();
         } else {
             collisionNormal = collision.GetContact(0).normal;
+            if (collisionNormal.x != 0) rb.velocity = new Vector2(0, rb.velocity.y);
+            if (collisionNormal.y != 0) rb.velocity = new Vector2(rb.velocity.x, 0);
         }
     }
 
