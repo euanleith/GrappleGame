@@ -41,7 +41,6 @@ public class MovementController: MonoBehaviour
         currentMovement = idleMovement;
     }
 
-    // test
     public void FixedUpdate()
     {
         if (WithinPlayerRange()) currentMovement = aggroMovement;
