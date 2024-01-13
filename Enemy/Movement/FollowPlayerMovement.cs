@@ -84,4 +84,11 @@ public class FollowPlayerMovement : Movement
     bool CloseEnough(float f1, float f2, float maxDif) {
         return Mathf.Abs(f2 - f1) <= maxDif;
     }
+
+    public override void OnCollision(Collision2D collision, Rigidbody2D rb) {
+        Vector2 normal = collision.GetContact(0).normal;
+        if (normal.y == 0) normal.y = 1; 
+        if (normal.x == 0) normal.x = 1;
+        rb.velocity = normal * speed;
+    }
 }

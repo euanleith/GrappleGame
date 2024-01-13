@@ -41,4 +41,12 @@ public class PingPongMovement : Movement
         // or i can use 'ref direction'
         //  and with this gone, can return the movement vector, helping with isolation and meaning don't have to have rb as a parameter
     }
+
+    // todo make everything here return velocities for rb instead of taking it in as parameter
+    public override void OnCollision(Collision2D collision, Rigidbody2D rb) {
+        Vector2 normal = collision.GetContact(0).normal;
+        if (normal.y == 0) normal.y = 1; 
+        if (normal.x == 0) normal.x = 1;
+        rb.velocity = normal * speed;
+    }
 }

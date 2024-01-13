@@ -22,6 +22,7 @@ public class MovementController: MonoBehaviour
     
     Movement idleMovement;
     Movement aggroMovement;
+    Movement currentMovement;
     Transform transform;
     Transform player;
     Rigidbody2D rb;
@@ -37,10 +38,14 @@ public class MovementController: MonoBehaviour
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
         idleMovement = GetComponent<Enemy>().idleMovement;
         aggroMovement = GetComponent<Enemy>().aggroMovement;
+        currentMovement = idleMovement;
     }
 
     public void FixedUpdate()
     {
+        if (WithinPlayerRange()) currentMovement = aggroMovement;
+        else currentMovement = idleMovement;
+
         if (stunCnt > 0) {
             stunCnt -= Time.deltaTime;
         }
@@ -50,17 +55,14 @@ public class MovementController: MonoBehaviour
             } else currentDecelVelocity = Vector2.zero;
         } 
         else if (rb.bodyType == RigidbodyType2D.Kinematic) {
-            if (WithinPlayerRange()) {//} && GetComponent<Enemy>().combatController.state != CombatController.State.cooldown) { // todo currently only aggroing when not in cooldown (for shark), do i always want this?
-                aggroMovement.Move(direction, transform.position, currentDecelVelocity, rb, collisionNormal);
-            } else {
-                direction = idleMovement.Move(direction, transform.position, currentDecelVelocity, rb, collisionNormal);
-            }
+            direction = currentMovement.Move(direction, transform.position, currentDecelVelocity, rb, collisionNormal);
         }
     }
 
     public void OnCollisionEnter2D(Collision2D collision) {
         if (collision.gameObject.layer == 2 || collision.gameObject.layer == 12) {
             Stun();
+            currentMovement.OnCollision(collision, rb);
         } else {
             collisionNormal = collision.GetContact(0).normal;
             if (collisionNormal.x != 0) rb.velocity = new Vector2(0, rb.velocity.y);
