@@ -70,6 +70,11 @@ public class MovementController: MonoBehaviour
         }
     }
 
+    public void OnTriggerEnter2D(Collider2D collider) {
+        Stun();
+        currentMovement.OnHit(collider, rb);
+    }
+
     public void OnCollisionStay2D(Collision2D collision) {
         if (collision.gameObject.layer == 2 || collision.gameObject.layer == 12) return;
         collisionNormal = collision.GetContact(0).normal;

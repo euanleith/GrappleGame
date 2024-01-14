@@ -63,9 +63,7 @@ public class CombatController : MonoBehaviour
                 } 
                 else
                 {
-                    countdown = currentAttack.cooldownDuration;
-                    currentAttack.Stop();
-                    state = State.cooldown;
+                    StopAttacking();
                 }
                 break;
             case State.windup:
@@ -94,5 +92,17 @@ public class CombatController : MonoBehaviour
         GetComponent<SpriteRenderer>().color = Color.red;
         state = State.windup;
         currentAttack.SetHitbox(transform, player);
+    }
+
+    public void OnCollisionEnter2D(Collision2D collision) {
+        if (collision.gameObject.layer == 2 || collision.gameObject.layer == 12) {
+            StopAttacking();
+        }
+    }
+
+    public void StopAttacking() {
+        countdown = currentAttack.cooldownDuration;
+        currentAttack.Stop();
+        state = State.cooldown;
     }
 }

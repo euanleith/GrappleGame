@@ -49,4 +49,11 @@ public class PingPongMovement : Movement
         if (normal.x == 0) normal.x = 1;
         rb.velocity = normal * speed;
     }
+
+    public override void OnHit(Collider2D collider, Rigidbody2D rb) {
+        Vector2 relativePosition = Vector2.zero;
+        relativePosition.x = collider.transform.position.x > rb.transform.position.x ? -1 : 1;
+        relativePosition.y = collider.transform.position.y > rb.transform.position.y ? -1 : 1;
+        rb.velocity = relativePosition * speed;
+    }
 }

@@ -65,7 +65,7 @@ public class PlayerControls : MonoBehaviour
 
     void Update()
     {
-        if (stunCnt > 0) {
+        if (stunCnt >= 0) {
             stunCnt -= Time.deltaTime;
             return;
         } else if (stunned) FinishStun();
@@ -215,6 +215,7 @@ public class PlayerControls : MonoBehaviour
     }
 
     public void Stun(float duration = stunDuration, Vector2 collisionNormal = new Vector2()) {
+        stunned = true;
         stunCnt = duration;
         rb.velocity = collisionNormal * knockbackSpeed;
         GetComponent<SpriteRenderer>().color = Color.cyan;
