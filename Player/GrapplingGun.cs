@@ -81,8 +81,10 @@ public class GrapplingGun : MonoBehaviour
         if (Input.GetButtonDown("Fire2") && canTransformGrapple)
         {
             SetGrapplePoint();
-            canTransformGrapple = false; // todo this is being reset if player grapples while grounded
-            gunHolder.gameObject.GetComponent<SpriteRenderer>().color = Color.yellow;
+            if (!GetComponent<PlayerControls>().isGrounded) {
+                canTransformGrapple = false;
+                gunHolder.gameObject.GetComponent<SpriteRenderer>().color = Color.yellow;
+            }
         }
         if ((Input.GetButton("Fire1") || Input.GetButton("Fire2")) && springJoint.enabled)
         {

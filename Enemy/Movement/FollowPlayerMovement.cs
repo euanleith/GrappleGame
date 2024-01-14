@@ -96,7 +96,6 @@ public class FollowPlayerMovement : Movement
         Vector2 relativePosition = Vector2.zero;
         relativePosition.x = collider.transform.position.x > rb.transform.position.x ? -1 : 1;
         relativePosition.y = collider.transform.position.y > rb.transform.position.y ? -1 : 1;
-        Debug.Log(relativePosition);
         rb.velocity = relativePosition * speed;
     }
 }
