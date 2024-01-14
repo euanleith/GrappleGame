@@ -10,13 +10,15 @@ public class MovementController: MonoBehaviour
     public Vector2 moveRange = new Vector2(3, 0); // todo move this to pingpongmovement
     public Vector2 aggroRange = new Vector2(7, 3);
     public float decelerationSpeed = 1;
+    public float stunDuration = 1f;
     
     [HideInInspector] public Vector2 collisionNormal;
     Vector2 currentDecelVelocity;
-    Vector2 direction;
+    [HideInInspector] public Vector2 direction;
     [HideInInspector] public Vector2 startPos;
     float stunCnt = 0f;
-    public float stunDuration = 1f;
+    bool stunned = false;
+    Vector2 prevPosition;
     
     Movement idleMovement;
     Movement aggroMovement;
@@ -44,9 +46,11 @@ public class MovementController: MonoBehaviour
         if (WithinPlayerRange()) currentMovement = aggroMovement;
         else currentMovement = idleMovement;
 
-        if (stunCnt > 0) {
+
+        if (stunCnt >= 0) {
             stunCnt -= Time.deltaTime;
-        }
+        } 
+        else if (stunned) FinishStun();
         else if (currentDecelVelocity != Vector2.zero) {
             if (!isCollidingWithGrapple()) {
                 currentDecelVelocity = SlowDown(currentDecelVelocity, decelerationSpeed);
@@ -54,7 +58,14 @@ public class MovementController: MonoBehaviour
         } 
         else if (rb.bodyType == RigidbodyType2D.Kinematic) {
             rb.MovePosition(currentMovement.Move(ref direction, transform, currentDecelVelocity, collisionNormal));
+            // todo would be nice if this was in Enemy instead
+            if (GetComponent<Enemy>().combatController.state == CombatController.State.idle ||
+                GetComponent<Enemy>().combatController.state == CombatController.State.cooldown) {
+                    float newScale = prevPosition.x < transform.position.x ? 1 : -1; // todo can i not use direction?
+                    transform.localScale = new Vector2(newScale, transform.localScale.y);
+            }
         }
+        prevPosition = rb.position;
     }
 
     public void OnCollisionEnter2D(Collision2D collision) {
@@ -135,7 +146,13 @@ public class MovementController: MonoBehaviour
     }
 
     public void Stun() {
+        stunned = true;
         stunCnt = stunDuration;
         rb.velocity = Vector2.zero; // todo remove this since velocity is set in movement.oncollision/onhit?
+    }
+
+    public void FinishStun() {
+        stunned = false;
+        rb.velocity = Vector2.zero;
     }
 }

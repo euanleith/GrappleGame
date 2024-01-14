@@ -13,11 +13,12 @@ public class FollowPlayerMovement : Movement
 
     public void Start() {
         player = GetComponentInParent<Enemy>().player;
-        layerMask = 1 << 8; // Enemy
+        layerMask = (1 << 8) & (1 << 17); // Enemy & EnemyInvulnerable todo add variable to inspector
     }
 
     public override Vector2 Move(ref Vector2 direction, Transform transform, Vector2 currentDecelVelocity, Vector2 collisionNormal) 
     {
+        
         Vector2 newVel = Vector2.zero;
         if (IsMinDistanceFromSurfaceX(transform.position, transform)) newVel.x = 0;
         else if (transform.position.x < player.position.x - maxDistanceFromPlayer.x) newVel.x = speed.x;
@@ -25,8 +26,8 @@ public class FollowPlayerMovement : Movement
         if (IsMinDistanceFromSurfaceY(transform.position, transform)) newVel.y = 0;
         else if (transform.position.y < player.position.y - maxDistanceFromPlayer.y - plsStopWiggling) newVel.y = speed.y;
         else if (transform.position.y > player.position.y + maxDistanceFromPlayer.y + plsStopWiggling) newVel.y = -speed.y;
-        return new Vector2(transform.position.x + newVel.x * Time.deltaTime, transform.position.y + newVel.y * Time.deltaTime); // todo this is probably being overwritten
-        //rb.position = new Vector2(position.x + newVel.x * Time.deltaTime, position.y + newVel.y * Time.deltaTime);
+        direction = newVel;
+        return new Vector2(transform.position.x + newVel.x * Time.deltaTime, transform.position.y + newVel.y * Time.deltaTime);
     }
     
     // todo raycast doesnt work on corners, might be better (and faster) to iterate through the platforms in the room and check distance

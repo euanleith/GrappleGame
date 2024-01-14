@@ -19,13 +19,14 @@ public abstract class Attack : MonoBehaviour
 	public virtual void Start() {
 	}
 
+	// todo clean up
 	public virtual void SetHitbox(Transform enemy, Transform player) {
 		float angle = GetAngle(enemy.position, player.transform.position);
 		switch (angle) {
 			case var _ when (angle > -135 && angle <= -45 && leftHitbox != null ||
 							angle > -180 && angle <= 0 && upHitbox == null && downHitbox == null ||
 							rightHitbox == null && upHitbox == null && downHitbox == null):
-				currentHitbox = leftHitbox;
+				currentHitbox = rightHitbox;
 				break;
 			case var _ when (angle > 45 && angle <= 135 && rightHitbox != null ||
 							angle > 0 && angle <= 180 && upHitbox == null && downHitbox == null):

@@ -30,6 +30,7 @@ public class RushAttack: Attack
     }
 
     public override bool IsFinished() {
+        if (movementController.collisionNormal != Vector2.zero) Debug.Log("finished");
         return movementController.collisionNormal != Vector2.zero;
     }
 }
