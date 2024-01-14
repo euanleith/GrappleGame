@@ -4,8 +4,6 @@ using UnityEngine;
 public class MovementController: MonoBehaviour
 {
     // todo everything should stop for a second when you grapple an enemy for impact, and to prepare you to hit them when they fly towards you
-    // todo problems when grappling enemies;
-    //  when pulling them towards you, if you hit them and they dont die, you'll get hurt. so need to have bounce back on hit
 
     // todo make these variables of instantiations of movement - will want different e.g. speeds for idle and aggro, and e.g. moverange is specific to pingpong and similar
     
@@ -55,14 +53,14 @@ public class MovementController: MonoBehaviour
             } else currentDecelVelocity = Vector2.zero;
         } 
         else if (rb.bodyType == RigidbodyType2D.Kinematic) {
-            direction = currentMovement.Move(direction, transform.position, currentDecelVelocity, rb, collisionNormal);
+            rb.MovePosition(currentMovement.Move(ref direction, transform, currentDecelVelocity, collisionNormal));
         }
     }
 
     public void OnCollisionEnter2D(Collision2D collision) {
         if (collision.gameObject.layer == 2 || collision.gameObject.layer == 12) {
             Stun();
-            currentMovement.OnCollision(collision, rb);
+            rb.velocity = currentMovement.OnCollision(collision);
         } else {
             collisionNormal = collision.GetContact(0).normal;
             if (collisionNormal.x != 0) rb.velocity = new Vector2(0, rb.velocity.y);
@@ -72,7 +70,7 @@ public class MovementController: MonoBehaviour
 
     public void OnTriggerEnter2D(Collider2D collider) {
         Stun();
-        currentMovement.OnHit(collider, rb);
+        rb.velocity = currentMovement.OnHit(collider, transform);
     }
 
     public void OnCollisionStay2D(Collision2D collision) {
@@ -138,6 +136,6 @@ public class MovementController: MonoBehaviour
 
     public void Stun() {
         stunCnt = stunDuration;
-        rb.velocity = Vector2.zero;
+        rb.velocity = Vector2.zero; // todo remove this since velocity is set in movement.oncollision/onhit?
     }
 }

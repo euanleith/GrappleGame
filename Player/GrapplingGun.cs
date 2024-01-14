@@ -81,7 +81,7 @@ public class GrapplingGun : MonoBehaviour
         if (Input.GetButtonDown("Fire2") && canTransformGrapple)
         {
             SetGrapplePoint();
-            if (!GetComponent<PlayerControls>().isGrounded) {
+            if (!GetComponentInParent<PlayerControls>().isGrounded) {
                 canTransformGrapple = false;
                 gunHolder.gameObject.GetComponent<SpriteRenderer>().color = Color.yellow;
             }
