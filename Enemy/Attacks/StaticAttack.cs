@@ -4,15 +4,19 @@ using UnityEngine;
 
 public class StaticAttack : Attack
 {
-    public Rigidbody2D rb;
-    public float aggroWindupDuration = 0.2f;
+    Rigidbody2D rb;
+
+    public void Start() {
+        base.Start();
+    }
 
     public override void Windup() {
-        rb.position = rb.position;
+        rb.MovePosition(rb.transform.position);
     }
 
     public override void KeepAttacking() {
-        rb.position = rb.position;
+        rb.MovePosition(rb.transform.position);
+    
     }
 
     public override bool IsFinished() {

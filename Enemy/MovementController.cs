@@ -20,31 +20,28 @@ public class MovementController: MonoBehaviour
     bool stunned = false;
     Vector2 prevPosition;
     
-    Movement idleMovement;
-    Movement aggroMovement;
     Movement currentMovement;
     Transform transform;
-    Transform player;
     Rigidbody2D rb;
+    CombatController combatController;
+    Enemy enemy;
 
     public void Start() {
         transform = gameObject.transform;        
         startPos = transform.position;
-        player = GetComponent<Enemy>().player;
         direction = new Vector2(1, 1);
         rb = GetComponent<Rigidbody2D>();
         rb.bodyType = RigidbodyType2D.Kinematic;
         rb.useFullKinematicContacts = true;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
-        idleMovement = GetComponent<Enemy>().idleMovement;
-        aggroMovement = GetComponent<Enemy>().aggroMovement;
-        currentMovement = idleMovement;
+        enemy = GetComponent<Enemy>();
+        currentMovement = enemy.idleMovement;
     }
 
     public void FixedUpdate()
     {
-        if (WithinPlayerRange()) currentMovement = aggroMovement;
-        else currentMovement = idleMovement;
+        if (WithinPlayerRange()) currentMovement = enemy.aggroMovement;
+        else currentMovement = enemy.idleMovement;
 
 
         if (stunCnt >= 0) {
@@ -57,10 +54,11 @@ public class MovementController: MonoBehaviour
             } else currentDecelVelocity = Vector2.zero;
         } 
         else if (rb.bodyType == RigidbodyType2D.Kinematic) {
-            rb.MovePosition(currentMovement.Move(ref direction, transform, currentDecelVelocity, collisionNormal));
-            // todo would be nice if this was in Enemy instead
-            if (GetComponent<Enemy>().combatController.state == CombatController.State.idle ||
-                GetComponent<Enemy>().combatController.state == CombatController.State.cooldown) {
+            if (enemy.combatController.state == CombatController.State.idle || 
+                enemy.combatController.state == CombatController.State.cooldown) {
+                    if (enemy.combatController.state == CombatController.State.idle) {
+                        Move();
+                    }
                     float newScale = prevPosition.x < transform.position.x ? 1 : -1; // todo can i not use direction?
                     transform.localScale = new Vector2(newScale, transform.localScale.y);
             }
@@ -137,8 +135,8 @@ public class MovementController: MonoBehaviour
     }
 
     public bool WithinPlayerRange() {
-        return Math.Abs(transform.position.x - player.transform.position.x) < aggroRange.x &&
-            Math.Abs(transform.position.y - player.transform.position.y) < aggroRange.y;
+        return Math.Abs(transform.position.x - enemy.player.transform.position.x) < aggroRange.x &&
+            Math.Abs(transform.position.y - enemy.player.transform.position.y) < aggroRange.y;
     }
 
     public bool isColliding() {
@@ -154,5 +152,9 @@ public class MovementController: MonoBehaviour
     public void FinishStun() {
         stunned = false;
         rb.velocity = Vector2.zero;
+    }
+
+    public void Move() {
+        rb.MovePosition(currentMovement.Move(ref direction, transform, currentDecelVelocity, collisionNormal));
     }
 }

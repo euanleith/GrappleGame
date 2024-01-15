@@ -13,10 +13,12 @@ public abstract class Attack : MonoBehaviour
 	public Transform upHitbox;
 	public Transform downHitbox;
     [HideInInspector] public Transform currentHitbox;
-
-	[HideInInspector] public bool createdProgramatically = false;
+    protected MovementController movementController;
+	protected Rigidbody2D rb;
 
 	public virtual void Start() {
+		this.movementController = GetComponentInParent<MovementController>();
+		this.rb = GetComponentInParent<Rigidbody2D>();
 	}
 
 	// todo clean up
@@ -26,7 +28,7 @@ public abstract class Attack : MonoBehaviour
 			case var _ when (angle > -135 && angle <= -45 && leftHitbox != null ||
 							angle > -180 && angle <= 0 && upHitbox == null && downHitbox == null ||
 							rightHitbox == null && upHitbox == null && downHitbox == null):
-				currentHitbox = rightHitbox;
+				currentHitbox = rightHitbox; // todo rename to horizontalHitbox or something
 				break;
 			case var _ when (angle > 45 && angle <= 135 && rightHitbox != null ||
 							angle > 0 && angle <= 180 && upHitbox == null && downHitbox == null):
@@ -43,7 +45,9 @@ public abstract class Attack : MonoBehaviour
 		}
 	}
 
-	public virtual void Windup() {}
+	public virtual void Windup() {
+		movementController.Move();
+	}
 
 	public virtual void StartAttacking() {
 		currentHitbox.GetComponent<SpriteRenderer>().enabled = true;
@@ -62,7 +66,9 @@ public abstract class Attack : MonoBehaviour
         currentHitbox.GetComponent<Animator>().StopPlayback();
 	}
 
-	public virtual void Cooldown() {}
+	public virtual void Cooldown() {
+		movementController.Move();
+	}
 
 	private float GetAngle(Vector2 pos1, Vector2 pos2) {
 		return Mathf.Atan2(pos2.x - pos1.x, pos2.y - pos1.y) * Mathf.Rad2Deg;
