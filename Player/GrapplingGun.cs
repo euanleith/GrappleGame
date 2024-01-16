@@ -215,4 +215,9 @@ public class GrapplingGun : MonoBehaviour
         canTransformGrapple = true;
         gunHolder.gameObject.GetComponent<SpriteRenderer>().color = Color.white;
     }
+
+    public void OnJump() {
+        canTransformGrapple = true;
+        gunHolder.gameObject.GetComponent<SpriteRenderer>().color = Color.white;
+    }
 }

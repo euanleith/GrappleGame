@@ -18,15 +18,10 @@ public class RushAttack: Attack
     }
 
     public override void KeepAttacking() {
-        // todo im not sure how to move without changing rb.transform.position, because otherwise it gets overwritten by movementcontroller
-        //  is there a way for me to communicate with movementcontroller from here? could have global variable here and and in enemycombat, which enemy accesses each frame and sends to movementcontroller
-        //  thats probably better and ill do it, but im leaving this for now since its easier
-        // maybe i can add an AddMovement function to movementController?
         rb.MovePosition(rb.transform.position+new Vector3(rushSpeed*direction*Time.deltaTime,0,0));
     }
 
     public override bool IsFinished() {
-        if (movementController.collisionNormal != Vector2.zero) Debug.Log("finished");
         return movementController.collisionNormal != Vector2.zero;
     }
 }

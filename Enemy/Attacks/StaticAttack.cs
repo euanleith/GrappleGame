@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class StaticAttack : Attack
 {
-    Rigidbody2D rb;
+    public float aggroWindupDuration = 0.2f;
 
     public void Start() {
         base.Start();
@@ -16,7 +16,6 @@ public class StaticAttack : Attack
 
     public override void KeepAttacking() {
         rb.MovePosition(rb.transform.position);
-    
     }
 
     public override bool IsFinished() {

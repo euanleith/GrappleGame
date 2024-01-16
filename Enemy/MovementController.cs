@@ -40,7 +40,7 @@ public class MovementController: MonoBehaviour
 
     public void FixedUpdate()
     {
-        if (WithinPlayerRange()) currentMovement = enemy.aggroMovement;
+        if (WithinPlayerRange() && enemy.aggroMovement != null) currentMovement = enemy.aggroMovement;
         else currentMovement = enemy.idleMovement;
 
 

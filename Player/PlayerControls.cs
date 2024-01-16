@@ -181,6 +181,7 @@ public class PlayerControls : MonoBehaviour
     }
 
     public void Jump() {
+        grapple.OnJump(); // todo note setting canTransformGrapple=true when doing any jump
         isGrounded = false;
         // todo theres a better way than if else / switch
         float velocityX = 0f;
