@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class CombatController : MonoBehaviour
 {
-    public int health = 1;
+    public int totalHealth = 1;
+    public int health;
     public enum State
     {
         windup,
@@ -22,11 +23,19 @@ public class CombatController : MonoBehaviour
     [HideInInspector] public Attack currentAttack; // todo could be int index to save a bit of space
     
     public void Start() {
-        state = State.cooldown;
+        InitObjects();
+        InitValues();
+    }
+
+    public void Reset() {
+        InitObjects();
+        InitValues();
+    }
+
+    public void InitObjects() {
         transform = gameObject.transform;
         player = GetComponent<Enemy>().player;
         attacks = GetComponent<Enemy>().attacks;
-        currentAttack = attacks[0]; 
         // todo add functionality for multiple attacks. might need DecideAttack() in Enemy, since deciding which attack to use might not be general to all enemies
         //  another option could be to have a CanAttack function in each attack which runs on cooldown instead if checking if within minAttackRange. Then if one attack CanAttack, that becomes the currentAttack. Otherwise if there's multiple, choose randomly between them?
         //      although sometimes i might want to prioritise one attack over another... i guess i could add a priority int to each Attack, but ew. 
@@ -35,6 +44,15 @@ public class CombatController : MonoBehaviour
         //      i still could have subclasses of Enemy, i just want to avoid it if i can, since every other element of each enemy type is defined in the editor
         //          i guess i could also have a separate attack decider class, which is either random, or defined by me in the editor using the existing attacks
         //  how do other games do it?
+    }
+
+    public void InitValues() {
+        health = totalHealth;
+        currentAttack = attacks[0];
+        if (state == State.attacking) {
+            StopAttacking();
+        }
+        state = State.idle;
     }
 
 

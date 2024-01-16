@@ -19,6 +19,7 @@ public abstract class Attack : MonoBehaviour
 	public virtual void Start() {
 		this.movementController = GetComponentInParent<MovementController>();
 		this.rb = GetComponentInParent<Rigidbody2D>();
+		currentHitbox = rightHitbox;
 	}
 
 	// todo clean up
@@ -61,6 +62,7 @@ public abstract class Attack : MonoBehaviour
 
 	// todo rename finish
 	public virtual void Stop() {
+		if (!currentHitbox) Debug.Log(gameObject.transform.parent.parent.name);
 		currentHitbox.GetComponent<SpriteRenderer>().enabled = false;
         currentHitbox.GetComponent<BoxCollider2D>().enabled = false;
         currentHitbox.GetComponent<Animator>().StopPlayback();

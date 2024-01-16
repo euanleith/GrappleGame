@@ -34,6 +34,12 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    public virtual void Reset() {
+        gameObject.SetActive(true);
+        movementController.Reset();
+        combatController.Reset();
+    }
+
     public virtual void OnCollisionEnterWithGrapple() {
         movementController.OnCollisionEnterWithGrapple();
     }

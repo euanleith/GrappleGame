@@ -27,14 +27,30 @@ public class MovementController: MonoBehaviour
     Enemy enemy;
 
     public void Start() {
-        transform = gameObject.transform;        
-        startPos = transform.position;
-        direction = new Vector2(1, 1);
+        InitObjects();
+        startPos = transform.position;  
+        InitValues();
+    }
+
+    public void Reset() {
+        InitObjects();
+        InitValues();
+    }
+
+    public void InitObjects() {
+        transform = gameObject.transform;
         rb = GetComponent<Rigidbody2D>();
-        rb.bodyType = RigidbodyType2D.Kinematic;
         rb.useFullKinematicContacts = true;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
         enemy = GetComponent<Enemy>();
+    }
+
+    public void InitValues() {
+        transform.position = startPos;
+        rb.bodyType = RigidbodyType2D.Kinematic;
+        stunned = false;
+        stunCnt = 0f;
+        direction = new Vector2(1, 1);
         currentMovement = enemy.idleMovement;
     }
 

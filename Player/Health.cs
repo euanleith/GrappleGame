@@ -35,20 +35,6 @@ public class Health : MonoBehaviour
 
     void Update()
     {
-        if (currentHealth <= 0) {
-            // respawning when at 0 health (from combat / platforming)
-            Respawn(spawnPoint.position);
-            ResetCamera();
-            currentHealth = maxHealth;
-            foreach (VisualElement heart in ui.rootVisualElement.ElementAt(0).Children()) {
-                heart.visible = true;
-            }
-            // todo add this back after adding room logic to enemies
-            //for (int i = 0; i < enemies.childCount; i++) 
-            //{
-            //    enemies.GetChild(i).gameObject.SetActive(true);
-            //}
-        }
         if (currentIFrames >= 0) {
             currentIFrames -= Time.deltaTime;
         }
@@ -64,7 +50,7 @@ public class Health : MonoBehaviour
             case 7:
             case 15:
                 GetHit(1, Vector2.zero); 
-                Respawn(roomSpawnPoint.position); // respawn at start of room for each platforming death
+                ResetRoom(roomSpawnPoint); // respawn at start of room for each platforming death
                 break;
             case 8:
                 GetHit(collision.gameObject.GetComponent<Enemy>().combatController.GetDamage(), new Vector2(0, 1));
@@ -82,7 +68,8 @@ public class Health : MonoBehaviour
         {
             if (damage > currentHealth) 
             {
-                currentHealth = 0;
+                Respawn();
+                
             }
             else 
             {
@@ -109,9 +96,25 @@ public class Health : MonoBehaviour
         roomSpawnPoint = spawnPoint;
     }
 
-    void Respawn(Vector2 position) {
-        rb.position = position;
+    void ResetRoom(Transform spawn) {
+        rb.position = spawn.position;
         rb.velocity = new Vector2(0, 0);
         grapple.grappleRope.enabled = false;
+        Transform enemies = spawn.parent.parent.parent.Find("Enemies"); // todo there's probably a better way to get enemies in current room. maybe after adding 'only load enemies in current room'? should just have a currentRoomEnemies variable? But how would I get that? Should I have a Room object? That might also make setting up new player spawns in editor easier
+        foreach (Transform enemy in enemies) {
+            if (enemy.gameObject.activeSelf) {
+                Transform controller = enemy.Find("Controller");
+                controller.GetComponent<Enemy>().Reset();
+            }
+        }
+    }
+
+    void Respawn() {
+        ResetRoom(spawnPoint);
+        ResetCamera();
+        currentHealth = maxHealth;
+        foreach (VisualElement heart in ui.rootVisualElement.ElementAt(0).Children()) {
+            heart.visible = true;
+        }
     }
 }
