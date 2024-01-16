@@ -15,21 +15,18 @@ public class Health : MonoBehaviour
     public int currentHealth;
     public float maxIFrames;
     public float currentIFrames;
-    public Transform spawnPoint;
-    public Transform roomSpawnPoint;
-    public Transform spawnMinPos;
-    public Transform spawnMaxPos;
-    public Transform enemies; // todo might need to split by room/level
+    public Room spawnRoom;
+    public Room room;
+    public Transform enemies; // todo might need to split by room/level // todo can now get this from room
 
     void Start()
     {
         currentHealth = maxHealth;   
         currentIFrames = maxIFrames;
         CameraControls cameraControls = camera.GetComponent<CameraControls>();
-        spawnMinPos = cameraControls.minPos;
-        spawnMaxPos = cameraControls.maxPos;
-        roomSpawnPoint = spawnPoint;
-        rb.position = spawnPoint.position;
+        room = cameraControls.room;
+        spawnRoom = room;
+        rb.position = room.spawn;
         // todo set spawn point & bounds from camera
     }
 
@@ -50,7 +47,7 @@ public class Health : MonoBehaviour
             case 7:
             case 15:
                 GetHit(1, Vector2.zero); 
-                ResetRoom(roomSpawnPoint); // respawn at start of room for each platforming death
+                ResetRoom(room); // respawn at start of room for each platforming death
                 break;
             case 8:
                 GetHit(collision.gameObject.GetComponent<Enemy>().combatController.GetDamage(), new Vector2(0, 1));
@@ -91,26 +88,22 @@ public class Health : MonoBehaviour
     void ResetCamera()
     {
         CameraControls camControls = Camera.main.gameObject.GetComponent<CameraControls>();
-        camControls.minPos = spawnMinPos;
-        camControls.maxPos = spawnMaxPos;
-        roomSpawnPoint = spawnPoint;
+        camControls.room = room;
     }
 
-    void ResetRoom(Transform spawn) {
-        rb.position = spawn.position;
+    void ResetRoom(Room room) {
+        rb.position = room.spawn; // todo maybe tp camera instead of making it lerp? // todo this should call a function in camera
         rb.velocity = new Vector2(0, 0);
         grapple.grappleRope.enabled = false;
-        Transform enemies = spawn.parent.parent.parent.Find("Enemies"); // todo there's probably a better way to get enemies in current room. maybe after adding 'only load enemies in current room'? should just have a currentRoomEnemies variable? But how would I get that? Should I have a Room object? That might also make setting up new player spawns in editor easier
-        foreach (Transform enemy in enemies) {
+        foreach (Enemy enemy in room.enemies) {
             if (enemy.gameObject.activeSelf) {
-                Transform controller = enemy.Find("Controller");
-                controller.GetComponent<Enemy>().Reset();
+                enemy.Reset();
             }
         }
     }
 
     void Respawn() {
-        ResetRoom(spawnPoint);
+        ResetRoom(spawnRoom);
         ResetCamera();
         currentHealth = maxHealth;
         foreach (VisualElement heart in ui.rootVisualElement.ElementAt(0).Children()) {

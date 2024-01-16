@@ -5,7 +5,7 @@ public class CameraControls : MonoBehaviour
 {
     public Transform player;
     public float smoothSpeed;
-    public Transform minPos, maxPos;
+    public Room room;
     public new Camera camera;
     private float height, width;
     public float offset;
@@ -15,6 +15,7 @@ public class CameraControls : MonoBehaviour
         height = 2f * camera.orthographicSize;
         width = height * camera.aspect;
         Move(false);
+        room.Enable();
     }
 
     void Update()
@@ -30,11 +31,10 @@ public class CameraControls : MonoBehaviour
 
     void Move(bool lerp = true) {
         Vector3 targetPos = player.position;
-
         Vector3 camBounds = new Vector3(
-            Mathf.Clamp(targetPos.x, minPos.position.x + (width / 2), maxPos.position.x - (width / 2)),
-            Mathf.Clamp(targetPos.y, minPos.position.y + (height / 2), maxPos.position.y - (height / 2)),
-            Mathf.Clamp(targetPos.z, minPos.position.z, maxPos.position.z)
+            Mathf.Clamp(targetPos.x, room.minPos.x + (width / 2), room.maxPos.x - (width / 2)),
+            Mathf.Clamp(targetPos.y, room.minPos.y + (height / 2), room.maxPos.y - (height / 2)),
+            0
         );
 
         Vector3 newPos = lerp ? Vector3.Lerp(transform.position, camBounds, smoothSpeed) : camBounds;

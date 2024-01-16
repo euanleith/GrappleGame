@@ -26,12 +26,16 @@ public class Enemy : MonoBehaviour
         // todo get hit animation, and maybe bounce backwards too, and stun both them and player (maybe stun instead of hurt player, or maybe it depends on the enemy?)
         if (combatController.health <= 0) {
             Debug.Log("BLEGH!!!!");
-            gameObject.SetActive(false);
+            Disable();
             return false;
         } else {
             Debug.Log("ow :(");
             return true;
         }
+    }
+
+    public virtual void Disable() {
+        gameObject.SetActive(false);
     }
 
     public virtual void Reset() {
