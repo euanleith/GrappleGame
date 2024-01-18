@@ -40,7 +40,9 @@ public class Enemy : MonoBehaviour
 
     public virtual void Reset() {
         gameObject.SetActive(true);
+        Debug.Log(-1);
         movementController.Reset();
+        Debug.Log(0);
         combatController.Reset();
     }
 

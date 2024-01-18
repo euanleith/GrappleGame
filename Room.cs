@@ -17,7 +17,7 @@ public class Room : MonoBehaviour
     //      nope, that won't work where player is in bound 1, enters overlapping bound 2, then exits bound 2 while still in bound 1
     //      so maybe should set new current bound when player is only in one bound
 
-    void Start()
+    protected void Awake()
     {
         InitBounds();
         InitEnemies();
@@ -25,7 +25,9 @@ public class Room : MonoBehaviour
         Disable();
     }
 
-    void InitBounds() {
+    protected void Update() {}
+
+    protected void InitBounds() {
         Transform boundsFolder = gameObject.transform.Find("Bounds");
         minPos = boundsFolder.Find("MinPos").position;
         maxPos = boundsFolder.Find("MaxPos").position;
@@ -35,7 +37,7 @@ public class Room : MonoBehaviour
         }
     }
 
-    void InitEnemies() {
+    protected void InitEnemies() {
         Transform enemyFolder = gameObject.transform.Find("Enemies");
         if (enemyFolder) {
             enemies = new Enemy[enemyFolder.childCount];
@@ -46,24 +48,23 @@ public class Room : MonoBehaviour
         //enemies = GetComponentInChildren<Enemy>(); // todo this is a slower option, but doesn't require enemy folder to be called 'Enemies'
     }
 
-    public void Enable() {
+    public virtual void Enable() {
         EnableEnemies();
         // todo EnableMovingPlatforms();
     }
 
-    void EnableEnemies() {
+    protected void EnableEnemies() {
         foreach (Enemy enemy in enemies) {
             enemy.Reset();
         }
     }
 
-    public void Disable() {
-        Debug.Log("disabled " + gameObject.name);
+    public virtual void Disable() {
         DisableEnemies();
         // todo DisableMovingPlatforms();
     }
 
-    void DisableEnemies() {
+    protected void DisableEnemies() {
         foreach (Enemy enemy in enemies) {
             enemy.Disable();
         }
