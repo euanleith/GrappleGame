@@ -17,7 +17,7 @@ public class Room : MonoBehaviour
     //      nope, that won't work where player is in bound 1, enters overlapping bound 2, then exits bound 2 while still in bound 1
     //      so maybe should set new current bound when player is only in one bound
 
-    protected void Awake()
+    public void Awake()
     {
         InitBounds();
         InitEnemies();
@@ -43,6 +43,7 @@ public class Room : MonoBehaviour
             enemies = new Enemy[enemyFolder.childCount];
             for (int i = 0; i < enemyFolder.childCount; i++) {
                 enemies[i] = enemyFolder.GetChild(i).transform.Find("Controller").GetComponent<Enemy>();
+                enemies[i].Init(); // todo also disable, or am i already doing that?
             }
         } else enemies = new Enemy[0];
         //enemies = GetComponentInChildren<Enemy>(); // todo this is a slower option, but doesn't require enemy folder to be called 'Enemies'

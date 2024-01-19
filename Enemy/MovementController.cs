@@ -26,7 +26,7 @@ public class MovementController: MonoBehaviour
     CombatController combatController;
     Enemy enemy;
 
-    public void Start() {
+    public void Init() {
         InitObjects();
         startPos = transform.position;  
         InitValues();

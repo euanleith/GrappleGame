@@ -12,9 +12,10 @@ public class Enemy : MonoBehaviour
     public Movement idleMovement;
     public Movement aggroMovement;
 
-    public void Start()
+    public void Init()
     {
         movementController = GetComponent<MovementController>();
+        movementController.Init();
         combatController = GetComponent<CombatController>();
     }
 
@@ -40,9 +41,7 @@ public class Enemy : MonoBehaviour
 
     public virtual void Reset() {
         gameObject.SetActive(true);
-        Debug.Log(-1);
         movementController.Reset();
-        Debug.Log(0);
         combatController.Reset();
     }
 
