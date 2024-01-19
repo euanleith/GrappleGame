@@ -4,12 +4,11 @@ using UnityEngine;
 
 public class PingPongMovement : Movement
 {
-    private Vector2 startPos;
-    private Vector2 moveRange;
-    // todo add initial direction (currently always up and right)
+    Vector2 startPos;
+    Vector2 moveRange;
 
     public void Start() {
-        startPos = gameObject.GetComponentInParent<MovementController>().transform.position;
+        startPos = gameObject.GetComponentInParent<MovementController>().startPos;
         moveRange = gameObject.GetComponentInParent<MovementController>().moveRange;
     }
 

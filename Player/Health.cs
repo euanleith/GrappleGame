@@ -91,7 +91,7 @@ public class Health : MonoBehaviour
         camControls.room = room;
     }
 
-    // todo move this to Room
+    // todo move this to Room?
     void ResetRoom(Room room) {
         rb.position = room.spawn; // todo maybe tp camera instead of making it lerp? // todo this should call a function in camera
         rb.velocity = new Vector2(0, 0);

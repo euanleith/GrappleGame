@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using Random=UnityEngine.Random;
 
 public class MovementController: MonoBehaviour
 {
@@ -11,6 +12,8 @@ public class MovementController: MonoBehaviour
     public Vector2 aggroRange = new Vector2(7, 3);
     public float decelerationSpeed = 1;
     public float stunDuration = 1f;
+    public Vector2 startDir;
+    public bool offset = true;
     
     [HideInInspector] public Vector2 collisionNormal;
     Vector2 currentDecelVelocity;
@@ -50,8 +53,46 @@ public class MovementController: MonoBehaviour
         rb.bodyType = RigidbodyType2D.Kinematic;
         stunned = false;
         stunCnt = 0f;
-        direction = new Vector2(1, 1);
+        if (!offset) {
+            transform.position = startPos;
+            direction = startDir;
+        }
+        else {
+            InitOffsets();
+        }
         currentMovement = enemy.idleMovement;
+    }
+
+    void InitOffsets() {
+        InitPositionOffset();
+        InitDirectionOffset();
+    }
+
+    void InitPositionOffset() {
+        Vector2 targetPos = new Vector2(
+            Random.Range(startPos.x - moveRange.x, startPos.x + moveRange.x),
+            Random.Range(startPos.y - moveRange.y, startPos.y - moveRange.y)
+        );
+        int ignoreRaycast = 1 << 8; // Enemy layer
+        RaycastHit2D hit = Physics2D.Linecast (transform.position, targetPos, ~ignoreRaycast);
+        if (!hit) {
+            transform.position = targetPos;
+        } else {
+            Vector2 newPos = hit.point;
+            if (hit.normal.x == 1) newPos.x += transform.localScale.x/2;
+            if (hit.normal.x == -1) newPos.x -= transform.localScale.x/2;
+            if (hit.normal.y == 1) newPos.x += transform.localScale.y/2;
+            if (hit.normal.y == -1) newPos.x -= transform.localScale.y/2;
+            transform.position = newPos;
+        }
+    }
+
+    void InitDirectionOffset() {
+        Vector2 newDir = new Vector2(Random.Range(0, 2),Random.Range(0, 2));
+        // don't want starting direction to be 0
+        if (newDir.x == 0) newDir.x = -1;
+        if (newDir.y == 0) newDir.y = -1;
+        direction = newDir;
     }
 
     public void FixedUpdate()
