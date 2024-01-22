@@ -174,7 +174,7 @@ public class GrapplingGun : MonoBehaviour
         grappleRope.enabled = false;
         springJoint.enabled = false;
         springJoint.connectedBody = null;
-        if (hit.transform.gameObject.layer == 8) {
+        if (hit && hit.transform.gameObject.layer == 8) {
             hit.transform.gameObject.GetComponent<Enemy>().OnCollisionExitWithGrapple();
         }
         gunHolder.GetComponent<Rigidbody2D>().gravityScale = 1;

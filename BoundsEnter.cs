@@ -16,10 +16,13 @@ public class BoundsEnter : MonoBehaviour
         if (collision.gameObject.name == "Player") {
             camControls.room.Disable();
             room.Enable();
+
+            // todo clean up
             camControls.room = room;
             Vector2 spawn = transform.Find("Spawn").position;
             camControls.room.spawn = spawn;
             collision.transform.position = spawn;
+            collision.gameObject.GetComponent<Health>().room.spawn = spawn;
         }
     }
 }

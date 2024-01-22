@@ -5,6 +5,7 @@ using UnityEngine;
 public class CombatRoom : Room
 {
     bool completed = false;
+    [SerializeField] public Enemy[][] waves;
 
     void Update() {
         base.Update();
