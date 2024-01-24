@@ -122,6 +122,8 @@ public class GrapplingGun : MonoBehaviour
                     }
                     if (hit.transform.gameObject.layer == 8) { // todo maybe also only if transform launch?
                         hit.transform.gameObject.GetComponent<Enemy>().OnCollisionEnterWithGrapple();
+                    } else if (hit.transform.gameObject.layer == 20) {
+                        hit.transform.gameObject.GetComponent<GrappleablePlatform>().OnCollisionEnterWithGrapple(distanceVector);
                     }
                 }
             }

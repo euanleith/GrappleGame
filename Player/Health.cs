@@ -47,7 +47,7 @@ public class Health : MonoBehaviour
             case 7:
             case 15:
                 GetHit(1, Vector2.zero); 
-                ResetRoom(room); // respawn at start of room for each platforming death
+                room.Reset(); // respawn at start of room for each platforming death
                 break;
             case 8:
                 GetHit(collision.gameObject.GetComponent<Enemy>().combatController.GetDamage(), new Vector2(0, 1));
@@ -91,18 +91,8 @@ public class Health : MonoBehaviour
         camControls.room = room;
     }
 
-    // todo move this to Room?
-    void ResetRoom(Room room) {
-        rb.position = room.spawn; // todo maybe tp camera instead of making it lerp? // todo this should call a function in camera
-        rb.velocity = new Vector2(0, 0);
-        grapple.grappleRope.enabled = false;
-        foreach (Enemy enemy in room.enemies) {
-            enemy.Reset();
-        }
-    }
-
     void Respawn() {
-        ResetRoom(spawnRoom);
+        spawnRoom.Reset();
         ResetCamera();
         currentHealth = maxHealth;
         foreach (VisualElement heart in ui.rootVisualElement.ElementAt(0).Children()) {

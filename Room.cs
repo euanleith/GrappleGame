@@ -4,7 +4,10 @@ using UnityEngine;
 
 public class Room : MonoBehaviour
 {
+    public Transform player;
+
     [HideInInspector] public Enemy[] enemies;
+    [HideInInspector] public Platform[] platforms;
     [HideInInspector] public Vector2 spawn; // todo only spawn rooms need this, maybe could make SpawnRoom subclass
     [HideInInspector] public Vector2 minPos;
     [HideInInspector] public Vector2 maxPos;
@@ -21,7 +24,7 @@ public class Room : MonoBehaviour
     {
         InitBounds();
         InitEnemies();
-        // todo InitMovingPlatforms()
+        InitPlatforms();
         Disable();
     }
 
@@ -38,36 +41,70 @@ public class Room : MonoBehaviour
     }
 
     protected void InitEnemies() {
-        Transform enemyFolder = gameObject.transform.Find("Enemies");
-        if (enemyFolder) {
-            enemies = new Enemy[enemyFolder.childCount];
-            for (int i = 0; i < enemyFolder.childCount; i++) {
-                enemies[i] = enemyFolder.GetChild(i).transform.Find("Controller").GetComponent<Enemy>();
-                enemies[i].Init(); // todo also disable, or am i already doing that?
+        enemies = GetFromFolder<Enemy>("Enemies", "Controller");
+        foreach (Enemy enemy in enemies) {
+            enemy.Init();
+        }
+    }
+
+    protected void InitPlatforms() {
+        platforms = GetFromFolder<Platform>("MovingPlatforms", ""); // todo folder name
+        foreach (Platform platform in platforms) {
+            platform.Init();
+        }
+    }
+
+    T[] GetFromFolder<T>(string folderPath, string itemPath) {
+        Transform folder = gameObject.transform.Find(folderPath);
+        if (folder) {
+            T[] res = new T[folder.childCount];
+            for (int i = 0; i < folder.childCount; i++) {
+                res[i] = folder.GetChild(i).transform.Find(itemPath).GetComponent<T>();
             }
-        } else enemies = new Enemy[0];
-        //enemies = GetComponentInChildren<Enemy>(); // todo this is a slower option, but doesn't require enemy folder to be called 'Enemies'
+            return res;
+        } else{} return new T[0];
     }
 
     public virtual void Enable() {
         EnableEnemies();
-        // todo EnableMovingPlatforms();
+        EnablePlatforms();
     }
 
     protected void EnableEnemies() {
         foreach (Enemy enemy in enemies) {
-            enemy.Reset();
+            enemy.Reset(); // todo rename functions Enable()?
+        }
+    }
+
+    protected void EnablePlatforms() {
+        foreach (Platform platform in platforms) {
+            platform.Reset(); // todo rename functions Enable()?
         }
     }
 
     public virtual void Disable() {
         DisableEnemies();
-        // todo DisableMovingPlatforms();
+        DisablePlatforms();
     }
 
     protected void DisableEnemies() {
         foreach (Enemy enemy in enemies) {
             enemy.Disable();
         }
+    }
+
+    protected void DisablePlatforms() {
+        foreach (Platform platform in platforms) {
+            platform.Disable();
+        }
+    }
+
+    // todo maybe always do player stuff here
+    public void Reset() {
+        Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
+        rb.position = spawn; // todo maybe tp camera instead of making it lerp? // todo this should call a function in camera
+        rb.velocity = new Vector2(0, 0);
+        player.GetComponent<PlayerControls>().grapple.grappleRope.enabled = false;
+        Enable();
     }
 }
