@@ -42,13 +42,13 @@ public class Room : MonoBehaviour
 
     protected void InitEnemies() {
         enemies = GetFromFolder<Enemy>("Enemies", "Controller");
-        foreach (Enemy enemy in enemies) {
+        foreach (Enemy enemy in enemies) { // todo i could generalise this and a bunch more if i made Enemy and Platform have the same interface with Init, Reset, and Disable functions
             enemy.Init();
         }
     }
 
     protected void InitPlatforms() {
-        platforms = GetFromFolder<Platform>("MovingPlatforms", ""); // todo folder name
+        platforms = GetFromFolder<Platform>("MovingPlatforms", "Platform"); // todo folder name
         foreach (Platform platform in platforms) {
             platform.Init();
         }
@@ -66,6 +66,7 @@ public class Room : MonoBehaviour
     }
 
     public virtual void Enable() {
+        player.position = spawn;
         EnableEnemies();
         EnablePlatforms();
     }

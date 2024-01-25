@@ -26,8 +26,6 @@ public class Health : MonoBehaviour
         CameraControls cameraControls = camera.GetComponent<CameraControls>();
         room = cameraControls.room;
         spawnRoom = room;
-        rb.position = room.spawn;
-        // todo set spawn point & bounds from camera
     }
 
     void Update()

@@ -14,8 +14,8 @@ public class CameraControls : MonoBehaviour
     {
         height = 2f * camera.orthographicSize;
         width = height * camera.aspect;
-        Move(false);
         room.Enable();
+        Move(false); // todo maybe this is running before player is moved
     }
 
     void Update()
