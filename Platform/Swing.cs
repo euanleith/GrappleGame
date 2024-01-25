@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Swing : MonoBehaviour, Platform
 {
-    public bool playerActivated = false; // todo might want it to be activated by other things to?
+    public bool playerActivated = false; // todo might want it to be activated by other things to? also maybe want just player on stand on and just on player grapple
 
     Rigidbody2D platform; // todo currently this is dynamic, should really be kinematic with manual collision detection
     Vector2 platformStartPos;
@@ -31,6 +31,12 @@ public class Swing : MonoBehaviour, Platform
         if (playerActivated && collision.gameObject.layer == 12) { // Player layer 
             platform.constraints &= ~RigidbodyConstraints2D.FreezePositionX & ~RigidbodyConstraints2D.FreezePositionY;
             // todo stop at some point? maybe when back at startPos?
+        }
+    }
+
+    public void OnCollisionEnterWithGrapple() {
+        if (playerActivated) {
+            platform.constraints &= ~RigidbodyConstraints2D.FreezePositionX & ~RigidbodyConstraints2D.FreezePositionY;
         }
     }
 }

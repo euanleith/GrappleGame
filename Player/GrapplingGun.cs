@@ -120,10 +120,13 @@ public class GrapplingGun : MonoBehaviour
                     } else {
                         springJoint.connectedAnchor = grapplePoint;
                     }
+                    // todo surely there's a better way of doing this :')
                     if (hit.transform.gameObject.layer == 8) { // todo maybe also only if transform launch?
                         hit.transform.gameObject.GetComponent<Enemy>().OnCollisionEnterWithGrapple();
                     } else if (hit.transform.gameObject.layer == 20) {
                         hit.transform.gameObject.GetComponent<GrappleablePlatform>().OnCollisionEnterWithGrapple(distanceVector);
+                    } else if (hit.transform.gameObject.layer == 21) {
+                        hit.transform.gameObject.GetComponent<Swing>().OnCollisionEnterWithGrapple();
                     }
                 }
             }
