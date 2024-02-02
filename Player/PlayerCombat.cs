@@ -25,6 +25,7 @@ public class PlayerCombat : MonoBehaviour
     }
     public State state;
     public bool hit = false;
+    PlayerControls playerControls;
 
     private void Start()
     {
@@ -33,6 +34,7 @@ public class PlayerCombat : MonoBehaviour
         leftHitbox.GetComponent<BoxCollider2D>().enabled = false;
         upHitbox.GetComponent<BoxCollider2D>().enabled = false;
         downHitbox.GetComponent<BoxCollider2D>().enabled = false;
+        playerControls = GetComponent<PlayerControls>();
     }
 
     void Update()
@@ -40,7 +42,7 @@ public class PlayerCombat : MonoBehaviour
         switch (state)
         {
             case State.cooldown:
-                if (Input.GetButton("Fire3") && countdown <= 0)
+                if (Input.GetButton("Fire3") && countdown <= 0 && !playerControls.stunned)
                 {
                     countdown = windupDuration;
                     hitbox = GetHitbox();
@@ -56,7 +58,7 @@ public class PlayerCombat : MonoBehaviour
                     //bool hit = HitEnemies(hitbox);
                     if (hit && hitbox.position.Equals(downHitbox.position)) // todo use enums?
                     {
-                        GetComponent<PlayerControls>().Jump();
+                        playerControls.Jump();
                     }
                 }
                 else 
