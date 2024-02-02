@@ -170,10 +170,13 @@ public class PlayerControls : MonoBehaviour
     {
         hitWallNormal = 0f;
 
+        // todo there's other cases;
+        //  on hit by enemy..?
+        //  on land on swing then die?
         // if player is within horizontal bounds of platform and hasnt jumped/grappled
         if (transform.position.x + (transform.localScale.x/2) > collision.transform.position.x - (collision.transform.localScale.x/2) &&
             transform.position.x - (transform.localScale.x/2) < collision.transform.position.x + (collision.transform.localScale.x/2) &&
-            !grapple.enabled) {
+            !grapple.isEnabled()) {
                 SnapToGround();
         } else {
             isGrounded = false;

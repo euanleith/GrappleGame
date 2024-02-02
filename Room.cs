@@ -20,6 +20,8 @@ public class Room : MonoBehaviour
     //      nope, that won't work where player is in bound 1, enters overlapping bound 2, then exits bound 2 while still in bound 1
     //      so maybe should set new current bound when player is only in one bound
 
+    // todo should only be able to grapple platforms in the current room
+
     public void Awake()
     {
         InitBounds();
@@ -103,7 +105,6 @@ public class Room : MonoBehaviour
     // todo maybe always do player stuff here
     public void Reset() {
         Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
-        rb.position = spawn; // todo maybe tp camera instead of making it lerp? // todo this should call a function in camera
         rb.velocity = new Vector2(0, 0);
         player.GetComponent<PlayerControls>().grapple.grappleRope.enabled = false;
         Enable();

@@ -61,10 +61,9 @@ public class Health : MonoBehaviour
     {
         if (currentIFrames <= 0) // if not already invincible
         {
-            if (damage > currentHealth) 
+            if (damage >= currentHealth) 
             {
                 Respawn();
-                
             }
             else 
             {
@@ -90,7 +89,8 @@ public class Health : MonoBehaviour
     }
 
     void Respawn() {
-        spawnRoom.Reset();
+        // todo also now damage is only applying on every second hit :')))))
+        room = spawnRoom;
         ResetCamera();
         currentHealth = maxHealth;
         foreach (VisualElement heart in ui.rootVisualElement.ElementAt(0).Children()) {
