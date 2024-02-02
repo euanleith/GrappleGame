@@ -11,8 +11,8 @@ public class CombatRoom : Room
         base.Update();
 
         completed = true;
-        foreach (Enemy enemy in enemies) {
-            if (enemy.gameObject.activeSelf) {
+        foreach (RoomElement elem in elements) {
+            if (elem is Enemy && ((Enemy)elem).gameObject.activeSelf) {
                 completed = false;
                 break;
             }
@@ -27,8 +27,7 @@ public class CombatRoom : Room
 
     public override void Enable() {
         if (!completed) { // enemies don't respawn in combat rooms
-            EnableEnemies();
+            base.Enable(); // todo probably still want to enable non-enemy room elements...
         }
-        // todo EnableMovingPlatforms();
     }
 }

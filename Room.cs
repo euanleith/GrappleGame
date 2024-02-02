@@ -7,7 +7,7 @@ public class Room : MonoBehaviour
 {
     public Transform player;
 
-    [HideInInspector] public Enemy[] enemies;
+    [HideInInspector] public RoomElement[] elements;
     [HideInInspector] public Vector2 spawn; // todo only spawn rooms need this, maybe could make SpawnRoom subclass
     [HideInInspector] public Vector2 minPos;
     [HideInInspector] public Vector2 maxPos;
