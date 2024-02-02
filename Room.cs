@@ -106,7 +106,10 @@ public class Room : MonoBehaviour
     public void Reset() {
         Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
         rb.velocity = new Vector2(0, 0);
-        player.GetComponent<PlayerControls>().grapple.grappleRope.enabled = false;
+        PlayerControls playerControls = player.GetComponent<PlayerControls>();
+        playerControls.grapple.grappleRope.enabled = false;
+        playerControls.isGrounded = true;
+        playerControls.FinishStun();
         player.GetComponent<Health>().currentIFrames = 0;
         Enable();
     }

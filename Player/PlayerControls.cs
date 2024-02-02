@@ -63,10 +63,7 @@ public class PlayerControls : MonoBehaviour
 
     void Update()
     {
-        // todo this is different from 1 & 2. maybe because of acceleration? make sure its not being changed elsewhere
-        //  maybe want to snap to ground like for slopes if distance isn't too far and/or on first falling frame
-        //  or existing snap isnt working because Swing layer wasn't included in raycast
-        if (stunCnt >= 0) {
+        if (stunCnt > 0) {
             stunCnt -= Time.deltaTime;
             return;
         } else if (stunned) FinishStun();
@@ -215,6 +212,7 @@ public class PlayerControls : MonoBehaviour
 
     public void FinishStun() {
         stunned = false;
+        stunCnt = 0;
         GetComponent<SpriteRenderer>().color = Color.white;
     }
 

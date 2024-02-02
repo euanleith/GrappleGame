@@ -44,8 +44,8 @@ public class Health : MonoBehaviour
             case 6: // todo "Death" or whatever; make these inspector variables
             case 7:
             case 15:
-                GetHit(1, Vector2.zero); 
-                room.Reset(); // respawn at start of room for each platforming death
+                bool alive = GetHit(1, Vector2.zero); 
+                if (alive) room.Reset(); // respawn at start of room for each platforming death
                 break;
             case 8:
                 GetHit(collision.gameObject.GetComponent<Enemy>().combatController.GetDamage(), new Vector2(0, 1));
@@ -57,13 +57,14 @@ public class Health : MonoBehaviour
         }
     }
 
-    public void GetHit(int damage, Vector2 contactNormal) 
+    public bool GetHit(int damage, Vector2 contactNormal) 
     {
         if (currentIFrames <= 0) // if not already invincible
         {
             if (damage >= currentHealth) 
             {
                 Respawn();
+                return false;
             }
             else 
             {
@@ -77,9 +78,10 @@ public class Health : MonoBehaviour
                         .visible = false;
                 }
                 currentIFrames = maxIFrames;
+                return true;
             }
-            
         }
+        return false;
     }
 
     void ResetCamera()
@@ -91,6 +93,7 @@ public class Health : MonoBehaviour
     void Respawn() {
         // todo also now damage is only applying on every second hit :')))))
         room = spawnRoom;
+        room.Reset();
         ResetCamera();
         currentHealth = maxHealth;
         foreach (VisualElement heart in ui.rootVisualElement.ElementAt(0).Children()) {
