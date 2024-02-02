@@ -43,28 +43,28 @@ public class Room : MonoBehaviour
     }
 
     protected void InitEnemies() {
-        enemies = GetFromFolder<Enemy>("Enemies", "Controller");
-        foreach (Enemy enemy in enemies) { // todo i could generalise this and a bunch more if i made Enemy and Platform have the same interface with Init, Reset, and Disable functions
+        enemies = GetFromFolder<Enemy>("Enemies");
+        foreach (Enemy enemy in enemies) { // todo i could generalise this and a bunch more if i made Enemy and Platform have the same interface (RoomElement?) with Init, Reset, and Disable functions
             enemy.Init();
         }
     }
 
     protected void InitPlatforms() {
-        platforms = GetFromFolder<Platform>("MovingPlatforms", "Platform"); // todo folder name
+        platforms = GetFromFolder<Platform>("MovingPlatforms"); // todo folder name - ActionObjects? InteractionObjects?
         foreach (Platform platform in platforms) {
             platform.Init();
         }
     }
 
-    T[] GetFromFolder<T>(string folderPath, string itemPath) {
+    T[] GetFromFolder<T>(string folderPath) {
         Transform folder = gameObject.transform.Find(folderPath);
         if (folder) {
             T[] res = new T[folder.childCount];
             for (int i = 0; i < folder.childCount; i++) {
-                res[i] = folder.GetChild(i).transform.Find(itemPath).GetComponent<T>();
+                res[i] = folder.GetChild(i).transform.GetComponentInChildren<T>();
             }
             return res;
-        } else{} return new T[0];
+        } else return new T[0];
     }
 
     public virtual void Enable() {
@@ -104,6 +104,7 @@ public class Room : MonoBehaviour
 
     // todo maybe always do player stuff here
     public void Reset() {
+        // todo move to Reset() function in PlayerControls
         Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
         rb.velocity = new Vector2(0, 0);
         PlayerControls playerControls = player.GetComponent<PlayerControls>();

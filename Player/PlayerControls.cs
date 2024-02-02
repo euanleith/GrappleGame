@@ -75,7 +75,12 @@ public class PlayerControls : MonoBehaviour
         {
             // todo would making this a switch make it clearer?
             if ((isGrounded || (hitWallNormal != 0)) && Input.GetButtonDown("Jump")) { // jumping
-                Jump();
+                if (isGrounded && lastGroundCollision.gameObject.layer == 22 && moveY < 0) { // TraversablePlatform layer
+                    // todo or holding down while land on TraversablePlatform?
+                    lastGroundCollision.gameObject.GetComponent<TraversablePlatform>().Traverse();
+                    isGrounded = false;
+                }
+                else Jump();
             }
             else if (isGrounded && 
                     hitWallNormal != 0 && 
@@ -123,7 +128,7 @@ public class PlayerControls : MonoBehaviour
     void OnCollisionEnter2D(Collision2D collision)
     {
         hitWallNormal = 0f;
-        foreach (ContactPoint2D contact in collision.contacts)
+        foreach (ContactPoint2D contact in collision.contacts) // todo is this necessary?
         {
             if (Math.Abs(contact.normal.x) > minWallAngle)
             {
