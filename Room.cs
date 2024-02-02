@@ -1,13 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class Room : MonoBehaviour
 {
     public Transform player;
 
     [HideInInspector] public Enemy[] enemies;
-    [HideInInspector] public Platform[] platforms;
     [HideInInspector] public Vector2 spawn; // todo only spawn rooms need this, maybe could make SpawnRoom subclass
     [HideInInspector] public Vector2 minPos;
     [HideInInspector] public Vector2 maxPos;
@@ -25,8 +25,7 @@ public class Room : MonoBehaviour
     public void Awake()
     {
         InitBounds();
-        InitEnemies();
-        InitPlatforms();
+        InitElements();
         Disable();
     }
 
@@ -42,17 +41,12 @@ public class Room : MonoBehaviour
         }
     }
 
-    protected void InitEnemies() {
-        enemies = GetFromFolder<Enemy>("Enemies");
-        foreach (Enemy enemy in enemies) { // todo i could generalise this and a bunch more if i made Enemy and Platform have the same interface (RoomElement?) with Init, Reset, and Disable functions
-            enemy.Init();
-        }
-    }
-
-    protected void InitPlatforms() {
-        platforms = GetFromFolder<Platform>("MovingPlatforms"); // todo folder name - ActionObjects? InteractionObjects?
-        foreach (Platform platform in platforms) {
-            platform.Init();
+    protected void InitElements() {
+        RoomElement[] enemies = GetFromFolder<Enemy>("Enemies");
+        RoomElement[] platforms = GetFromFolder<RoomElement>("MovingPlatforms"); // todo folder name - ActionObjects? InteractionObjects?
+        elements = enemies.Concat(platforms).ToArray();;
+        foreach (RoomElement elem in elements) {
+            elem.Init();
         }
     }
 
@@ -69,36 +63,14 @@ public class Room : MonoBehaviour
 
     public virtual void Enable() {
         player.position = spawn;
-        EnableEnemies();
-        EnablePlatforms();
-    }
-
-    protected void EnableEnemies() {
-        foreach (Enemy enemy in enemies) {
-            enemy.Reset(); // todo rename functions Enable()?
-        }
-    }
-
-    protected void EnablePlatforms() {
-        foreach (Platform platform in platforms) {
-            platform.Reset(); // todo rename functions Enable()?
+        foreach (RoomElement elem in elements) {
+            elem.Reset();
         }
     }
 
     public virtual void Disable() {
-        DisableEnemies();
-        DisablePlatforms();
-    }
-
-    protected void DisableEnemies() {
-        foreach (Enemy enemy in enemies) {
-            enemy.Disable();
-        }
-    }
-
-    protected void DisablePlatforms() {
-        foreach (Platform platform in platforms) {
-            platform.Disable();
+        foreach (RoomElement elem in elements) {
+            elem.Disable();
         }
     }
 

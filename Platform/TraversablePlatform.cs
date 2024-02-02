@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TraversablePlatform : MonoBehaviour, Platform
+public class TraversablePlatform : MonoBehaviour, RoomElement
 {
 
     BoxCollider2D collider;
