@@ -59,12 +59,13 @@ public class PlayerControls : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         boxColliderPlayer = GetComponent<BoxCollider2D>();
         heightTestPlayer = Mathf.Sqrt(Mathf.Sqrt(boxColliderPlayer.size.x)*2);
-        layerMaskGround = LayerMask.GetMask("Ground");
-        StartCoroutine(SnapToGround());
     }
 
     void Update()
     {
+        // todo this is different from 1 & 2. maybe because of acceleration? make sure its not being changed elsewhere
+        //  maybe want to snap to ground like for slopes if distance isn't too far and/or on first falling frame
+        //  or existing snap isnt working because Swing layer wasn't included in raycast
         if (stunCnt >= 0) {
             stunCnt -= Time.deltaTime;
             return;
@@ -112,15 +113,13 @@ public class PlayerControls : MonoBehaviour
         }
     }
 
-    IEnumerator SnapToGround()
+    void SnapToGround()
     {
-        while (isGrounded) {
-            //RaycastHit2D hit = Physics2D.BoxCast(transform.position, new Vector2(2,2), 0, Vector2.down);
-            RaycastHit2D hit = Physics2D.Raycast(boxColliderPlayer.bounds.center, Vector2.down, layerMaskGround);
+        if (isGrounded) {
+            layerMaskGround = LayerMask.GetMask("Ground", "Swing");
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, Mathf.Infinity, layerMaskGround);
             float distanceToGround = transform.position.y - hit.point.y;
             transform.position += Vector3.up * (0.5f - distanceToGround);
-
-            yield return new WaitForFixedUpdate();
         }
     }
 
@@ -170,12 +169,13 @@ public class PlayerControls : MonoBehaviour
     void OnCollisionExit2D(Collision2D collision)
     {
         hitWallNormal = 0f;
-        // todo for slopes
-        //RaycastHit2D hit = Physics2D.Raycast(boxColliderPlayer.bounds.center, Vector2.down, layerMaskGround);
-        //float distanceToGround = transform.position.y - hit.point.y;
-        //Debug.Log(distanceToGround);
-        //if (distanceToGround > 3) isGrounded = false; // todo ew, also still doesnt work, but a good way to test SnapToGround by making sure isGrounded is true
-        if (lastGroundCollision != null && collision.collider == lastGroundCollision) {
+
+        // if player is within horizontal bounds of platform and hasnt jumped/grappled
+        if (transform.position.x + (transform.localScale.x/2) > collision.transform.position.x - (collision.transform.localScale.x/2) &&
+            transform.position.x - (transform.localScale.x/2) < collision.transform.position.x + (collision.transform.localScale.x/2) &&
+            !grapple.enabled) {
+                SnapToGround();
+        } else {
             isGrounded = false;
         }
     }
