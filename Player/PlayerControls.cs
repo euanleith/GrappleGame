@@ -48,6 +48,7 @@ public class PlayerControls : MonoBehaviour
     public float minSlope = 0.5f; // todo might need to change this for slopes
 
     Collider2D lastGroundCollision; // need this since OnCollisionExit2D doesn't contain collision info of the exited collision
+    int nCurrentCollisions = 0;
 
     public bool stunned = false;
     public const float stunDuration = 1f;
@@ -127,6 +128,7 @@ public class PlayerControls : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D collision)
     {
+        nCurrentCollisions = collision.contacts.Length;
         hitWallNormal = 0f;
         foreach (ContactPoint2D contact in collision.contacts) // todo is this necessary?
         {
@@ -180,7 +182,7 @@ public class PlayerControls : MonoBehaviour
             transform.position.x - (transform.localScale.x/2) < collision.transform.position.x + (collision.transform.localScale.x/2) &&
             !grapple.isEnabled()) {
                 SnapToGround();
-        } else {
+        } else if (nCurrentCollisions <= 1) {
             isGrounded = false;
         }
     }
