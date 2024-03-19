@@ -80,7 +80,7 @@ public class Room : MonoBehaviour
         Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
         rb.velocity = new Vector2(0, 0);
         PlayerControls playerControls = player.GetComponent<PlayerControls>();
-        playerControls.grapple.grappleRope.enabled = false;
+        playerControls.grapple.Disable();
         playerControls.isGrounded = true;
         playerControls.FinishStun();
         player.GetComponent<Health>().currentIFrames = 0;

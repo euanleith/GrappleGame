@@ -126,7 +126,7 @@ public class GrapplingGun : MonoBehaviour
                     } else if (hit.transform.gameObject.layer == 20) {
                         hit.transform.gameObject.GetComponent<GrappleablePlatform>().OnCollisionEnterWithGrapple(distanceVector);
                     } else if (hit.transform.gameObject.layer == 21) {
-                        hit.transform.gameObject.GetComponent<Swing>().OnCollisionEnterWithGrapple();
+                        hit.transform.gameObject.GetComponent<SwingPlatform>().OnCollisionEnterWithGrapple();
                     }
                 }
             }
@@ -224,5 +224,14 @@ public class GrapplingGun : MonoBehaviour
     public void OnJump() {
         canTransformGrapple = true;
         gunHolder.gameObject.GetComponent<SpriteRenderer>().color = Color.white;
+    }
+
+    public bool isEnabled() {
+        return springJoint.enabled;
+    }
+
+    public void Disable() {
+        springJoint.enabled = false;
+        grappleRope.enabled = false;
     }
 }
