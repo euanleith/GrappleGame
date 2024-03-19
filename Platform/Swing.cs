@@ -2,22 +2,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Swing : MonoBehaviour, RoomElement
-{
+public class Swing : MonoBehaviour, RoomElement {
     // todo jumping while on these isn't working properly
     //  swinging is weird too
     // todo it loses momentum over time, i dont want that
 
-    // todo move all this to parent Swing object? then can have only one script etc
 
-    public bool playerActivated = false; // todo might want it to be activated by other things to? also maybe want just player on stand on and just on player grapple
+    public bool activated = false; // todo maybe want just player on 'stand on' and just on 'player'
+    public LayerMask activatorLayers = 1 << 12; // Player layer
 
-    Rigidbody2D platform; // todo currently this is dynamic, should really be kinematic with manual collision detection
+    public bool breakable = false;
+    public LayerMask breakerLayers = 1 << 2; // todo PLAYER_ATTACK_LAYER (currently just using IgnoreRaycast layer)
+
+    [HideInInspector] public SpringJoint2D springJoint;
+    Rigidbody2D platform;
     Vector2 platformStartPos;
 
-    public void Init()
-    {
-        platform = GetComponent<Rigidbody2D>();
+    public void Init() {
+        springJoint = GetComponentInChildren<SpringJoint2D>();
+        platform = springJoint.connectedBody;
         platformStartPos = platform.position;
         Reset();
     }
@@ -25,29 +28,22 @@ public class Swing : MonoBehaviour, RoomElement
     public void Reset() {
         // todo on start, platform moves to where the spring joint wants it. is there a way to move it to that point here so i dont have to manually get it right for every one?
         platform.position = platformStartPos;
-        transform.parent.GetComponentInChildren<SpringJoint2D>().enabled = true;
+        springJoint.enabled = true;
         if (platform.bodyType != RigidbodyType2D.Static) platform.velocity = Vector2.zero;
-        if (playerActivated) {
+        if (activated) {
             platform.bodyType = RigidbodyType2D.Static;
         }
     }
 
-    public void Disable() {}
-
-    public void OnCollisionEnter2D(Collision2D collision) {
-        if (playerActivated && collision.gameObject.layer == 12) { // Player layer 
-            Activate();
-        }
-    }
-
-    public void OnCollisionEnterWithGrapple() {
-        if (playerActivated) {
-            Activate();
-        }
-    }
+    public void Disable() { }
 
     public void Activate() {
         platform.bodyType = RigidbodyType2D.Dynamic;
         // todo stop at some point? maybe when back at startPos?
+    }
+
+    // todo currently on break, collides with deathplatforms off screen
+    public void Break() {
+        springJoint.enabled = false;
     }
 }
