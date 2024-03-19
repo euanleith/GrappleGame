@@ -128,34 +128,28 @@ public class PlayerControls : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-        nCurrentCollisions = collision.contacts.Length;
+        nCurrentCollisions++;
         hitWallNormal = 0f;
-        foreach (ContactPoint2D contact in collision.contacts) // todo is this necessary?
+        ContactPoint2D contact = collision.GetContact(0); // only need 1 contact point as player collider is box
+        if (Math.Abs(contact.normal.x) > minWallAngle)
         {
-            if (Math.Abs(contact.normal.x) > minWallAngle)
-            {
-                hitWallNormal = contact.normal.x;
-                break;
-            } else {
-                if (contact.normal.y > minSlope) {
-                    lastGroundCollision = contact.collider;
-                    isGrounded = true;
-                    grapple.OnCollisionWithGround();
-                }
-            }
+            hitWallNormal = contact.normal.x;
+        } else if (contact.normal.y > minSlope) {
+            lastGroundCollision = contact.collider;
+            isGrounded = true;
+            grapple.OnCollisionWithGround();
         }
     }
 
     void OnCollisionStay2D(Collision2D collision) {
-        foreach (ContactPoint2D contact in collision.contacts)
+        ContactPoint2D contact = collision.GetContact(0); // only need 1 contact point as player collider is box
+        if (Math.Abs(contact.normal.x) <= minWallAngle)
         {
-            if (Math.Abs(contact.normal.x) <= minWallAngle)
-            {
-                if (contact.normal.y > minSlope) {
-                    velocityOfGround = GetVelocityOfGround(contact.collider.gameObject.transform); // todo would this not mean that it wouldn't be grounded if connected to a non ground platform, even if also connected to a ground platform?
-                }
+            if (contact.normal.y > minSlope) {
+                velocityOfGround = GetVelocityOfGround(contact.collider.gameObject.transform); // todo would this not mean that it wouldn't be grounded if connected to a non ground platform, even if also connected to a ground platform?
             }
         }
+        
     }
 
     public Vector2 GetVelocityOfGround(Transform ground) {
@@ -172,6 +166,7 @@ public class PlayerControls : MonoBehaviour
 
     void OnCollisionExit2D(Collision2D collision)
     {
+        nCurrentCollisions--;
         hitWallNormal = 0f;
 
         // todo there's other cases;
@@ -182,7 +177,7 @@ public class PlayerControls : MonoBehaviour
             transform.position.x - (transform.localScale.x/2) < collision.transform.position.x + (collision.transform.localScale.x/2) &&
             !grapple.isEnabled()) {
                 SnapToGround();
-        } else if (nCurrentCollisions <= 1) {
+        } else if (nCurrentCollisions <= 0) {
             isGrounded = false;
         }
     }
@@ -194,7 +189,7 @@ public class PlayerControls : MonoBehaviour
         float velocityX = 0f;
         switch (hitWallNormal) {
             case > 0:
-                velocityX = wallJumpSpeed;
+                velocityX = wallJumpSpeed; 
                 break;
             case < 0:  
                 velocityX = -wallJumpSpeed;
