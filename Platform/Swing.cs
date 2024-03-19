@@ -8,6 +8,8 @@ public class Swing : MonoBehaviour, RoomElement
     //  swinging is weird too
     // todo it loses momentum over time, i dont want that
 
+    // todo move all this to parent Swing object? then can have only one script etc
+
     public bool playerActivated = false; // todo might want it to be activated by other things to? also maybe want just player on stand on and just on player grapple
 
     Rigidbody2D platform; // todo currently this is dynamic, should really be kinematic with manual collision detection
@@ -22,7 +24,8 @@ public class Swing : MonoBehaviour, RoomElement
 
     public void Reset() {
         // todo on start, platform moves to where the spring joint wants it. is there a way to move it to that point here so i dont have to manually get it right for every one?
-        platform.position = platformStartPos; 
+        platform.position = platformStartPos;
+        transform.parent.GetComponentInChildren<SpringJoint2D>().enabled = true;
         if (platform.bodyType != RigidbodyType2D.Static) platform.velocity = Vector2.zero;
         if (playerActivated) {
             platform.bodyType = RigidbodyType2D.Static;
