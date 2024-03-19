@@ -91,7 +91,6 @@ public class Health : MonoBehaviour
     }
 
     void Respawn() {
-        // todo also now damage is only applying on every second hit :')))))
         room = spawnRoom;
         room.Reset();
         ResetCamera();
@@ -99,5 +98,9 @@ public class Health : MonoBehaviour
         foreach (VisualElement heart in ui.rootVisualElement.ElementAt(0).Children()) {
             heart.visible = true;
         }
+    }
+
+    public void SetSpawnRoom(Room room) {
+        spawnRoom = room;
     }
 }
