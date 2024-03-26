@@ -47,8 +47,8 @@ public class Health : MonoBehaviour
                 if (alive) room.Reset(); // respawn at start of room for each platforming death
                 break;
             case 8:
-                GetHit(collision.gameObject.GetComponent<Enemy>().combatController.GetDamage(), new Vector2(0, 1));
                 GetComponent<PlayerControls>().Stun(collisionNormal: collision.GetContact(0).normal);
+                GetHit(collision.gameObject.GetComponent<Enemy>().combatController.GetDamage(), new Vector2(0, 1));
                 break;
             case 11:
                 // todo why doesnt this stun?
