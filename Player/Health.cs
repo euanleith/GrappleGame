@@ -86,8 +86,9 @@ public class Health : MonoBehaviour
 
     void ResetCamera()
     {
-        CameraControls camControls = Camera.main.gameObject.GetComponent<CameraControls>();
-        camControls.room = room;
+        CameraControls cameraControls = camera.GetComponent<CameraControls>();
+        cameraControls.room = room;
+        cameraControls.Move(false);
     }
 
     void Respawn() {

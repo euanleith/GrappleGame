@@ -12,8 +12,9 @@ public class CameraControls : MonoBehaviour
 
     void Start()
     {
+        camera.aspect = 16f / 9f;
         height = 2f * camera.orthographicSize;
-        width = height * camera.aspect;
+        width = height * (16f / 9f);
         room.Enable();
         Move(false); // todo maybe this is running before player is moved
     }
@@ -29,7 +30,7 @@ public class CameraControls : MonoBehaviour
         }
     }
 
-    void Move(bool lerp = true) {
+    public void Move(bool lerp = true) {
         Vector3 targetPos = player.position;
         Vector3 camBounds = new Vector3(
             Mathf.Clamp(targetPos.x, room.minPos.x + (width / 2), room.maxPos.x - (width / 2)),
