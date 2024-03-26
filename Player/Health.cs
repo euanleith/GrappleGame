@@ -22,7 +22,7 @@ public class Health : MonoBehaviour
     void Start()
     {
         currentHealth = maxHealth;   
-        currentIFrames = maxIFrames;
+        currentIFrames = 0f;
         CameraControls cameraControls = camera.GetComponent<CameraControls>();
         room = cameraControls.room;
         spawnRoom = room;
@@ -39,12 +39,11 @@ public class Health : MonoBehaviour
     // todo here only processes collisions with player (not attack hitboxes), since those are onTrigger
     void OnCollisionEnter2D(Collision2D collision)
     {
-        // todo for each contact?
         switch (collision.gameObject.layer) {
             case 6: // todo "Death" or whatever; make these inspector variables
             case 7:
             case 15:
-                bool alive = GetHit(1, Vector2.zero); 
+                bool alive = GetHit(1, Vector2.zero);
                 if (alive) room.Reset(); // respawn at start of room for each platforming death
                 break;
             case 8:
@@ -52,6 +51,7 @@ public class Health : MonoBehaviour
                 GetComponent<PlayerControls>().Stun(collisionNormal: collision.GetContact(0).normal);
                 break;
             case 11:
+                // todo why doesnt this stun?
                 GetHit(collision.gameObject.GetComponent<Enemy>().combatController.GetDamage(), new Vector2(0, 1));
                 break;
         }
@@ -59,6 +59,7 @@ public class Health : MonoBehaviour
 
     public bool GetHit(int damage, Vector2 contactNormal) 
     {
+        Debug.Log(currentIFrames + " " + damage + " " + currentHealth);
         if (currentIFrames <= 0) // if not already invincible
         {
             if (damage >= currentHealth) 
@@ -68,6 +69,7 @@ public class Health : MonoBehaviour
             }
             else 
             {
+                Debug.Log("hi");
                 GetComponent<PlayerControls>().Bounce(contactNormal); // todo how do other games do this?
                 grapple.StopGrappling();
                 for (int i = 0; i < damage; i++) {
