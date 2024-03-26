@@ -59,7 +59,6 @@ public class Health : MonoBehaviour
 
     public bool GetHit(int damage, Vector2 contactNormal) 
     {
-        Debug.Log(currentIFrames + " " + damage + " " + currentHealth);
         if (currentIFrames <= 0) // if not already invincible
         {
             if (damage >= currentHealth) 
@@ -69,7 +68,6 @@ public class Health : MonoBehaviour
             }
             else 
             {
-                Debug.Log("hi");
                 GetComponent<PlayerControls>().Bounce(contactNormal); // todo how do other games do this?
                 grapple.StopGrappling();
                 for (int i = 0; i < damage; i++) {
