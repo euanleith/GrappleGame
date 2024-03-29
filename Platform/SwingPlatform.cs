@@ -8,25 +8,14 @@ public class SwingPlatform : MonoBehaviour
     Vector2 startPosition;
     Rigidbody2D rb;
 
-
-    float maxAngleDeflection;
-    float pendulumSpeed;
-    float offset;
-
     void Start() {
         swing = GetComponentInParent<Swing>();
-
-        SwingRopeMovement ropeMovement = GetComponentInParent<SwingRopeMovement>();
-        maxAngleDeflection = ropeMovement.maxAngleDeflection;
-        pendulumSpeed = ropeMovement.pendulumSpeed;
-        offset = ropeMovement.offset;
+        rb = GetComponent<Rigidbody2D>();
+        transform.rotation = Quaternion.identity;
     }
 
     void Update() {
-        // pendulum rotation
-        float angle = maxAngleDeflection * Mathf.Sin(offset * pendulumSpeed);
-        transform.localRotation = Quaternion.Euler(0, 0, -angle);
-        offset += Time.deltaTime;
+        transform.rotation = Quaternion.identity;
     }
 
     public void OnCollisionEnter2D(Collision2D collision) {
@@ -42,5 +31,27 @@ public class SwingPlatform : MonoBehaviour
     // todo create static extension class for this, see https://discussions.unity.com/t/check-if-layer-is-in-layermask/16007/2
     bool LayerMaskContains(LayerMask mask, int layer) {
         return mask == (mask | (1 << layer));
+    }
+
+    public Vector2 GetPosition() {
+        return transform.position;
+    }
+
+    public void SetPosition(Vector2 position) {
+        transform.position = position;
+    }
+
+    public RigidbodyType2D GetBodyType() {
+        if (rb == null) rb = GetComponent<Rigidbody2D>(); // todo shouldnt have to do this
+        return rb.bodyType;
+    }
+
+    public void SetBodyType(RigidbodyType2D bodyType) {
+        if (rb == null) rb = GetComponent<Rigidbody2D>(); // todo shouldnt have to do this
+        rb.bodyType = bodyType;
+    }
+
+    public void Stop() {
+        rb.velocity = Vector2.zero;
     }
 }

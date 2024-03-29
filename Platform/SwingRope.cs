@@ -8,16 +8,14 @@ public class SwingRope : MonoBehaviour {
     public float width = 0.25f;
 
     Swing swing;
-    Transform startTransform;
-    Transform endTransform;
+    public Transform startTransform;
+    public Transform endTransform;
 
     LineRenderer lineRenderer;
     new EdgeCollider2D collider;
 
     void Start() {
         swing = GetComponentInParent<Swing>();
-        startTransform = swing.springJoint.transform;
-        endTransform = swing.springJoint.connectedBody.transform;
 
         lineRenderer = GetComponent<LineRenderer>();
         lineRenderer.startWidth = width;
