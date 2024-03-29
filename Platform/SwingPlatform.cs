@@ -5,9 +5,28 @@ using UnityEngine;
 public class SwingPlatform : MonoBehaviour
 {
     Swing swing;
+    Vector2 startPosition;
+    Rigidbody2D rb;
+
+
+    float maxAngleDeflection;
+    float pendulumSpeed;
+    float offset;
 
     void Start() {
         swing = GetComponentInParent<Swing>();
+
+        SwingRopeMovement ropeMovement = GetComponentInParent<SwingRopeMovement>();
+        maxAngleDeflection = ropeMovement.maxAngleDeflection;
+        pendulumSpeed = ropeMovement.pendulumSpeed;
+        offset = ropeMovement.offset;
+    }
+
+    void Update() {
+        // pendulum rotation
+        float angle = maxAngleDeflection * Mathf.Sin(offset * pendulumSpeed);
+        transform.localRotation = Quaternion.Euler(0, 0, -angle);
+        offset += Time.deltaTime;
     }
 
     public void OnCollisionEnter2D(Collision2D collision) {

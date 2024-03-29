@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// todo rename SwingRopeRenderer
+// todo or maybe split into SwingRopeRenderer and SwingRope (the latter of which deals with the functioning of the rope, i.e. breaking, movement)
 public class SwingRope : MonoBehaviour {
     public float width = 0.25f;
 
@@ -10,7 +12,7 @@ public class SwingRope : MonoBehaviour {
     Transform endTransform;
 
     LineRenderer lineRenderer;
-    EdgeCollider2D collider;
+    new EdgeCollider2D collider;
 
     void Start() {
         swing = GetComponentInParent<Swing>();
@@ -30,13 +32,14 @@ public class SwingRope : MonoBehaviour {
     }
 
     void Render() {
-        if (!swing.breakable || swing.springJoint.enabled) {
-            lineRenderer.SetPositions(new Vector3[] { startTransform.localPosition, endTransform.localPosition });
-            collider.SetPoints(new List<Vector2>() { startTransform.localPosition, endTransform.localPosition });
-        } else {
-            lineRenderer.enabled = false;
-            collider.enabled = false;
-        }
+        //if (!swing.breakable || swing.springJoint.enabled) {
+            Vector3 endTransformLocalPosition = endTransform.position - endTransform.parent.position + endTransform.parent.localPosition; // position determined by rotation of parent
+            lineRenderer.SetPositions(new Vector3[] { startTransform.localPosition, endTransformLocalPosition });
+            collider.SetPoints(new List<Vector2>() { startTransform.localPosition, endTransformLocalPosition });
+        //} else {
+            //lineRenderer.enabled = false;
+        //    collider.enabled = false;
+        //}
     }
 
     public void OnTriggerEnter2D(Collider2D collider) {

@@ -28,7 +28,7 @@ public class Swing : MonoBehaviour, RoomElement {
     public void Reset() {
         // todo on start, platform moves to where the spring joint wants it. is there a way to move it to that point here so i dont have to manually get it right for every one?
         platform.position = platformStartPos;
-        springJoint.enabled = true;
+        //springJoint.enabled = true;
         if (platform.bodyType != RigidbodyType2D.Static) platform.velocity = Vector2.zero;
         if (activated) {
             platform.bodyType = RigidbodyType2D.Static;
