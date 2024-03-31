@@ -4,14 +4,24 @@ using UnityEngine;
 
 public class SwingRopeRotation : MonoBehaviour
 {
-    public float maxAngleDeflection = 60.0f;
+    public float angleOffset = 90f;
+    public float angleRange = 90.0f;
     public float speed = 1.0f;
-    public float offset;
+
+    float timeOffset;
+
+    void Start() {
+        timeOffset = CalculateTimeOffset(angleOffset);
+    }
 
     void Update()
     {
-        float angle = maxAngleDeflection * Mathf.Sin(offset * speed);
+        float angle = angleRange * Mathf.Sin(timeOffset * speed); // shm equation: https://en.wikipedia.org/wiki/Simple_harmonic_motion
         transform.localRotation = Quaternion.Euler(0, 0, angle);
-        offset += Time.deltaTime;
+        timeOffset += Time.deltaTime;
+    }
+
+    float CalculateTimeOffset(float angle) {
+        return (Mathf.Asin(angle / angleRange)) / speed; // this is just a refactor of the shm equation
     }
 }
