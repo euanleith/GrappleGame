@@ -15,7 +15,8 @@ public class SwingPlatform : MonoBehaviour
     }
 
     void Update() {
-        transform.rotation = Quaternion.identity;
+        transform.rotation = Quaternion.Euler(0,0,0);
+        rb.rotation = 0;
         //Debug.Log(transform.position.y);
     }
 
