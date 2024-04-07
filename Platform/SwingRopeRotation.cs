@@ -16,17 +16,25 @@ public class SwingRopeRotation : MonoBehaviour
 
     float angleRange;
     float timeOffset;
+    float startTimeOffset;
 
-    void Start() {
+    public void Init() {
         Transform child = transform.GetChild(0).transform;
         float length = Vector2.Distance(Vector2.zero, child.localPosition);
 
         // angle range calculated as the angle between the pivot-down vector and the starting pivot-platform vector
         angleRange = Vector2.SignedAngle(new Vector2(0, -length), child.localPosition);
         timeOffset = CalculateTimeOffset(angleRange);
+        startTimeOffset = timeOffset;
 
         // move platform to directly below pivot and maintain angleOffset
         child.localPosition = new Vector2(0, -length);
+    }
+
+    public void Reset() {
+        if (timeOffset != startTimeOffset) { // todo shouldnt have to do this
+            timeOffset = startTimeOffset;
+        }
     }
 
     void Update()

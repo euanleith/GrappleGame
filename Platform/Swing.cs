@@ -11,27 +11,26 @@ public class Swing : MonoBehaviour, RoomElement {
     public LayerMask breakerLayers = 1 << 2; // todo PLAYER_ATTACK_LAYER (currently just using IgnoreRaycast layer)
 
     SwingPlatform platform;
-    Vector2 platformStartPos;
+    SwingRopeRotation ropeRotation;
 
     public void Init() {
         platform = GetComponentInChildren<SwingPlatform>();
-        platformStartPos = platform.GetPosition();
+        ropeRotation = GetComponentInChildren<SwingRopeRotation>();
+        ropeRotation.Init();
+        platform.Init();
         Reset();
     }
 
     public void Reset() {
-        // todo on start, platform moves to where the spring joint wants it. is there a way to move it to that point here so i dont have to manually get it right for every one?
-        platform.SetPosition(platformStartPos);
+        ropeRotation.Reset();
         if (platform.GetBodyType() != RigidbodyType2D.Static) platform.Stop();
-        if (activated) {
-            platform.SetBodyType(RigidbodyType2D.Static);
-        }
+        if (activated) platform.SetBodyType(RigidbodyType2D.Static);
     }
 
     public void Disable() { }
 
     public void Activate() {
-        platform.SetBodyType(RigidbodyType2D.Dynamic);
+        //platform.SetBodyType(RigidbodyType2D.Dynamic);
         // todo stop at some point? maybe when back at startPos?
     }
 
