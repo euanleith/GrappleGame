@@ -122,7 +122,7 @@ public class PlayerControls : MonoBehaviour
             layerMaskGround = LayerMask.GetMask("Ground", "Swing");
             RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, Mathf.Infinity, layerMaskGround);
             float distanceToGround = transform.position.y - hit.point.y;
-            transform.position += Vector3.up * (0.5f - distanceToGround);
+            transform.position += Vector3.up * (0.5f - distanceToGround); // todo 0.5f = player height / 2
         }
     }
 
@@ -146,15 +146,15 @@ public class PlayerControls : MonoBehaviour
         if (Math.Abs(contact.normal.x) <= minWallAngle)
         {
             if (contact.normal.y > minSlope) {
-                velocityOfGround = GetVelocityOfGround(contact.collider.gameObject.transform); // todo would this not mean that it wouldn't be grounded if connected to a non ground platform, even if also connected to a ground platform?
+                velocityOfGround = GetVelocityOfGround(contact.collider.gameObject); // todo would this not mean that it wouldn't be grounded if connected to a non ground platform, even if also connected to a ground platform?
             }
         }
         
     }
 
-    public Vector2 GetVelocityOfGround(Transform ground) {
+    public Vector2 GetVelocityOfGround(GameObject ground) {
         try {
-            return ground.gameObject.GetComponent<Rigidbody2D>().velocity;
+            return ground.GetComponent<Rigidbody2D>().velocity;
             // todo im pretty sure animations change the velocity, so this should work for both
             //Animator anim = ground.gameObject.GetComponent<Animator>();
             //return anim.velocity;

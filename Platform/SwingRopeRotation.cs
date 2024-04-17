@@ -4,11 +4,8 @@ using UnityEngine;
 
 /*
  * todo
- *  breaks after respawning
- *  breaks when player interacts with it
  *  'break' functionality not working
  *  figure out speed
- *  platform is still rotating
  */
 public class SwingRopeRotation : MonoBehaviour
 {
@@ -18,7 +15,10 @@ public class SwingRopeRotation : MonoBehaviour
     float timeOffset;
     float startTimeOffset;
 
+    Rigidbody2D rb;
+
     public void Init() {
+        rb = GetComponent<Rigidbody2D>();
         Transform child = transform.GetChild(0).transform;
         float length = Vector2.Distance(Vector2.zero, child.localPosition);
 
@@ -37,10 +37,10 @@ public class SwingRopeRotation : MonoBehaviour
         }
     }
 
-    void Update()
+    void FixedUpdate()
     {
         float angle = angleRange * Mathf.Sin(timeOffset * speed); // shm equation: https://en.wikipedia.org/wiki/Simple_harmonic_motion
-        transform.localRotation = Quaternion.Euler(0, 0, angle);
+        rb.MoveRotation(Quaternion.Euler(0, 0, angle));
         timeOffset += Time.deltaTime;
     }
 

@@ -5,10 +5,10 @@ using UnityEngine;
 public class TraversablePlatform : MonoBehaviour, RoomElement
 {
 
-    BoxCollider2D collider;
+    new BoxCollider2D collider;
     public Transform player;
     bool traversing = false;
-    bool enabled = false;
+    new bool enabled = false;
 
     // if update runs before box collider processes the collision and player is falling, player could be underneath the platform, which would produce wrong output, so adding a buffer
     public float buffer = 0.1f; 
