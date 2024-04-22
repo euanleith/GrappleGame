@@ -8,26 +8,34 @@ public class SwingPlatform : MonoBehaviour
     Rigidbody2D rb;
     Vector2 prevPos;
     Vector2 velocity;
+    bool broken;
 
     public void Init() {
         swing = GetComponentInParent<Swing>();
         rb = GetComponent<Rigidbody2D>();
-        //rb.bodyType = RigidbodyType2D.Static;
         transform.rotation = Quaternion.identity;
         prevPos = rb.position;
+        broken = false;
+    }
+
+    public void Reset() {
+        broken = false;
+        rb.constraints &= RigidbodyConstraints2D.FreezePositionY; // todo shouldn't have to do this...
     }
 
     void Update() {
         transform.rotation = Quaternion.Euler(0, 0, 0);
         rb.rotation = 0;
-        rb.velocity = velocity;
+        if (!broken) rb.velocity = velocity;
     }
 
     // physics done in FixedUpdate
     void FixedUpdate() {
         // velocity isn't set by parent's rotation, so have to set manually
-        velocity = (rb.position - prevPos) / Time.deltaTime;
-        prevPos = rb.position;
+        if (!broken) {
+            velocity = (rb.position - prevPos) / Time.deltaTime;
+            prevPos = rb.position;
+        }
     }
 
     public void OnCollisionEnter2D(Collision2D collision) {
@@ -35,7 +43,6 @@ public class SwingPlatform : MonoBehaviour
             swing.Activate();
         }
     }
-
 
     public void OnCollisionEnterWithGrapple() {
         swing.Activate();
@@ -46,17 +53,10 @@ public class SwingPlatform : MonoBehaviour
         return mask == (mask | (1 << layer));
     }
 
-    public RigidbodyType2D GetBodyType() {
-        if (rb == null) rb = GetComponent<Rigidbody2D>(); // todo shouldnt have to do this
-        return rb.bodyType;
-    }
-
-    public void SetBodyType(RigidbodyType2D bodyType) {
-        if (rb == null) rb = GetComponent<Rigidbody2D>(); // todo shouldnt have to do this
-        //rb.bodyType = bodyType;
-    }
-
-    public void Stop() {
-        rb.velocity = Vector2.zero;
+    public void Break() {
+        broken = true;
+        rb.bodyType = RigidbodyType2D.Dynamic;
+        rb.constraints &= ~RigidbodyConstraints2D.FreezePositionX;
+        rb.constraints &= ~RigidbodyConstraints2D.FreezePositionY;
     }
 }

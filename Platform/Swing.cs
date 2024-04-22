@@ -12,10 +12,12 @@ public class Swing : MonoBehaviour, RoomElement {
 
     SwingPlatform platform;
     SwingRopeRotation ropeRotation;
+    SwingRope rope;
 
     public void Init() {
         platform = GetComponentInChildren<SwingPlatform>();
         ropeRotation = GetComponentInChildren<SwingRopeRotation>();
+        rope = GetComponentInChildren<SwingRope>();
         ropeRotation.Init(initActivated);
         platform.Init();
         Reset();
@@ -23,7 +25,8 @@ public class Swing : MonoBehaviour, RoomElement {
 
     public void Reset() {
         ropeRotation.Reset(initActivated);
-        if (platform.GetBodyType() != RigidbodyType2D.Static) platform.Stop();
+        platform.Reset();
+        rope.Reset();
     }
 
     public void Disable() { }
@@ -35,6 +38,8 @@ public class Swing : MonoBehaviour, RoomElement {
 
     // todo currently on break, collides with deathplatforms off screen
     public void Break() {
-        //springJoint.enabled = false; // todo
+        ropeRotation.Break();
+        platform.Break();
+        rope.Break();
     }
 }

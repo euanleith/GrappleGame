@@ -17,6 +17,7 @@ public class SwingRopeRotation : MonoBehaviour
 
     Rigidbody2D rb;
     bool activated;
+    bool broken = false;
 
     public void Init(bool activated) {
         rb = GetComponent<Rigidbody2D>();
@@ -36,6 +37,7 @@ public class SwingRopeRotation : MonoBehaviour
 
     public void Reset(bool activated) {
         this.activated = activated;
+        broken = false;
         if (timeOffset != startTimeOffset) { // todo shouldnt have to do this
             timeOffset = startTimeOffset;
         }
@@ -45,10 +47,14 @@ public class SwingRopeRotation : MonoBehaviour
         activated = true;
     }
 
+    public void Break() {
+        broken = true;
+    }
+
     void FixedUpdate()
     {
         float angle = angleRange * Mathf.Sin(timeOffset * speed); // shm equation: https://en.wikipedia.org/wiki/Simple_harmonic_motion
-        rb.MoveRotation(Quaternion.Euler(0, 0, angle));
+        if (!broken) rb.MoveRotation(Quaternion.Euler(0, 0, angle));
         if (activated) timeOffset += Time.deltaTime;
     }
 

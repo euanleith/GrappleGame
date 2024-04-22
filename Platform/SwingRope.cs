@@ -18,11 +18,18 @@ public class SwingRope : MonoBehaviour {
         swing = GetComponentInParent<Swing>();
 
         lineRenderer = GetComponent<LineRenderer>();
+        lineRenderer.enabled = true;
         lineRenderer.startWidth = width;
         lineRenderer.endWidth = width;
-
+        
         collider = GetComponent<EdgeCollider2D>();
+        collider.enabled = true;
         collider.edgeRadius = width;
+    }
+
+    public void Reset() {
+        lineRenderer.enabled = true;
+        collider.enabled = true;
     }
 
     void Update() {
@@ -30,14 +37,14 @@ public class SwingRope : MonoBehaviour {
     }
 
     void Render() {
-        //if (!swing.breakable || swing.springJoint.enabled) {
-            Vector3 endTransformLocalPosition = endTransform.position - endTransform.parent.position + endTransform.parent.localPosition; // position determined by rotation of parent
-            lineRenderer.SetPositions(new Vector3[] { startTransform.localPosition, endTransformLocalPosition });
-            collider.SetPoints(new List<Vector2>() { startTransform.localPosition, endTransformLocalPosition });
-        //} else {
-            //lineRenderer.enabled = false;
-        //    collider.enabled = false;
-        //}
+        Vector3 endTransformLocalPosition = endTransform.position - endTransform.parent.position + endTransform.parent.localPosition; // position determined by rotation of parent
+        lineRenderer.SetPositions(new Vector3[] { startTransform.localPosition, endTransformLocalPosition });
+        collider.SetPoints(new List<Vector2>() { startTransform.localPosition, endTransformLocalPosition });
+    }
+
+    public void Break() {
+        lineRenderer.enabled = false;
+        collider.enabled = false;
     }
 
     public void OnTriggerEnter2D(Collider2D collider) {
