@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Swing : MonoBehaviour, RoomElement {
 
-    public bool activated = false; // todo maybe want just player on 'stand on' and just on 'player'
+    public bool initActivated = true; // todo maybe want just player on 'stand on' and just on 'player'
     public LayerMask activatorLayers = 1 << 12; // Player layer
 
     public bool breakable = false;
@@ -16,21 +16,20 @@ public class Swing : MonoBehaviour, RoomElement {
     public void Init() {
         platform = GetComponentInChildren<SwingPlatform>();
         ropeRotation = GetComponentInChildren<SwingRopeRotation>();
-        ropeRotation.Init();
+        ropeRotation.Init(initActivated);
         platform.Init();
         Reset();
     }
 
     public void Reset() {
-        ropeRotation.Reset();
+        ropeRotation.Reset(initActivated);
         if (platform.GetBodyType() != RigidbodyType2D.Static) platform.Stop();
-        if (activated) platform.SetBodyType(RigidbodyType2D.Static);
     }
 
     public void Disable() { }
 
     public void Activate() {
-        //platform.SetBodyType(RigidbodyType2D.Dynamic);
+        ropeRotation.Activate();
         // todo stop at some point? maybe when back at startPos?
     }
 

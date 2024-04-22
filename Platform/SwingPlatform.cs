@@ -31,7 +31,7 @@ public class SwingPlatform : MonoBehaviour
     }
 
     public void OnCollisionEnter2D(Collision2D collision) {
-        if (swing.activated && LayerMaskContains(swing.activatorLayers, collision.gameObject.layer)) {
+        if (!swing.initActivated && LayerMaskContains(swing.activatorLayers, collision.gameObject.layer)) {
             swing.Activate();
         }
     }
