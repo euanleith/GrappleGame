@@ -14,7 +14,7 @@ public class SwingRope : MonoBehaviour {
     LineRenderer lineRenderer;
     new EdgeCollider2D collider;
 
-    void Start() {
+    public void Init() {
         swing = GetComponentInParent<Swing>();
 
         lineRenderer = GetComponent<LineRenderer>();

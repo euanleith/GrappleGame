@@ -20,6 +20,7 @@ public class Swing : MonoBehaviour, RoomElement {
         rope = GetComponentInChildren<SwingRope>();
         ropeRotation.Init(initActivated);
         platform.Init();
+        rope.Init();
         Reset();
     }
 

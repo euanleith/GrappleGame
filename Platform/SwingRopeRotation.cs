@@ -38,9 +38,8 @@ public class SwingRopeRotation : MonoBehaviour
     public void Reset(bool activated) {
         this.activated = activated;
         broken = false;
-        if (timeOffset != startTimeOffset) { // todo shouldnt have to do this
-            timeOffset = startTimeOffset;
-        }
+        timeOffset = startTimeOffset;
+        
     }
 
     public void Activate() {
