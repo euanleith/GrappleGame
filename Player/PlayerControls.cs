@@ -76,6 +76,7 @@ public class PlayerControls : MonoBehaviour
         {
             // todo would making this a switch make it clearer?
             if ((isGrounded || (hitWallNormal != 0)) && Input.GetButtonDown("Jump")) { // jumping
+                Debug.Log("trying to jump");
                 if (isGrounded && lastGroundCollision.gameObject.layer == 22 && moveY < 0) { // TraversablePlatform layer
                     // todo or holding down while land on TraversablePlatform?
                     lastGroundCollision.gameObject.GetComponent<TraversablePlatform>().Traverse();
@@ -120,9 +121,15 @@ public class PlayerControls : MonoBehaviour
     {
         if (isGrounded) {
             layerMaskGround = LayerMask.GetMask("Ground", "Swing");
-            RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, Mathf.Infinity, layerMaskGround);
-            float distanceToGround = transform.position.y - hit.point.y;
-            transform.position += Vector3.up * (0.5f - distanceToGround); // todo 0.5f = player height / 2
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 0.6f, layerMaskGround); // todo 0.6 = player height/2 + wiggle room
+            if (hit.collider) { 
+                float distanceToGround = transform.position.y - hit.point.y;
+                transform.position += Vector3.up * (0.5f - distanceToGround); // todo 0.5f = player height / 2
+            } 
+            else {
+                isGrounded = false;
+            }
+            
         }
     }
 
@@ -183,6 +190,7 @@ public class PlayerControls : MonoBehaviour
     }
 
     public void Jump() {
+        Debug.Log("jumping " + Time.deltaTime);
         grapple.OnJump(); // todo note setting canTransformGrapple=true when doing any jump
         isGrounded = false;
         // todo theres a better way than if else / switch
