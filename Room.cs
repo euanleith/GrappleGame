@@ -77,12 +77,14 @@ public class Room : MonoBehaviour
     // todo maybe always do player stuff here
     public void Reset() {
         // todo move to Reset() function in PlayerControls
-
+        Debug.Log("reset");
         Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
         rb.velocity = new Vector2(0, 0);
         PlayerControls playerControls = player.GetComponent<PlayerControls>();
         playerControls.grapple.Disable();
         playerControls.FinishStun();
+        playerControls.velocityOfGround = Vector2.zero;
+        // todo isGrounded = true
         player.GetComponent<Health>().currentIFrames = 0;
         Enable();
     }

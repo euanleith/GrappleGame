@@ -54,6 +54,9 @@ public class PlayerControls : MonoBehaviour
     public const float stunDuration = 1f;
     float stunCnt = 0f;
 
+    public const float jumpCooldownDuration = 0.1f;
+    float jumpCooldown = 0f;
+
     void Start()
     {
         previousPos = transform.position;
@@ -68,6 +71,9 @@ public class PlayerControls : MonoBehaviour
             stunCnt -= Time.deltaTime;
             return;
         } else if (stunned) FinishStun();
+        if (jumpCooldown > 0) {
+            jumpCooldown -= Time.deltaTime;
+        }
 
         moveX = Input.GetAxis("Horizontal");
         moveY = Input.GetAxis("Vertical");
@@ -89,10 +95,10 @@ public class PlayerControls : MonoBehaviour
             {
                 rb.velocity = new Vector2(0, wallClimbSpeed);
             }
-            else if (isGrounded) { // moving along ground
+            else if (isGrounded && jumpCooldown <= 0) { // moving along ground
                 if (moveX != 0) {
                     if (moveX * velocityOfGround.x > 0) { // not add velocityOfGround.x when moveX is in the opposite direction
-                    rb.velocity = new Vector2((moveX * groundSpeed) + velocityOfGround.x, velocityOfGround.y);
+                        rb.velocity = new Vector2((moveX * groundSpeed) + velocityOfGround.x, velocityOfGround.y);
                     } else {
                         rb.velocity = new Vector2((moveX * groundSpeed), velocityOfGround.y);
                     }
@@ -119,6 +125,7 @@ public class PlayerControls : MonoBehaviour
     void SnapToGround()
     {
         if (isGrounded) {
+            Debug.Log("----------player: " + rb.velocity);
             layerMaskGround = LayerMask.GetMask("Ground", "Swing");
             RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 0.75f, layerMaskGround); // todo 0.6 = player height/2 + wiggle room
             if (hit.collider) { 
@@ -179,16 +186,18 @@ public class PlayerControls : MonoBehaviour
         //  on hit by enemy..?
         //  on land on swing then die?
         // if player is within horizontal bounds of platform and hasnt jumped/grappled
-        if (transform.position.x + (transform.localScale.x/2) > collision.transform.position.x - (collision.transform.localScale.x/2) &&
-            transform.position.x - (transform.localScale.x/2) < collision.transform.position.x + (collision.transform.localScale.x/2) &&
-            !grapple.isEnabled()) {
-                SnapToGround();
+        if (transform.position.x + (transform.localScale.x / 2) > collision.transform.position.x - (collision.transform.localScale.x / 2) &&
+            transform.position.x - (transform.localScale.x / 2) < collision.transform.position.x + (collision.transform.localScale.x / 2) &&
+            !grapple.isEnabled() && jumpCooldown <= 0) {
+            SnapToGround();
         } else if (nCurrentCollisions <= 0) {
+            Debug.Log(rb.velocity);
             isGrounded = false;
         }
     }
 
     public void Jump() {
+        jumpCooldown = jumpCooldownDuration;
         grapple.OnJump(); // todo note setting canTransformGrapple=true when doing any jump
         isGrounded = false;
         // todo theres a better way than if else / switch
@@ -204,7 +213,7 @@ public class PlayerControls : MonoBehaviour
                 velocityX = rb.velocity.x + (moveX * forwardAirSpeed * Time.deltaTime);
                 break;
         }
-        float velocityY = jumpSpeed;
+        float velocityY = rb.velocity.y + jumpSpeed;
         // todo should i add this?
         //if (velocityOfGround != Vector2.zero) {
         //    velocityX = velocityOfGround.x + rb.velocity.x + (moveX * forwardAirSpeed * Time.deltaTime);
