@@ -48,6 +48,10 @@ public class SwingRope : MonoBehaviour {
     }
 
     public void OnTriggerEnter2D(Collider2D collider) {
+        if (swing.ropeTouchActivated && LayerMaskContains(swing.activatorLayers, collider.gameObject.layer)) {
+            Debug.Log("hi");
+            swing.Activate();
+        }
         if (swing.breakable && LayerMaskContains(swing.breakerLayers, collider.gameObject.layer)) { // todo PLAYER_ATTACK_LAYER) {
             swing.Break();
         }

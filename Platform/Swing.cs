@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class Swing : MonoBehaviour, RoomElement {
 
-    public bool initActivated = true; // todo maybe want just player on 'stand on' and just on 'player'
+    // todo maybe make these some single data type visible in the inspector
+    public bool platformTouchActivated = false; // todo maybe want just player on 'stand on' and just on 'player'
+    public bool ropeTouchActivated = false;
     public LayerMask activatorLayers = 1 << 12; // Player layer
 
     public bool breakable = false;
@@ -18,14 +20,14 @@ public class Swing : MonoBehaviour, RoomElement {
         platform = GetComponentInChildren<SwingPlatform>();
         ropeRotation = GetComponentInChildren<SwingRopeRotation>();
         rope = GetComponentInChildren<SwingRope>();
-        ropeRotation.Init(initActivated);
+        ropeRotation.Init(IsInitActivated());
         if (platform) platform.Init();
         rope.Init();
         Reset();
     }
 
     public void Reset() {
-        ropeRotation.Reset(initActivated);
+        ropeRotation.Reset(IsInitActivated());
         if (platform) platform.Reset();
         rope.Reset();
     }
@@ -42,5 +44,9 @@ public class Swing : MonoBehaviour, RoomElement {
         ropeRotation.Break();
         platform.Break();
         rope.Break();
+    }
+
+    bool IsInitActivated() {
+        return !(platformTouchActivated || ropeTouchActivated);
     }
 }

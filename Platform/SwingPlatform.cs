@@ -39,13 +39,15 @@ public class SwingPlatform : MonoBehaviour
     }
 
     public void OnCollisionEnter2D(Collision2D collision) {
-        if (!swing.initActivated && LayerMaskContains(swing.activatorLayers, collision.gameObject.layer)) {
+        if (swing.platformTouchActivated && LayerMaskContains(swing.activatorLayers, collision.gameObject.layer)) {
             swing.Activate();
         }
     }
 
     public void OnCollisionEnterWithGrapple() {
-        swing.Activate();
+        if (swing.platformTouchActivated) {
+            swing.Activate();
+        }
     }
 
     // todo create static extension class for this, see https://discussions.unity.com/t/check-if-layer-is-in-layermask/16007/2
