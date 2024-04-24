@@ -19,14 +19,14 @@ public class Swing : MonoBehaviour, RoomElement {
         ropeRotation = GetComponentInChildren<SwingRopeRotation>();
         rope = GetComponentInChildren<SwingRope>();
         ropeRotation.Init(initActivated);
-        platform.Init();
+        if (platform) platform.Init();
         rope.Init();
         Reset();
     }
 
     public void Reset() {
         ropeRotation.Reset(initActivated);
-        platform.Reset();
+        if (platform) platform.Reset();
         rope.Reset();
     }
 
