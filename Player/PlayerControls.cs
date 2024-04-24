@@ -125,7 +125,6 @@ public class PlayerControls : MonoBehaviour
     void SnapToGround()
     {
         if (isGrounded) {
-            Debug.Log("----------player: " + rb.velocity);
             layerMaskGround = LayerMask.GetMask("Ground", "Swing");
             RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 0.75f, layerMaskGround); // todo 0.6 = player height/2 + wiggle room
             if (hit.collider) { 
@@ -191,7 +190,6 @@ public class PlayerControls : MonoBehaviour
             !grapple.isEnabled() && jumpCooldown <= 0) {
             SnapToGround();
         } else if (nCurrentCollisions <= 0) {
-            Debug.Log(rb.velocity);
             isGrounded = false;
         }
     }

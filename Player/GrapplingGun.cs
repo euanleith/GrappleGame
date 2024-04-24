@@ -57,7 +57,7 @@ public class GrapplingGun : MonoBehaviour
 
     private Health health;
 
-    public Vector2 relativeGrapplePoint = new Vector2(0, 0);
+    Vector2 relativeGrapplePoint = new Vector2(0, 0);
 
     public RaycastHit2D hit; // todo is there a better way? - using to keep track of enemy for processing collisions
 
@@ -111,8 +111,8 @@ public class GrapplingGun : MonoBehaviour
                 if (Vector2.Distance(hit.point, firePoint.position) <= maxDistance)
                 {
                     grapplePoint = hit.point;
-                    relativeGrapplePoint = hit.point - (Vector2)hit.transform.position;
                     grappleDistanceVector = grapplePoint - (Vector2)gunHolder.position;
+                    Vector2 relativeGrapplePoint = hit.point - (Vector2)hit.transform.position;
                     grappleRope.enabled = true;
                     if (hit.transform.gameObject.GetComponent<Rigidbody2D>()) {
                         springJoint.connectedBody = hit.transform.gameObject.GetComponent<Rigidbody2D>();
@@ -134,22 +134,34 @@ public class GrapplingGun : MonoBehaviour
     }
 
     void UpdateGrapplePoint() {
-        // take into account position & rotation of connectedBody
-        if (springJoint.connectedBody != null) {
-            // position
-            Vector2 relocatedGrapplePoint = springJoint.connectedBody.position + relativeGrapplePoint;
-            // rotation
-            Vector2 centre = springJoint.connectedBody.worldCenterOfMass;
-            float rotation = springJoint.connectedBody.rotation;
-            if (rotation < 0) rotation = 360-(-rotation%360); // convert from pos/neg degrees to just pos
-            rotation = MathF.PI * rotation / 180f; // degrees to radians
-            // calculate point along rotation - https://math.stackexchange.com/questions/3935956/calculate-the-new-position-of-a-point-after-rotating-it-around-another-point-2d
-            grapplePoint.x = ((relocatedGrapplePoint.x - centre.x) * MathF.Cos(rotation)) - ((relocatedGrapplePoint.y - centre.y) * MathF.Sin(rotation)) + centre.x;
-            grapplePoint.y = ((relocatedGrapplePoint.x - centre.x) * MathF.Sin(rotation)) + ((relocatedGrapplePoint.y - centre.y) * MathF.Cos(rotation)) + centre.y;
+        // take into account position & rotation of hit object
 
-            // todo not moving along with grapple when rotating :( need to take some stuff from grapple? would be nice if just ran it every frame, but thats not working for some reason... maybe want to set grapple distance to the current, and only allow it to change with user input moving up and down?
-            // works differently for transform than physics??
+        // position
+        //Vector2 relocatedGrapplePoint = (Vector2)hit.transform.position + relativeGrapplePoint;
+        grapplePoint = (Vector2)hit.transform.position + relativeGrapplePoint;
+
+        // if grapple swing rope
+        // todo maybe i wouldn't need a separate section just for swing ropes if SwingRope was a child of pivot and rotated accordingly, though idk
+        if (hit.transform.gameObject.GetComponent<SwingRope>() != null) {
+            Transform pivot = hit.transform.gameObject.GetComponent<SwingRope>().startTransform;
+            float angle = pivot.eulerAngles.z * Mathf.Deg2Rad;
+            float distanceFromPivot = Vector2.Distance(hit.point, pivot.position);
+            grapplePoint = new Vector2(pivot.position.x + distanceFromPivot * Mathf.Sin(angle), pivot.position.y - distanceFromPivot * Mathf.Cos(angle));
         }
+
+        /*
+        // rotation
+        Vector2 centre = (Vector2)hit.transform.worldCenterOfMass;
+        float rotation = hit.transform.eulerAngles.z;
+        if (rotation < 0) rotation = 360-(-rotation%360); // convert from pos/neg degrees to just pos
+        rotation = MathF.PI * rotation / 180f; // degrees to radians
+        // calculate point along rotation - https://math.stackexchange.com/questions/3935956/calculate-the-new-position-of-a-point-after-rotating-it-around-another-point-2d
+        grapplePoint.x = ((relocatedGrapplePoint.x - centre.x) * MathF.Cos(rotation)) - ((relocatedGrapplePoint.y - centre.y) * MathF.Sin(rotation)) + centre.x;
+        grapplePoint.y = ((relocatedGrapplePoint.x - centre.x) * MathF.Sin(rotation)) + ((relocatedGrapplePoint.y - centre.y) * MathF.Cos(rotation)) + centre.y;
+
+        // todo not moving along with grapple when rotating :( need to take some stuff from grapple? would be nice if just ran it every frame, but thats not working for some reason... maybe want to set grapple distance to the current, and only allow it to change with user input moving up and down?
+        // works differently for transform than physics??
+        */
     }
 
     public void Grapple()
