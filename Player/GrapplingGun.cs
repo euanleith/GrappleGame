@@ -77,6 +77,7 @@ public class GrapplingGun : MonoBehaviour
         }
         if (Input.GetButtonDown("Fire1")) {
             SetGrapplePoint();
+            UpdateGrapplePoint();
         }
         if (Input.GetButtonDown("Fire2") && canTransformGrapple)
         {
@@ -112,14 +113,9 @@ public class GrapplingGun : MonoBehaviour
                 {
                     grapplePoint = hit.point;
                     grappleDistanceVector = grapplePoint - (Vector2)gunHolder.position;
-                    Vector2 relativeGrapplePoint = hit.point - (Vector2)hit.transform.position;
+                    relativeGrapplePoint = hit.point - (Vector2)hit.transform.position;
                     grappleRope.enabled = true;
-                    if (hit.transform.gameObject.GetComponent<Rigidbody2D>()) {
-                        springJoint.connectedBody = hit.transform.gameObject.GetComponent<Rigidbody2D>();
-                        springJoint.connectedAnchor = Vector2.zero;
-                    } else {
-                        springJoint.connectedAnchor = grapplePoint;
-                    }
+
                     // todo surely there's a better way of doing this :')
                     if (hit.transform.gameObject.layer == 8) { // todo maybe also only if transform launch?
                         hit.transform.gameObject.GetComponent<Enemy>().OnCollisionEnterWithGrapple();
@@ -162,6 +158,13 @@ public class GrapplingGun : MonoBehaviour
         // todo not moving along with grapple when rotating :( need to take some stuff from grapple? would be nice if just ran it every frame, but thats not working for some reason... maybe want to set grapple distance to the current, and only allow it to change with user input moving up and down?
         // works differently for transform than physics??
         */
+
+        if (hit.transform.gameObject.GetComponent<Rigidbody2D>()) {
+            springJoint.connectedBody = hit.transform.gameObject.GetComponent<Rigidbody2D>();
+            springJoint.connectedAnchor = Vector2.zero;
+        } else {
+            springJoint.connectedAnchor = grapplePoint;
+        }
     }
 
     public void Grapple()
