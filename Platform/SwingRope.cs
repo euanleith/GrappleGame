@@ -14,7 +14,7 @@ public class SwingRope : MonoBehaviour {
     LineRenderer lineRenderer;
     new EdgeCollider2D collider;
 
-    public void Init() {
+    public void Init(bool isCollidable) {
         swing = GetComponentInParent<Swing>();
 
         lineRenderer = GetComponent<LineRenderer>();
@@ -24,7 +24,8 @@ public class SwingRope : MonoBehaviour {
         
         collider = GetComponent<EdgeCollider2D>();
         collider.enabled = true;
-        collider.edgeRadius = width;
+        collider.edgeRadius = 0;
+        collider.isTrigger = !isCollidable;
     }
 
     public void Reset() {
@@ -47,12 +48,19 @@ public class SwingRope : MonoBehaviour {
         collider.enabled = false;
     }
 
+    public void OnCollisionEnter2D(Collision2D collision) {
+        OnCollision(collision.gameObject);
+    }
+
     public void OnTriggerEnter2D(Collider2D collider) {
-        if (swing.ropeTouchActivated && LayerMaskContains(swing.activatorLayers, collider.gameObject.layer)) {
-            Debug.Log("hi");
+        OnCollision(collider.gameObject);
+    }
+
+    void OnCollision(GameObject collider) {
+        if (swing.ropeTouchActivated && LayerMaskContains(swing.activatorLayers, collider.layer)) {
             swing.Activate();
         }
-        if (swing.breakable && LayerMaskContains(swing.breakerLayers, collider.gameObject.layer)) { // todo PLAYER_ATTACK_LAYER) {
+        if (swing.breakable && LayerMaskContains(swing.breakerLayers, collider.layer)) { // todo PLAYER_ATTACK_LAYER) {
             swing.Break();
         }
     }
