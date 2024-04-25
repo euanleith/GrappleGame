@@ -140,7 +140,7 @@ public class GrapplingGun : MonoBehaviour
         // todo maybe i wouldn't need a separate section just for swing ropes if SwingRope was a child of pivot and rotated accordingly, though idk
         if (hit.transform.gameObject.GetComponent<SwingRope>() != null) {
             Transform pivot = hit.transform.gameObject.GetComponent<SwingRope>().startTransform;
-            float angle = pivot.eulerAngles.z * Mathf.Deg2Rad;
+            float angle = (pivot.eulerAngles.z-90) * Mathf.Deg2Rad; // need to subtract 90 degrees as rotating through 0->180 rather than -90->90, see https://team-kbscl1g1am1g.atlassian.net/browse/GGBT-69
             float distanceFromPivot = Vector2.Distance(hit.point, pivot.position);
             grapplePoint = new Vector2(pivot.position.x + distanceFromPivot * Mathf.Sin(angle), pivot.position.y - distanceFromPivot * Mathf.Cos(angle));
         }
