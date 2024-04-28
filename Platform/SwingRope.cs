@@ -8,24 +8,28 @@ public class SwingRope : MonoBehaviour {
     public float width = 0.25f;
 
     Swing swing;
-    public Transform startTransform;
-    public Transform endTransform;
+    // start and end transform should be pivot and platform respectively in parent swing, and swapped for any child swings,
+    // for more info see https://team-kbscl1g1am1g.atlassian.net/browse/GGBT-69
+    public Transform pivot;
+    public Transform platform;
 
-    LineRenderer lineRenderer;
-    new EdgeCollider2D collider;
+    public LineRenderer lineRenderer; // todo why do these need to be added in the inspector?
+    new public EdgeCollider2D collider;
 
     public void Init(bool isCollidable) {
         swing = GetComponentInParent<Swing>();
 
-        lineRenderer = GetComponent<LineRenderer>();
+        //lineRenderer = GetComponent<LineRenderer>();
         lineRenderer.enabled = true;
         lineRenderer.startWidth = width;
         lineRenderer.endWidth = width;
         
-        collider = GetComponent<EdgeCollider2D>();
+        //collider = GetComponent<EdgeCollider2D>();
         collider.enabled = true;
         collider.edgeRadius = 0;
         collider.isTrigger = !isCollidable;
+
+        Render();
     }
 
     public void Reset() {
@@ -33,14 +37,13 @@ public class SwingRope : MonoBehaviour {
         collider.enabled = true;
     }
 
-    void Update() {
-        Render();
+    void FixedUpdate() {
+        //Render();
     }
 
     void Render() {
-        Vector3 endTransformLocalPosition = endTransform.position - endTransform.parent.position + endTransform.parent.localPosition; // position determined by rotation of parent
-        lineRenderer.SetPositions(new Vector3[] { startTransform.localPosition, endTransformLocalPosition });
-        collider.SetPoints(new List<Vector2>() { startTransform.localPosition, endTransformLocalPosition });
+        lineRenderer.SetPositions(new Vector3[] { pivot.localPosition, platform.localPosition });
+        collider.SetPoints(new List<Vector2>() { pivot.localPosition, platform.localPosition });
     }
 
     public void Break() {

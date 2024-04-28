@@ -61,6 +61,8 @@ public class GrapplingGun : MonoBehaviour
 
     public RaycastHit2D hit; // todo is there a better way? - using to keep track of enemy for processing collisions
 
+    float distanceFromPivot;
+
     private void Start()
     {
         grappleRope.enabled = false;
@@ -121,8 +123,10 @@ public class GrapplingGun : MonoBehaviour
                         hit.transform.gameObject.GetComponent<Enemy>().OnCollisionEnterWithGrapple();
                     } else if (hit.transform.gameObject.layer == 20) {
                         hit.transform.gameObject.GetComponent<GrappleablePlatform>().OnCollisionEnterWithGrapple(distanceVector);
-                    } else if (hit.transform.gameObject.layer == 21) {
-                        hit.transform.gameObject.GetComponent<SwingPlatform>().OnCollisionEnterWithGrapple();
+                    } else if (hit.collider.gameObject.layer == 21) {
+                        hit.collider.gameObject.GetComponent<SwingPlatform>().OnCollisionEnterWithGrapple();
+                    } else if (hit.collider.gameObject.GetComponent<SwingRope>() != null) {
+                        distanceFromPivot = Vector2.Distance(hit.point, hit.collider.gameObject.GetComponent<SwingRope>().pivot.position);
                     }
                 }
             }
@@ -138,10 +142,10 @@ public class GrapplingGun : MonoBehaviour
 
         // if grapple swing rope
         // todo maybe i wouldn't need a separate section just for swing ropes if SwingRope was a child of pivot and rotated accordingly, though idk
-        if (hit.transform.gameObject.GetComponent<SwingRope>() != null) {
-            Transform pivot = hit.transform.gameObject.GetComponent<SwingRope>().startTransform;
-            float angle = (pivot.eulerAngles.z-90) * Mathf.Deg2Rad; // need to subtract 90 degrees as rotating through 0->180 rather than -90->90, see https://team-kbscl1g1am1g.atlassian.net/browse/GGBT-69
-            float distanceFromPivot = Vector2.Distance(hit.point, pivot.position);
+        // actually even if i don't, i can just set the pivot to the object, and add a condition to set it to swingrope.pivot if its a swingrope
+        if (hit.collider.gameObject.GetComponent<SwingRope>() != null) {
+            Transform pivot = hit.collider.gameObject.GetComponent<SwingRope>().pivot;
+            float angle = (pivot.eulerAngles.z-90) * Mathf.Deg2Rad; // need to subtract 90 degrees as rotating through 0->180 rather than -90->90, see https://github.com/euanleith/GrappleGame/commit/f7e0c2fde40b93b5c7b2481b6bb43c119cd27b39
             grapplePoint = new Vector2(pivot.position.x + distanceFromPivot * Mathf.Sin(angle), pivot.position.y - distanceFromPivot * Mathf.Cos(angle));
         }
 

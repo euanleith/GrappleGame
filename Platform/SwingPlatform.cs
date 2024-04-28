@@ -4,15 +4,15 @@ using UnityEngine;
 
 public class SwingPlatform : MonoBehaviour
 {
-    Swing swing;
-    Rigidbody2D rb;
+    public Swing swing;
+    public Rigidbody2D rb; // why does this needed to be added in the inspector?
     Vector2 prevPos;
     Vector2 velocity;
     bool broken;
 
     public void Init() {
-        swing = GetComponentInParent<Swing>();
-        rb = GetComponent<Rigidbody2D>();
+        //swing = GetComponentInParent<Swing>();
+        //rb = GetComponent<Rigidbody2D>();
         transform.rotation = Quaternion.identity;
         prevPos = rb.position;
         broken = false;

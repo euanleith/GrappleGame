@@ -60,7 +60,7 @@ public class SwingRopeRotation : MonoBehaviour
             i'm rotating through 0 -> 180.
             this requires using angleRange*2 as using angleRange will 
             return NaN when running asin in CalculateTimeOffset
-            for more info: https://team-kbscl1g1am1g.atlassian.net/browse/GGBT-69
+            for more info, see https://github.com/euanleith/GrappleGame/commit/f7e0c2fde40b93b5c7b2481b6bb43c119cd27b39
         */
         angle = (angleRange*2) * Mathf.Sin(CalculateTimeOffset(angle + 90, angleRange*2)) * speed;
 
