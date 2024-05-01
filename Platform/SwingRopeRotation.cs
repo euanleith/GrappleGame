@@ -53,16 +53,7 @@ public class SwingRopeRotation : MonoBehaviour
     void FixedUpdate()
     {
         float angle = angleRange * Mathf.Sin(timeOffset * speed); // shm equation: https://en.wikipedia.org/wiki/Simple_harmonic_motion
-
-        /* todo there's probably a better equation for this, but for now i'll explain
-            i want rotation = 0 on start,
-            so instead of rotating through -90 -> 90 for angleRange,
-            i'm rotating through 0 -> 180.
-            this requires using angleRange*2 as using angleRange will 
-            return NaN when running asin in CalculateTimeOffset
-            for more info, see https://github.com/euanleith/GrappleGame/commit/f7e0c2fde40b93b5c7b2481b6bb43c119cd27b39
-        */
-        angle = (angleRange*2) * Mathf.Sin(CalculateTimeOffset(angle + 90, angleRange*2)) * speed;
+        angle -= angleRange; // want rotation = 0 on start, so rotating through 0 -> angleRange*2 instead of -angleRange -> angleRange
 
         if (!broken) rb.MoveRotation(Quaternion.Euler(0, 0, angle));
         if (activated) timeOffset += Time.deltaTime;
