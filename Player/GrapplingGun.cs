@@ -26,6 +26,9 @@ public class GrapplingGun : MonoBehaviour
     //      precise limitation
     //      forces player to lose momentum to recharge, so there's a opportunity cost that needs to be calculated
 
+    public float frequency = 1f;
+    public float movingPlatformFrequency = 5f; // see https://team-kbscl1g1am1g.atlassian.net/browse/GGBT-80
+
     public float countdown;
 
     public LayerMask ignoreRaycast;
@@ -138,7 +141,9 @@ public class GrapplingGun : MonoBehaviour
 
         // position
         //Vector2 relocatedGrapplePoint = (Vector2)hit.transform.position + relativeGrapplePoint;
-        grapplePoint = (Vector2)hit.transform.position + relativeGrapplePoint;
+        Vector2 newGrapplePoint = (Vector2)hit.transform.position + relativeGrapplePoint;
+        if (newGrapplePoint != grapplePoint) springJoint.frequency = movingPlatformFrequency;
+        grapplePoint = newGrapplePoint;
 
         // if grapple swing rope
         // todo maybe i wouldn't need a separate section just for swing ropes if SwingRope was a child of pivot and rotated accordingly, though idk
@@ -199,6 +204,7 @@ public class GrapplingGun : MonoBehaviour
         grappleRope.enabled = false;
         springJoint.enabled = false;
         springJoint.connectedBody = null;
+        springJoint.frequency = frequency;
         if (hit && hit.transform.gameObject.layer == 8) {
             hit.transform.gameObject.GetComponent<Enemy>().OnCollisionExitWithGrapple();
         }
