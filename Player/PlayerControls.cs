@@ -28,6 +28,8 @@ public class PlayerControls : MonoBehaviour
     public float stdBounceSpeed;
     public Vector2 knockbackSpeed = new Vector2(1, 2);
 
+    public float maxSpeed = 20f;
+
 
     public float moveX;
     public float moveY;
@@ -119,6 +121,10 @@ public class PlayerControls : MonoBehaviour
         } else {
             // todo make only possible for transform grapple after reaching original destination? otherwise its weird when e.g. you transform grapple straight down while holding down
             rb.velocity = new Vector2((rb.velocity.x + (Time.deltaTime * moveX * grappleMoveSpeed)), rb.velocity.y);
+        }
+
+        if (rb.velocity.magnitude > maxSpeed) {
+            rb.velocity = rb.velocity.normalized * maxSpeed;
         }
     }
 
