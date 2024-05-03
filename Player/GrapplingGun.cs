@@ -145,7 +145,8 @@ public class GrapplingGun : MonoBehaviour
         // actually even if i don't, i can just set the pivot to the object, and add a condition to set it to swingrope.pivot if its a swingrope
         if (hit.collider.gameObject.GetComponent<SwingRope>() != null) {
             Transform pivot = hit.collider.gameObject.GetComponent<SwingRope>().pivot;
-            float angle = (pivot.eulerAngles.z-90) * Mathf.Deg2Rad; // need to subtract 90 degrees as rotating through 0->180 rather than -90->90, see https://github.com/euanleith/GrappleGame/commit/f7e0c2fde40b93b5c7b2481b6bb43c119cd27b39
+            float angleRange = Mathf.Abs(pivot.gameObject.GetComponent<SwingRopeRotation>().angleRange);
+            float angle = (pivot.eulerAngles.z-angleRange) * Mathf.Deg2Rad; // subtract angleRange as rotating through 0->2*angleRange rather than -angleRange->angleRange, see https://github.com/euanleith/GrappleGame/commit/f7e0c2fde40b93b5c7b2481b6bb43c119cd27b39
             grapplePoint = new Vector2(pivot.position.x + distanceFromPivot * Mathf.Sin(angle), pivot.position.y - distanceFromPivot * Mathf.Cos(angle));
         }
 
@@ -163,8 +164,8 @@ public class GrapplingGun : MonoBehaviour
         // works differently for transform than physics??
         */
 
-        if (hit.transform.gameObject.GetComponent<Rigidbody2D>()) {
-            springJoint.connectedBody = hit.transform.gameObject.GetComponent<Rigidbody2D>();
+        if (hit.collider.gameObject.GetComponent<Rigidbody2D>()) {
+            springJoint.connectedBody = hit.collider.gameObject.GetComponent<Rigidbody2D>();
             springJoint.connectedAnchor = Vector2.zero;
         } else {
             springJoint.connectedAnchor = grapplePoint;
