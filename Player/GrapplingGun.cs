@@ -151,7 +151,7 @@ public class GrapplingGun : MonoBehaviour
         // actually even if i don't, i can just set the pivot to the object, and add a condition to set it to swingrope.pivot if its a swingrope
         if (hit.collider.gameObject.GetComponent<SwingRope>() != null) {
             Transform pivot = hit.collider.gameObject.GetComponent<SwingRope>().pivot;
-            float angleRange = Mathf.Abs(pivot.gameObject.GetComponent<SwingRopeRotation>().angleRange);
+            float angleRange = -pivot.gameObject.GetComponent<SwingRopeRotation>().angleRange;
             float angle = (pivot.eulerAngles.z-angleRange) * Mathf.Deg2Rad; // subtract angleRange as rotating through 0->2*angleRange rather than -angleRange->angleRange, see https://github.com/euanleith/GrappleGame/commit/f7e0c2fde40b93b5c7b2481b6bb43c119cd27b39
             grapplePoint = new Vector2(pivot.position.x + distanceFromPivot * Mathf.Sin(angle), pivot.position.y - distanceFromPivot * Mathf.Cos(angle));
         }
