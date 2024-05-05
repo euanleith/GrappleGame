@@ -8,8 +8,6 @@ public class SwingRope : MonoBehaviour {
     public float width = 0.25f;
 
     Swing swing;
-    // start and end transform should be pivot and platform respectively in parent swing, and swapped for any child swings,
-    // for more info see https://team-kbscl1g1am1g.atlassian.net/browse/GGBT-69
     public Transform pivot;
     public Transform platform;
 
@@ -66,6 +64,10 @@ public class SwingRope : MonoBehaviour {
         if (swing.breakable && LayerMaskContains(swing.breakerLayers, collider.layer)) { // todo PLAYER_ATTACK_LAYER) {
             swing.Break();
         }
+    }
+
+    public void OnCollisionEnterWithGrapple() {
+        swing.Activate();
     }
 
     // todo create static extension class for this, see https://discussions.unity.com/t/check-if-layer-is-in-layermask/16007/2

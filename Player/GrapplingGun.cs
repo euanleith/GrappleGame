@@ -129,6 +129,7 @@ public class GrapplingGun : MonoBehaviour
                     } else if (hit.collider.gameObject.layer == 21) {
                         hit.collider.gameObject.GetComponent<SwingPlatform>().OnCollisionEnterWithGrapple();
                     } else if (hit.collider.gameObject.GetComponent<SwingRope>() != null) {
+                        hit.collider.gameObject.GetComponent<SwingRope>().OnCollisionEnterWithGrapple();
                         distanceFromPivot = Vector2.Distance(hit.point, hit.collider.gameObject.GetComponent<SwingRope>().pivot.position);
                     }
                 }
