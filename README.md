@@ -1,2 +1,2 @@
 <h1>Grapple Game</h1>
-https://euanleith.github.io/GrappleGame/
+<p>https://euanleith.github.io/GrappleGame/ (Controller required)</p>
