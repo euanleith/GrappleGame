@@ -9,7 +9,7 @@ public class Health : MonoBehaviour
     public Rigidbody2D rb;
     public GrapplingGun grapple;
     public UIDocument ui;
-    public Camera camera;
+    new public Camera camera;
 
     public int maxHealth;
     public int currentHealth;
@@ -44,7 +44,7 @@ public class Health : MonoBehaviour
             case 7:
             case 15:
                 bool alive = GetHit(1, Vector2.zero);
-                if (alive) room.Reset(); // respawn at start of room for each platforming death
+                if (alive) Retry(); // respawn at start of room for each platforming death
                 break;
             case 8:
                 GetComponent<PlayerControls>().Stun(collisionNormal: collision.GetContact(0).normal);
@@ -91,7 +91,7 @@ public class Health : MonoBehaviour
         cameraControls.Move(false);
     }
 
-    void Respawn() {
+    public void Respawn() {
         room = spawnRoom;
         room.Reset();
         ResetCamera();
@@ -99,6 +99,10 @@ public class Health : MonoBehaviour
         foreach (VisualElement heart in ui.rootVisualElement.ElementAt(0).Children()) {
             heart.visible = true;
         }
+    }
+
+    public void Retry() {
+        room.Reset();
     }
 
     public void SetSpawnRoom(Room room) {

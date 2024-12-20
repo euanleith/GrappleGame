@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
+using System.ComponentModel.Design;
 using UnityEngine;
-
 
 // todo rename PlayerMovement, or just Movement
 public class PlayerControls : MonoBehaviour
@@ -11,6 +11,7 @@ public class PlayerControls : MonoBehaviour
     public Rigidbody2D rb;
     public new Camera camera;
     public GrapplingGun grapple;
+    public Menu menu;
 
     public float groundSpeed = 7f;
     public float jumpSpeed = 7f;
@@ -73,6 +74,7 @@ public class PlayerControls : MonoBehaviour
             stunCnt -= Time.deltaTime;
             return;
         } else if (stunned) FinishStun();
+
         if (jumpCooldown > 0) {
             jumpCooldown -= Time.deltaTime;
         }
@@ -83,7 +85,7 @@ public class PlayerControls : MonoBehaviour
         if (!(Input.GetButton("Fire1") || Input.GetButton("Fire2"))) // todo if not grappling
         {
             // todo would making this a switch make it clearer?
-            if ((isGrounded || (hitWallNormal != 0)) && Input.GetButtonDown("Jump")) { // jumping
+            if ((isGrounded || (hitWallNormal != 0)) && Input.GetButtonDown("Jump") && !menu.enabled) { // jumping
                 if (isGrounded && lastGroundCollision.gameObject.layer == 22 && moveY < 0) { // TraversablePlatform layer
                     // todo or holding down while land on TraversablePlatform?
                     lastGroundCollision.gameObject.GetComponent<TraversablePlatform>().Traverse();
@@ -123,9 +125,10 @@ public class PlayerControls : MonoBehaviour
             rb.velocity = new Vector2((rb.velocity.x + (Time.deltaTime * moveX * grappleMoveSpeed)), rb.velocity.y);
         }
 
-        if (rb.velocity.magnitude > maxSpeed) {
-            rb.velocity = rb.velocity.normalized * maxSpeed;
-        }
+        rb.velocity = Vector2.ClampMagnitude(rb.velocity, maxSpeed);
+        // todo clamp angular velocity too?
+
+        menu.ManualUpdate();
     }
 
     void SnapToGround()
