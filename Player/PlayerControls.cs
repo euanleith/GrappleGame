@@ -39,7 +39,6 @@ public class PlayerControls : MonoBehaviour
     public float minWallAngle = 0.5f;
 
     BoxCollider2D boxColliderPlayer;
-    int layerMaskGround;
     float heightTestPlayer; // todo name
 
     private Vector2 previousPos;
@@ -59,6 +58,9 @@ public class PlayerControls : MonoBehaviour
 
     public const float jumpCooldownDuration = 0.1f;
     float jumpCooldown = 0f;
+
+    bool delayedSwingCollision = false;
+
 
     void Start()
     {
@@ -84,7 +86,7 @@ public class PlayerControls : MonoBehaviour
 
         if (!(Input.GetButton("Fire1") || Input.GetButton("Fire2"))) // todo if not grappling
         {
-            // todo would making this a switch make it clearer?
+            // todo would making this a switch make it clearer? or maybe just move the booleans to functions, and maybe also the contents of each if, though idk about the latter
             if ((isGrounded || (hitWallNormal != 0)) && Input.GetButtonDown("Jump") && !menu.enabled) { // jumping
                 if (isGrounded && lastGroundCollision.gameObject.layer == 22 && moveY < 0) { // TraversablePlatform layer
                     // todo or holding down while land on TraversablePlatform?
@@ -100,16 +102,7 @@ public class PlayerControls : MonoBehaviour
                 rb.velocity = new Vector2(0, wallClimbSpeed);
             }
             else if (isGrounded && jumpCooldown <= 0) { // moving along ground
-                if (moveX != 0) {
-                    if (moveX * velocityOfGround.x > 0) { // not add velocityOfGround.x when moveX is in the opposite direction
-                        rb.velocity = new Vector2((moveX * groundSpeed) + velocityOfGround.x, velocityOfGround.y);
-                    } else {
-                        rb.velocity = new Vector2((moveX * groundSpeed), velocityOfGround.y);
-                    }
-                } 
-                else {
-                    rb.velocity = velocityOfGround; 
-                }
+                rb.velocity = new Vector2(moveX * groundSpeed, 0f);
             } else { // moving in air
                 float airSpeedX = moveX * rb.velocity.x > 0 ? forwardAirSpeed : backwardAirSpeed;
                 float airSpeedY;
@@ -131,19 +124,9 @@ public class PlayerControls : MonoBehaviour
         menu.ManualUpdate();
     }
 
-    void SnapToGround()
-    {
-        if (isGrounded) {
-            layerMaskGround = LayerMask.GetMask("Ground", "Swing");
-            RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 0.75f, layerMaskGround); // todo 0.6 = player height/2 + wiggle room
-            if (hit.collider) { 
-                float distanceToGround = transform.position.y - hit.point.y;
-                transform.position += Vector3.up * (0.5f - distanceToGround); // todo 0.5f = player height / 2
-            } 
-            else {
-                isGrounded = false;
-            }
-            
+    private void LateUpdate() {
+        if (ShouldUnlinkFromSwing()) {
+            UnlinkFromSwing();
         }
     }
 
@@ -160,17 +143,15 @@ public class PlayerControls : MonoBehaviour
             isGrounded = true;
             grapple.OnCollisionWithGround();
         }
-    }
-
-    void OnCollisionStay2D(Collision2D collision) {
-        ContactPoint2D contact = collision.GetContact(0); // only need 1 contact point as player collider is box
-        if (Math.Abs(contact.normal.x) <= minWallAngle)
+        if (!grapple.isEnabled() &&
+            IsAbove(gameObject, collision.gameObject))
         {
-            if (contact.normal.y > minSlope) {
-                velocityOfGround = GetVelocityOfGround(contact.collider.gameObject); // todo would this not mean that it wouldn't be grounded if connected to a non ground platform, even if also connected to a ground platform?
+            if (collision.gameObject.GetComponent<SwingPlatform>() != null) {
+                LinkToSwing(collision.transform);
+            } else {
+                gameObject.transform.parent = collision.gameObject.transform;
             }
         }
-        
     }
 
     public Vector2 GetVelocityOfGround(GameObject ground) {
@@ -185,7 +166,7 @@ public class PlayerControls : MonoBehaviour
         }
     }
 
-    void OnCollisionExit2D(Collision2D collision)
+    void OnCollisionExit2D(Collision2D collision) 
     {
         nCurrentCollisions--;
         hitWallNormal = 0f;
@@ -194,16 +175,79 @@ public class PlayerControls : MonoBehaviour
         //  on hit by enemy..?
         //  on land on swing then die?
         // if player is within horizontal bounds of platform and hasnt jumped/grappled
-        if (transform.position.x + (transform.localScale.x / 2) > collision.transform.position.x - (collision.transform.localScale.x / 2) &&
-            transform.position.x - (transform.localScale.x / 2) < collision.transform.position.x + (collision.transform.localScale.x / 2) &&
-            !grapple.isEnabled() && jumpCooldown <= 0) {
-            SnapToGround();
-        } else if (nCurrentCollisions <= 0) {
+
+        //Debug.Log("Collision exit");
+        //Debug.Log("grapple enabled: " + grapple.isEnabled());
+        if (IsLinkedToSwing()) {
+            delayedSwingCollision = true;
+        } else {
             isGrounded = false;
         }
+
+        //if (nCurrentCollisions <= 0) {
+        //    isGrounded = false;
+        //}
+    }
+
+    // todo maybe this stuff should be on the swing platform's end?
+
+    private void LinkToSwing(Transform swingPlatform) {
+        // todo idk if i should be doing if checks in here, just terrible code
+        transform.parent = swingPlatform;
+        isGrounded = true;
+    }
+
+    private bool IsLinkedToSwing() {
+        return gameObject.transform.parent != null &&
+            transform.parent.GetComponent<SwingPlatform>() != null &&
+            isGrounded;
+    }
+
+    private void UnlinkFromSwing() {
+        if (transform.parent != null &&
+                transform.parent.GetComponent<SwingPlatform>() != null) {
+            rb.velocity += GetVelocityOfGround(transform.parent.gameObject); // todo maybe have special case for swing, boosting player unnaturally if they jump within the last part of the swing
+            transform.parent = null;
+            isGrounded = false;
+        }
+        delayedSwingCollision = false;
+    }
+
+    private bool ShouldUnlinkFromSwing() {
+        return delayedSwingCollision && (
+            !WithinBoundsX(transform, transform.parent) || // todo maybe just try with collision box above the platform like in the video?
+            //!WithinBoundsY(transform, collision.transform, 0.1f) ||
+            IsAbove(transform.parent.gameObject, gameObject) ||
+            grapple.isEnabled() ||
+            jumpCooldown > 0);
+    }
+
+    // todo move these to some utils class
+
+    // returns true if t1 is within x bounds of t2
+    bool WithinBoundsX(Transform t1, Transform t2, float wiggleRoom = 0f) {
+        float t1Min = t1.position.x - (t1.localScale.x / 2) - wiggleRoom;
+        float t1Max = t1.position.x + (t1.localScale.x / 2) + wiggleRoom;
+        float t2Min = t2.position.x - (t2.localScale.x / 2);
+        float t2Max = t2.position.x + (t2.localScale.x / 2);
+
+        return t1Max > t2Min && t1Min < t2Max;
+    }
+
+    // returns true if t1 is within y bounds of t2
+    bool WithinBoundsY(Transform t1, Transform t2, float wiggleRoom = 0f) {
+        return t1.position.y + (t1.localScale.y / 2) + wiggleRoom > t2.position.y - (t2.localScale.y / 2) &&
+            t1.position.y - (t1.localScale.y / 2) - wiggleRoom < t2.position.y + (t2.localScale.y / 2);
+    }
+
+    // returns true if obj1 is above obj2
+    // requires both objects to have Collider2D's (todo maybe make params Collider2D so don't have to specify this)
+    bool IsAbove(GameObject obj1, GameObject obj2) {
+        return obj1.GetComponent<Collider2D>().bounds.min.y > obj2.GetComponent<Collider2D>().bounds.max.y;
     }
 
     public void Jump() {
+        UnlinkFromSwing(); // todo is this necessary?
         jumpCooldown = jumpCooldownDuration;
         grapple.OnJump(); // todo note setting canTransformGrapple=true when doing any jump
         isGrounded = false;
