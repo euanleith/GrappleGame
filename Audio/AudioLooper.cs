@@ -4,7 +4,7 @@ using UnityEngine;
 public class AudioLooper : MonoBehaviour {
     public float overlapTime = 4f;
     public float volume = 0.5f;
-    public float minVolume = 0f; // todo replace with 'smoothing'?
+    public float minVolume = 0f; // todo replace with 'smoothing'? or volumeRange (0-1)?
     private AudioSource[] audioSources;
     private float elapsedTime = 0;
 

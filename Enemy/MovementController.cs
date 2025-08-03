@@ -24,7 +24,6 @@ public class MovementController: MonoBehaviour
     Vector2 prevPosition;
     
     Movement currentMovement;
-    Transform transform;
     Rigidbody2D rb;
     CombatController combatController;
     Enemy enemy;
@@ -41,7 +40,6 @@ public class MovementController: MonoBehaviour
     }
 
     public void InitObjects() {
-        transform = gameObject.transform;
         rb = GetComponent<Rigidbody2D>();
         rb.useFullKinematicContacts = true;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;

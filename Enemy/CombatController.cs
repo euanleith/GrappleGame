@@ -17,7 +17,6 @@ public class CombatController : MonoBehaviour
 
     public float countdown;
 
-    Transform transform;
     Transform player;
     [HideInInspector] public List<Attack> attacks;
     [HideInInspector] public Attack currentAttack; // todo could be int index to save a bit of space
@@ -33,7 +32,6 @@ public class CombatController : MonoBehaviour
     }
 
     public void InitObjects() {
-        transform = gameObject.transform;
         player = GetComponent<Enemy>().player;
         attacks = GetComponent<Enemy>().attacks;
         // todo add functionality for multiple attacks. might need DecideAttack() in Enemy, since deciding which attack to use might not be general to all enemies

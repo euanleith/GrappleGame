@@ -11,7 +11,7 @@ public class MiniRushAttack: Attack
 
     float direction;
 
-    public void Start() {
+    public override void Start() {
         base.Start();
     }
 

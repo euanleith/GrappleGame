@@ -19,6 +19,7 @@ public class Menu : MonoBehaviour
         respawnButton.onClick.AddListener(RespawnOnClick);
         Button quitButton = buttons.GetChild(3).GetComponent<Button>();
         quitButton.onClick.AddListener(QuitOnClick);
+        // todo on mouse hover should change selected button to that button
     }
 
     public void ManualUpdate()

@@ -6,7 +6,7 @@ public class StaticAttack : Attack
 {
     public float aggroWindupDuration = 0.2f;
 
-    public void Start() {
+    public override void Start() {
         base.Start();
     }
 

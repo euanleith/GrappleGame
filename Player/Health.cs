@@ -19,7 +19,7 @@ public class Health : MonoBehaviour
     public Room room;
     public Transform enemies; // todo might need to split by room/level // todo can now get this from room
 
-    void Start()
+    public void Start()
     {
         currentHealth = maxHealth;   
         currentIFrames = 0f;

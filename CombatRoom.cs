@@ -7,7 +7,7 @@ public class CombatRoom : Room
     bool completed = false;
     [SerializeField] public Enemy[][] waves;
 
-    void Update() {
+    new void Update() {
         base.Update();
 
         completed = true;

@@ -143,7 +143,7 @@ public class GrapplingGun : MonoBehaviour
         // position
         //Vector2 relocatedGrapplePoint = (Vector2)hit.transform.position + relativeGrapplePoint;
         Vector2 newGrapplePoint = (Vector2)hit.transform.position + relativeGrapplePoint;
-        if (newGrapplePoint != grapplePoint) springJoint.frequency = movingPlatformFrequency;
+        if (grapplePoint == null || newGrapplePoint != grapplePoint) springJoint.frequency = movingPlatformFrequency;
         grapplePoint = newGrapplePoint;
 
         // if grapple swing rope
@@ -197,11 +197,13 @@ public class GrapplingGun : MonoBehaviour
             gunHolder.GetComponent<Rigidbody2D>().velocity = Vector2.zero; // todo should be doing GetPosition here and everywhere else
             gunHolder.GetComponent<Rigidbody2D>().gravityScale = 0; // todo need to turn this off once player hits the target, otherwise they can extend the grapple and swing without gravity
         }
-        
+
+        //Debug.Log("grappling");
         springJoint.enabled = true;
     }
 
     public void StopGrappling() {
+        //Debug.Log("Stopped grappling");
         grappleRope.enabled = false;
         springJoint.enabled = false;
         springJoint.connectedBody = null;
