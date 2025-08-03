@@ -12,7 +12,7 @@ public class SwingRope : MonoBehaviour {
     public Transform platform;
 
     public LineRenderer lineRenderer; // todo why do these need to be added in the inspector?
-    new public EdgeCollider2D collider;
+    public EdgeCollider2D edgeCollider;
 
     public void Init(bool isCollidable) {
         swing = GetComponentInParent<Swing>();
@@ -22,17 +22,17 @@ public class SwingRope : MonoBehaviour {
         lineRenderer.startWidth = width;
         lineRenderer.endWidth = width;
         
-        //collider = GetComponent<EdgeCollider2D>();
-        collider.enabled = true;
-        collider.edgeRadius = 0;
-        collider.isTrigger = !isCollidable;
+        edgeCollider = GetComponent<EdgeCollider2D>();
+        edgeCollider.enabled = true;
+        edgeCollider.edgeRadius = 0;
+        edgeCollider.isTrigger = !isCollidable;
 
         Render();
     }
 
     public void Reset() {
         lineRenderer.enabled = true;
-        collider.enabled = true;
+        edgeCollider.enabled = true;
     }
 
     void FixedUpdate() {
@@ -41,27 +41,27 @@ public class SwingRope : MonoBehaviour {
 
     void Render() {
         lineRenderer.SetPositions(new Vector3[] { pivot.localPosition, platform.localPosition });
-        collider.SetPoints(new List<Vector2>() { pivot.localPosition, platform.localPosition });
+        edgeCollider.SetPoints(new List<Vector2>() { pivot.localPosition, platform.localPosition });
     }
 
     public void Break() {
         lineRenderer.enabled = false;
-        collider.enabled = false;
+        edgeCollider.enabled = false;
     }
 
     public void OnCollisionEnter2D(Collision2D collision) {
         OnCollision(collision.gameObject);
     }
 
-    public void OnTriggerEnter2D(Collider2D collider) {
-        OnCollision(collider.gameObject);
+    public void OnTriggerEnter2D(Collider2D edgeCollider) {
+        OnCollision(edgeCollider.gameObject);
     }
 
-    void OnCollision(GameObject collider) {
-        if (swing.ropeTouchActivated && LayerMaskContains(swing.activatorLayers, collider.layer)) {
+    void OnCollision(GameObject edgeCollider) {
+        if (swing.ropeTouchActivated && LayerMaskContains(swing.activatorLayers, edgeCollider.layer)) {
             swing.Activate();
         }
-        if (swing.breakable && LayerMaskContains(swing.breakerLayers, collider.layer)) { // todo PLAYER_ATTACK_LAYER) {
+        if (swing.breakable && LayerMaskContains(swing.breakerLayers, edgeCollider.layer)) { // todo PLAYER_ATTACK_LAYER) {
             swing.Break();
         }
     }

@@ -12,17 +12,19 @@ public class Swing : MonoBehaviour, RoomElement {
     public bool breakable = false;
     public LayerMask breakerLayers = 1 << 2; // todo PLAYER_ATTACK_LAYER (currently just using IgnoreRaycast layer)
 
-    SwingPlatform platform;
-    SwingRopeRotation ropeRotation;
-    SwingRope rope;
+    public bool collidableRope = false; // todo maybe just want to set this automatically = !platform.enabled
+
+    public SwingPlatform platform;
+    public SwingRopeRotation ropeRotation;
+    public SwingRope rope;
 
     public void Init() {
-        platform = GetComponentInChildren<SwingPlatform>();
-        ropeRotation = GetComponentInChildren<SwingRopeRotation>();
-        rope = GetComponentInChildren<SwingRope>();
+        //platform = GetComponentInChildren<SwingPlatform>();
+        //ropeRotation = GetComponentInChildren<SwingRopeRotation>();
+        //rope = GetComponentInChildren<SwingRope>();
         ropeRotation.Init(IsInitActivated());
         if (platform) platform.Init();
-        rope.Init();
+        rope.Init(collidableRope);
         Reset();
     }
 

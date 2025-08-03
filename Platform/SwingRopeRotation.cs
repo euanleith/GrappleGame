@@ -11,7 +11,7 @@ public class SwingRopeRotation : MonoBehaviour
 {
     public float speed = 1f; // todo maybe speed should be determined by angleRange, since currently it takes the same amount of time for different size ranges, meaning different speeds. or at least influenced by anglerange
 
-    float angleRange;
+    [HideInInspector] public float angleRange;
     float timeOffset;
     float startTimeOffset;
 
@@ -27,7 +27,8 @@ public class SwingRopeRotation : MonoBehaviour
         float length = Vector2.Distance(Vector2.zero, child.localPosition);
 
         // angle range calculated as the angle between the pivot-down vector and the starting pivot-platform vector
-        angleRange = Vector2.SignedAngle(new Vector2(0, -length), child.localPosition);
+        Vector2 downVector = new Vector2(0, -length);
+        angleRange = Vector2.SignedAngle(downVector, child.localPosition);
         timeOffset = CalculateTimeOffset(angleRange, angleRange);
         startTimeOffset = timeOffset;
 
@@ -54,8 +55,7 @@ public class SwingRopeRotation : MonoBehaviour
     {
         float angle = angleRange * Mathf.Sin(timeOffset * speed); // shm equation: https://en.wikipedia.org/wiki/Simple_harmonic_motion
         angle -= angleRange; // want rotation = 0 on start, so rotating through 0 -> angleRange*2 instead of -angleRange -> angleRange
-
-        if (!broken) rb.MoveRotation(Quaternion.Euler(0, 0, angle));
+        if (!broken) transform.rotation = Quaternion.Euler(0, 0, angle);
         if (activated) timeOffset += Time.deltaTime;
     }
 
