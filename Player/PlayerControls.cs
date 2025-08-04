@@ -86,9 +86,9 @@ public class PlayerControls : MonoBehaviour
         {
             // todo would making this a switch make it clearer? or maybe just move the booleans to functions, and maybe also the contents of each if, though idk about the latter
             if ((isGrounded || (hitWallNormal != 0)) && Input.GetButtonDown("Jump") && !menu.enabled) { // jumping
-                if (isGrounded && lastGroundCollision.gameObject.layer == 22 && moveY < 0) { // TraversablePlatform layer
+                if (isGrounded && lastGroundCollision.GetComponent<PlatformEffector2D>() != null && moveY < 0) { // TraversablePlatform layer
                     // todo or holding down while land on TraversablePlatform?
-                    lastGroundCollision.gameObject.GetComponent<TraversablePlatform>().Traverse();
+                    StartCoroutine(FallThroughTraversablePlatform(lastGroundCollision.GetComponent<PlatformEffector2D>()));
                     isGrounded = false;
                 }
                 else Jump();
@@ -120,6 +120,14 @@ public class PlayerControls : MonoBehaviour
         // todo clamp angular velocity too?
 
         menu.ManualUpdate();
+    }
+
+    // todo maybe move this to TraversablePlatform
+    private IEnumerator FallThroughTraversablePlatform(PlatformEffector2D platform) {
+        int playerLayerMask = 1 << 12;
+        platform.colliderMask &= ~playerLayerMask;
+        yield return new WaitForSeconds(0.5f);
+        platform.colliderMask |= playerLayerMask;
     }
 
     private void LateUpdate() {

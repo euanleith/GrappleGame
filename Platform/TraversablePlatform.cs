@@ -1,11 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
+[Obsolete("Use PlatformEffector2D instead")]
 public class TraversablePlatform : MonoBehaviour, RoomElement
 {
 
-    new BoxCollider2D collider;
+    public new Collider2D collider;
     public Transform player;
     bool traversing = false;
     new bool enabled = false;
@@ -14,7 +14,9 @@ public class TraversablePlatform : MonoBehaviour, RoomElement
     public float buffer = 0.1f; 
 
     void Start() {
-        collider = GetComponentInParent<BoxCollider2D>();   
+        if (collider == null) {
+            collider = GetComponentInParent<Collider2D>();
+        }
     }
 
     public void Init() {
@@ -27,7 +29,8 @@ public class TraversablePlatform : MonoBehaviour, RoomElement
     void Update()
     {
         if (enabled) {
-            if (player.position.y - player.localScale.y/2 + buffer < transform.position.y + transform.localScale.y/2) {
+            // todo this won't work for tilemaps. can i do like 'if player colliding with the top of the platform's collider'?
+            if (player.position.y - player.localScale.y / 2 + buffer < transform.position.y + transform.localScale.y / 2) {
                 collider.isTrigger = true;
                 traversing = false;
             } else if (!traversing) {
@@ -43,5 +46,12 @@ public class TraversablePlatform : MonoBehaviour, RoomElement
 
     public void Disable() {
         enabled = false;
+    }
+
+    public void OnCollisionEnter2D(Collision2D collision) {
+        if (enabled && collision.GetContact(0).normal.y > 0.9f) {
+            collider.isTrigger = true;
+            traversing = false;
+        }
     }
 }
