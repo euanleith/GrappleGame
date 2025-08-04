@@ -38,8 +38,7 @@ public class PlayerControls : MonoBehaviour
     public float hitWallNormal; // todo not great name - it's reffering to the normal of the wall currently being collided with, if there is one, and 0 otherwise
     public float minWallAngle = 0.5f;
 
-    BoxCollider2D boxColliderPlayer;
-    float heightTestPlayer; // todo name
+    private Collider2D playerCollider;
 
     private Vector2 previousPos;
 
@@ -66,8 +65,7 @@ public class PlayerControls : MonoBehaviour
     {
         previousPos = transform.position;
         rb = GetComponent<Rigidbody2D>();
-        boxColliderPlayer = GetComponent<BoxCollider2D>();
-        heightTestPlayer = Mathf.Sqrt(Mathf.Sqrt(boxColliderPlayer.size.x)*2);
+        playerCollider = GetComponent<Collider2D>();
     }
 
     void Update()
@@ -215,7 +213,7 @@ public class PlayerControls : MonoBehaviour
 
     private bool ShouldUnlinkFromSwing() {
         return delayedSwingCollision && (
-            !WithinBoundsX(boxColliderPlayer, transform.parent.GetComponent<Collider2D>()) || // todo maybe just try with collision box above the platform like in the video?
+            !WithinBoundsX(playerCollider, transform.parent.GetComponent<Collider2D>()) || // todo maybe just try with collision box above the platform like in the video?
             //!WithinBoundsY(transform, collision.transform, 0.1f) ||
             IsAbove(transform.parent.gameObject, gameObject) ||
             grapple.isEnabled() ||
