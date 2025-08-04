@@ -138,6 +138,7 @@ public class GrapplingGun : MonoBehaviour
     }
 
     void UpdateGrapplePoint() {
+        if (!hit) return;
         // take into account position & rotation of hit object
 
         // position
