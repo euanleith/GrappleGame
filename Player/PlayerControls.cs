@@ -215,7 +215,7 @@ public class PlayerControls : MonoBehaviour
 
     private bool ShouldUnlinkFromSwing() {
         return delayedSwingCollision && (
-            !WithinBoundsX(transform, transform.parent) || // todo maybe just try with collision box above the platform like in the video?
+            !WithinBoundsX(boxColliderPlayer, transform.parent.GetComponent<Collider2D>()) || // todo maybe just try with collision box above the platform like in the video?
             //!WithinBoundsY(transform, collision.transform, 0.1f) ||
             IsAbove(transform.parent.gameObject, gameObject) ||
             grapple.isEnabled() ||
@@ -224,14 +224,13 @@ public class PlayerControls : MonoBehaviour
 
     // todo move these to some utils class
 
-    // returns true if t1 is within x bounds of t2
-    bool WithinBoundsX(Transform t1, Transform t2, float wiggleRoom = 0f) {
-        float t1Min = t1.position.x - (t1.localScale.x / 2) - wiggleRoom;
-        float t1Max = t1.position.x + (t1.localScale.x / 2) + wiggleRoom;
-        float t2Min = t2.position.x - (t2.localScale.x / 2);
-        float t2Max = t2.position.x + (t2.localScale.x / 2);
-
-        return t1Max > t2Min && t1Min < t2Max;
+    // returns true if a is within bounds of b on x-axis
+    bool WithinBoundsX(Collider2D a, Collider2D b, float wiggleRoom = 0f) {
+        float aMin = a.bounds.min.x - wiggleRoom;
+        float aMax = a.bounds.max.x + wiggleRoom;
+        float bMin = b.bounds.min.x;
+        float bMax = b.bounds.max.x;
+        return aMax > bMin && aMin < bMax;
     }
 
     // returns true if t1 is within y bounds of t2
