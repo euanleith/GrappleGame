@@ -170,12 +170,7 @@ public class GrapplingGun : MonoBehaviour
         // works differently for transform than physics??
         */
 
-        if (hit.collider.gameObject.GetComponent<Rigidbody2D>()) {
-            springJoint.connectedBody = hit.collider.gameObject.GetComponent<Rigidbody2D>();
-            springJoint.connectedAnchor = Vector2.zero;
-        } else {
-            springJoint.connectedAnchor = grapplePoint;
-        }
+        springJoint.connectedAnchor = grapplePoint;
     }
 
     public void Grapple()
@@ -198,12 +193,10 @@ public class GrapplingGun : MonoBehaviour
             gunHolder.GetComponent<Rigidbody2D>().gravityScale = 0; // todo need to turn this off once player hits the target, otherwise they can extend the grapple and swing without gravity
         }
 
-        //Debug.Log("grappling");
         springJoint.enabled = true;
     }
 
     public void StopGrappling() {
-        //Debug.Log("Stopped grappling");
         grappleRope.enabled = false;
         springJoint.enabled = false;
         springJoint.connectedBody = null;
