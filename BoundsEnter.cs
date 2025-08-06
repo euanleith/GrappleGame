@@ -17,16 +17,13 @@ public class BoundsEnter : MonoBehaviour
             room.Enable();
 
             Vector2 spawn = transform.Find("Spawn").position;
-            camControls.room = room;
-            camControls.room.spawn = spawn;
+            camControls.ChangeRoom(room, spawn);
             collider.GetComponent<Health>().room = room;
             collider.GetComponent<Health>().room.spawn = spawn;
 
             // todo nope, GetDirection is wrong
             Vector2 direction = GetCardinalDirection(collider.transform, transform);
             Debug.Log(direction);
-            Debug.Log("player current position: " + playerNewPosition);
-            Debug.Log("new spawn position: " + transform.Find("Spawn").position);
             if (direction.x != 0) playerNewPosition.x = spawn.x; 
             else if (direction.y != 0) playerNewPosition.y = spawn.y;
             Debug.Log("new player position: " + playerNewPosition);

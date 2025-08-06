@@ -44,7 +44,7 @@ public class Room : MonoBehaviour
     protected void InitElements() {
         RoomElement[] enemies = GetFromFolder<Enemy>("Enemies");
         RoomElement[] platforms = GetFromFolder<RoomElement>("MovingPlatforms"); // todo folder name - ActionObjects? InteractionObjects?
-        elements = enemies.Concat(platforms).ToArray();;
+        elements = enemies.Concat(platforms).ToArray();
         foreach (RoomElement elem in elements) {
             elem.Init();
         }
@@ -86,5 +86,17 @@ public class Room : MonoBehaviour
         // todo isGrounded = true
         player.GetComponent<Health>().currentIFrames = 0;
         Enable();
+    }
+
+    public void Pause() {
+        Time.timeScale = 0;
+    }
+
+    public bool isPaused() {
+        return Time.timeScale == 0;
+    }
+
+    public void Unpause() {
+        Time.timeScale = 1;
     }
 }

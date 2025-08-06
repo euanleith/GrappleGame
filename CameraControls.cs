@@ -9,6 +9,8 @@ public class CameraControls : MonoBehaviour
     public new Camera camera;
     private float height, width;
     public float offset;
+    private bool isChangingRoom;
+    public float settledThreshold = 0.01f;
 
     void Start()
     {
@@ -21,16 +23,27 @@ public class CameraControls : MonoBehaviour
 
     void Update()
     {
-
     }
 
     void LateUpdate() {
-        if (transform.position != player.position) {
-            Move();
+        Vector3 newPos = GetNewPosition();
+        if (ShouldMove(newPos)) {
+            float speed = GetSpeed(transform.position, newPos);
+            Move(newPos);
+            if (isChangingRoom) {
+                if (speed > settledThreshold) {
+                    if (!room.isPaused()) {
+                        room.Pause();
+                    }
+                } else {
+                    room.Unpause();
+                    isChangingRoom = false;
+                }
+            }
         }
     }
 
-    public void Move(bool lerp = true) {
+    private Vector3 GetNewPosition(bool lerp = true) {
         Vector3 targetPos = player.position;
         Vector3 camBounds = new Vector3(
             Mathf.Clamp(targetPos.x, room.minPos.x + (width / 2), room.maxPos.x - (width / 2)),
@@ -38,7 +51,39 @@ public class CameraControls : MonoBehaviour
             0
         );
 
-        Vector3 newPos = lerp ? Vector3.Lerp(transform.position, camBounds, smoothSpeed) : camBounds;
-        transform.position = newPos;
+        return lerp ? Vector3.Lerp(transform.position, camBounds, smoothSpeed) : camBounds;
+    }
+
+    private bool ShouldMove(Vector3 newPos) {
+        return transform.position != newPos;
+    }
+
+    private void Move(Vector3 pos) {
+        transform.position = pos;
+    }
+
+    public void Move(bool lerp = true) {
+        Move(GetNewPosition(lerp));
+    }
+
+    public void ChangeRoom(Room room, Vector2 spawn) {
+        this.room = room;
+        this.room.spawn = spawn;
+        isChangingRoom = true;
+    }
+
+    // todo these move to utils
+
+    public Vector3 GetDisplacement(Vector3 a, Vector3 b) {
+        return a - b;
+    }
+
+    public float GetVelocity(Vector3 a, Vector3 b) {
+        Vector3 displacement = GetDisplacement(a, b);
+        return displacement.magnitude;
+    }
+
+    public float GetSpeed(Vector3 a, Vector3 b) {
+        return Math.Abs(GetVelocity(a, b));
     }
 }
