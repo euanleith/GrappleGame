@@ -1,22 +1,27 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+
+using static Utils.Layers;
 
 public class Swing : MonoBehaviour, RoomElement {
 
     // todo maybe make these some single data type visible in the inspector
     public bool platformTouchActivated = false; // todo maybe want just player on 'stand on' and just on 'player'
     public bool ropeTouchActivated = false;
-    public LayerMask activatorLayers = 1 << 12; // Player layer
+    public LayerMask activatorLayers;
 
     public bool breakable = false;
-    public LayerMask breakerLayers = 1 << 2; // todo PLAYER_ATTACK_LAYER (currently just using IgnoreRaycast layer)
+    public LayerMask breakerLayers;
 
     public bool collidableRope = false; // todo maybe just want to set this automatically = !platform.enabled
 
     public SwingPlatform platform;
     public SwingRopeRotation ropeRotation;
     public SwingRope rope;
+
+    public void Start() {
+        activatorLayers = ToLayerMask(PLAYER);
+        breakerLayers = ToLayerMask(IGNORE_RAYCAST); // todo PLAYER_ATTACK_LAYER (currently just using IgnoreRaycast layer)
+    }
 
     public void Init() {
         //platform = GetComponentInChildren<SwingPlatform>();

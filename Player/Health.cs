@@ -1,8 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
-using System;
 using UnityEngine;
 using UnityEngine.UIElements;
+
+using static Utils.Layers;
 
 public class Health : MonoBehaviour
 {
@@ -39,21 +38,17 @@ public class Health : MonoBehaviour
     // todo here only processes collisions with player (not attack hitboxes), since those are onTrigger
     void OnCollisionEnter2D(Collision2D collision)
     {
-        switch (collision.gameObject.layer) {
-            case 6: // todo "Death" or whatever; make these inspector variables
-            case 7:
-            case 15:
-                bool alive = GetHit(1, Vector2.zero);
-                if (alive) Retry(); // respawn at start of room for each platforming death
-                break;
-            case 8:
-                GetComponent<PlayerControls>().Stun(collisionNormal: collision.GetContact(0).normal);
-                GetHit(collision.gameObject.GetComponent<Enemy>().combatController.GetDamage(), new Vector2(0, 1));
-                break;
-            case 11:
-                // todo why doesnt this stun?
-                GetHit(collision.gameObject.GetComponent<Enemy>().combatController.GetDamage(), new Vector2(0, 1));
-                break;
+        if (IsDeathLayer(collision.gameObject.layer)) {
+            bool alive = GetHit(1, Vector2.zero);
+            if (alive) Retry(); // respawn at start of room for each platforming death
+        } 
+        else if (LayerEquals(collision.gameObject.layer, ENEMY)) {
+            GetComponent<PlayerControls>().Stun(collisionNormal: collision.GetContact(0).normal);
+            GetHit(collision.gameObject.GetComponent<Enemy>().combatController.GetDamage(), new Vector2(0, 1));
+        } 
+        else if (LayerEquals(collision.gameObject.layer, ENEMY_ATTACK)) {
+            // todo why doesnt this stun?
+            GetHit(collision.gameObject.GetComponent<Enemy>().combatController.GetDamage(), new Vector2(0, 1));
         }
     }
 

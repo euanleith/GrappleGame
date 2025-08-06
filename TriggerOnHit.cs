@@ -1,6 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+
+using static Utils.Layers;
 
 public class TriggerOnHit : MonoBehaviour
 {
@@ -22,7 +22,7 @@ public class TriggerOnHit : MonoBehaviour
 
     public void OnTriggerEnter2D(Collider2D collider) {
         Debug.Log("hi");
-        if (collider.gameObject.layer == 2) { // todo player attack - make it its own layer
+        if (Equals(collider.gameObject.layer, IGNORE_RAYCAST)) { // todo player attack - make it its own layer
             anim.enabled = true;
             GetComponent<SpriteRenderer>().color = Color.black;
             //anim.Play(0);

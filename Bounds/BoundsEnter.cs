@@ -1,5 +1,7 @@
 using UnityEngine;
 
+using static Utils.Layers;
+
 public class BoundsEnter : MonoBehaviour 
 {
     CameraControls camControls;
@@ -11,7 +13,7 @@ public class BoundsEnter : MonoBehaviour
     }
     
     void OnTriggerEnter2D(Collider2D collider) {
-        if (collider.gameObject.layer == 12) { // player
+        if (LayerEquals(collider.gameObject.layer, PLAYER)) {
             camControls.room.Disable();
             Vector2 playerNewPosition = collider.transform.position;
             room.Enable();
@@ -21,15 +23,14 @@ public class BoundsEnter : MonoBehaviour
             collider.GetComponent<Health>().room = room;
             collider.GetComponent<Health>().room.spawn = spawn;
 
-            // todo nope, GetDirection is wrong
             Vector2 direction = GetCardinalDirection(collider.transform, transform);
-            Debug.Log(direction);
             if (direction.x != 0) playerNewPosition.x = spawn.x; 
             else if (direction.y != 0) playerNewPosition.y = spawn.y;
-            Debug.Log("new player position: " + playerNewPosition);
             collider.transform.position = playerNewPosition;
         }
     }
+
+    // todo move these to utils
 
     public Vector2 GetCardinalDirection(Transform a, Transform b) {
         Vector2 direction = a.position - b.position;

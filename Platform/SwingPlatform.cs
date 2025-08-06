@@ -1,6 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+
+using static Utils.Layers;
 
 public class SwingPlatform : MonoBehaviour
 {
@@ -48,11 +48,6 @@ public class SwingPlatform : MonoBehaviour
         if (swing.platformTouchActivated) {
             swing.Activate();
         }
-    }
-
-    // todo create static extension class for this, see https://discussions.unity.com/t/check-if-layer-is-in-layermask/16007/2
-    bool LayerMaskContains(LayerMask mask, int layer) {
-        return mask == (mask | (1 << layer));
     }
 
     public void Break() {

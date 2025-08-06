@@ -2,6 +2,8 @@ using System;
 using UnityEngine;
 using Random=UnityEngine.Random;
 
+using static Utils.Layers;
+
 public class MovementController: MonoBehaviour
 {
     // todo everything should stop for a second when you grapple an enemy for impact, and to prepare you to hit them when they fly towards you
@@ -122,7 +124,7 @@ public class MovementController: MonoBehaviour
     }
 
     public void OnCollisionEnter2D(Collision2D collision) {
-        if (collision.gameObject.layer == 2 || collision.gameObject.layer == 12) {
+        if (LayerEqualsAny(collision.gameObject.layer, IGNORE_RAYCAST, PLAYER)) {
             Stun();
             rb.velocity = currentMovement.OnCollision(collision);
         } else {
@@ -138,7 +140,7 @@ public class MovementController: MonoBehaviour
     }
 
     public void OnCollisionStay2D(Collision2D collision) {
-        if (collision.gameObject.layer == 2 || collision.gameObject.layer == 12) return;
+        if (LayerEqualsAny(collision.gameObject.layer, IGNORE_RAYCAST, PLAYER)) return;
         collisionNormal = collision.GetContact(0).normal;
         //if (collisionNormal.x > 0) rb.MovePosition(new Vector2(collision.transform.position.x - collision.transform.localScale.x/2, rb.position.y));
         //if (collisionNormal.x < 0) rb.MovePosition(new Vector2(collision.transform.position.x + collision.transform.localScale.x/2, rb.position.y));

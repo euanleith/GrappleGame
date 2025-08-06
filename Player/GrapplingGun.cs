@@ -2,6 +2,8 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 
+using static Utils.Layers;
+
 public class GrapplingGun : MonoBehaviour
 {
     // todo should there be a small cooldown for physics mode just to stop player spamming?
@@ -112,7 +114,8 @@ public class GrapplingGun : MonoBehaviour
         if (hit)
         {
             // note that hit.collider is the collided object, where hit.transform is the parent collider object
-            if (grapplableLayerNumbers.Contains(hit.transform.gameObject.layer) || grappleToAll)
+            if (LayerEqualsAny(hit.transform.gameObject.layer, grapplableLayerNumbers)
+                    || grappleToAll)
             {
                 if (Vector2.Distance(hit.point, firePoint.position) <= maxDistance)
                 {
@@ -122,11 +125,11 @@ public class GrapplingGun : MonoBehaviour
                     grappleRope.enabled = true;
 
                     // todo surely there's a better way of doing this :')
-                    if (hit.transform.gameObject.layer == 8) { // todo maybe also only if transform launch?
+                    if (LayerEquals(hit.transform.gameObject.layer, ENEMY)) { // todo maybe also only if transform launch?
                         hit.transform.gameObject.GetComponent<Enemy>().OnCollisionEnterWithGrapple();
-                    } else if (hit.transform.gameObject.layer == 20) {
+                    } else if (LayerEquals(hit.transform.gameObject.layer, GRAPPLEABLE_PLATFORM)) {
                         hit.transform.gameObject.GetComponent<GrappleablePlatform>().OnCollisionEnterWithGrapple(distanceVector);
-                    } else if (hit.collider.gameObject.layer == 21) {
+                    } else if (LayerEquals(hit.collider.gameObject.layer, SWING)) {
                         hit.collider.gameObject.GetComponent<SwingPlatform>().OnCollisionEnterWithGrapple();
                     } else if (hit.collider.gameObject.GetComponent<SwingRope>() != null) {
                         hit.collider.gameObject.GetComponent<SwingRope>().OnCollisionEnterWithGrapple();
@@ -202,7 +205,7 @@ public class GrapplingGun : MonoBehaviour
         springJoint.enabled = false;
         springJoint.connectedBody = null;
         springJoint.frequency = frequency;
-        if (hit && hit.transform.gameObject.layer == 8) {
+        if (hit && LayerEquals(hit.transform.gameObject.layer, ENEMY)) {
             hit.transform.gameObject.GetComponent<Enemy>().OnCollisionExitWithGrapple();
         }
         gunHolder.GetComponent<Rigidbody2D>().gravityScale = 1;

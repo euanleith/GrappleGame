@@ -1,6 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+
+using static Utils.Layers;
 
 public class SpawnPoint : MonoBehaviour, RoomElement
 {
@@ -13,7 +13,7 @@ public class SpawnPoint : MonoBehaviour, RoomElement
     public void Disable() {}
 
     void OnTriggerEnter2D(Collider2D collider) {
-        if (collider.gameObject.layer == 12) { // Player layer
+        if (LayerEqualsAny(collider.gameObject.layer, PLAYER)) {
             collider.gameObject.GetComponent<Health>().SetSpawnRoom(room);
             GetComponent<SpriteRenderer>().color = Color.green;
         }

@@ -1,6 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+using static Utils.Layers;
 
 // todo rename SwingRopeRenderer
 // todo or maybe split into SwingRopeRenderer and SwingRope (the latter of which deals with the functioning of the rope, i.e. breaking, movement)
@@ -68,10 +69,5 @@ public class SwingRope : MonoBehaviour {
 
     public void OnCollisionEnterWithGrapple() {
         swing.Activate();
-    }
-
-    // todo create static extension class for this, see https://discussions.unity.com/t/check-if-layer-is-in-layermask/16007/2
-    bool LayerMaskContains(LayerMask mask, int layer) {
-        return mask == (mask | (1 << layer));
     }
 }

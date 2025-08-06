@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+using static Utils.Layers;
+
 public class CombatController : MonoBehaviour
 {
     public int totalHealth = 1;
@@ -111,7 +113,7 @@ public class CombatController : MonoBehaviour
     }
 
     public void OnCollisionEnter2D(Collision2D collision) {
-        if (collision.gameObject.layer == 2 || collision.gameObject.layer == 12) {
+        if (LayerEqualsAny(collision.gameObject.layer, IGNORE_RAYCAST, PLAYER)) {
             StopAttacking();
         }
     }

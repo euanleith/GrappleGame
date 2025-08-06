@@ -1,6 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+
+using static Utils.Layers;
 
 public class GrappleablePlatform : MonoBehaviour
 {
@@ -27,7 +27,7 @@ public class GrappleablePlatform : MonoBehaviour
     }
 
     public void OnCollisionEnter2D(Collision2D collision) {
-        if (collision.gameObject.layer != 12) { // Player layer
+        if (LayerEqualsAny(collision.gameObject.layer, PLAYER)) {
             rb.velocity = Vector2.zero;
         }
     }

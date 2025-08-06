@@ -1,6 +1,7 @@
-using System.Collections.Generic;
 using UnityEngine;
 using System;
+
+using static Utils.Layers;
 
 public class PlayerCombat : MonoBehaviour
 {
@@ -117,19 +118,16 @@ public class PlayerCombat : MonoBehaviour
     // todo something should happen to player after hitting enemy
     public void OnTriggerEnter2D(Collider2D collider) {
         if (hit) return; // only hit one object per attack
-        switch (collider.gameObject.layer) {
-            case 8: // Enemy
-            case 19: // EnemyTraversable
-                if (!collider.gameObject.GetComponent<EnemyLayer>()) {
-                    collider.gameObject.GetComponentInParent<Enemy>().OnHit(damage);
-                } else {
-                    collider.gameObject.GetComponent<EnemyLayer>().OnHit(damage);
-                }
-                hit = true;
-                break;
-            case 17: // EnemyInvulnerable
-                hit = true;
-                break;
+        if (LayerEqualsAny(collider.gameObject.layer, ENEMY, ENEMY_TRAVERSABLE)) {
+            if (!collider.gameObject.GetComponent<EnemyLayer>()) {
+                collider.gameObject.GetComponentInParent<Enemy>().OnHit(damage);
+            } else {
+                collider.gameObject.GetComponent<EnemyLayer>().OnHit(damage);
             }
+            hit = true;
+        } 
+        else if (LayerEquals(collider.gameObject.layer, ENEMY_INVULNERABLE)) {
+            hit = true;
+        }
     }
 }

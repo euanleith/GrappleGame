@@ -1,7 +1,8 @@
 using System;
 using System.Collections;
-using System.ComponentModel.Design;
 using UnityEngine;
+
+using static Utils.Layers;
 
 // todo rename PlayerMovement, or just Movement
 public class PlayerControls : MonoBehaviour
@@ -124,10 +125,9 @@ public class PlayerControls : MonoBehaviour
 
     // todo maybe move this to TraversablePlatform
     private IEnumerator FallThroughTraversablePlatform(PlatformEffector2D platform) {
-        int playerLayerMask = 1 << 12;
-        platform.colliderMask &= ~playerLayerMask;
+        platform.colliderMask = RemoveFromLayerMask(platform.colliderMask, PLAYER);
         yield return new WaitForSeconds(0.5f);
-        platform.colliderMask |= playerLayerMask;
+        platform.colliderMask = AddToLayerMask(platform.colliderMask, PLAYER);
     }
 
     private void LateUpdate() {
@@ -182,8 +182,6 @@ public class PlayerControls : MonoBehaviour
         //  on land on swing then die?
         // if player is within horizontal bounds of platform and hasnt jumped/grappled
 
-        //Debug.Log("Collision exit");
-        //Debug.Log("grapple enabled: " + grapple.isEnabled());
         if (IsLinkedToSwing()) {
             delayedSwingCollision = true;
         } else {

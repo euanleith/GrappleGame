@@ -1,6 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+
+using static Utils.Layers;
 
 public class FollowPlayerMovement : Movement
 {
@@ -13,7 +13,7 @@ public class FollowPlayerMovement : Movement
 
     public void Start() {
         player = GetComponentInParent<Enemy>().player;
-        layerMask = (1 << 8) & (1 << 17); // Enemy & EnemyInvulnerable todo add variable to inspector
+        layerMask = ToLayerMask(ENEMY, ENEMY_INVULNERABLE);
     }
 
     public override Vector2 Move(ref Vector2 direction, Transform transform, Vector2 currentDecelVelocity, Vector2 collisionNormal) 
