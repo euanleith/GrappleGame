@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-using static Utils.Layers;
+using static Utilities.Layer;
 
 public class CombatController : MonoBehaviour
 {

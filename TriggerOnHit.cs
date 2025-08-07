@@ -1,6 +1,6 @@
 using UnityEngine;
 
-using static Utils.Layers;
+using static Utilities.Layer;
 
 public class TriggerOnHit : MonoBehaviour
 {

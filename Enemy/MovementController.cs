@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using Random=UnityEngine.Random;
 
-using static Utils.Layers;
+using static Utilities.Layer;
 
 public class MovementController: MonoBehaviour
 {

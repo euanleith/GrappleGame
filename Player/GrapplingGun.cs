@@ -2,7 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 
-using static Utils.Layers;
+using static Utilities.Layer;
 
 public class GrapplingGun : MonoBehaviour
 {

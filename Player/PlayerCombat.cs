@@ -1,7 +1,7 @@
 using UnityEngine;
 using System;
 
-using static Utils.Layers;
+using static Utilities.Layer;
 
 public class PlayerCombat : MonoBehaviour
 {

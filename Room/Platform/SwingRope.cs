@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using static Utils.Layers;
+using static Utilities.Layer;
 
 // todo rename SwingRopeRenderer
 // todo or maybe split into SwingRopeRenderer and SwingRope (the latter of which deals with the functioning of the rope, i.e. breaking, movement)

@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-using static Utils.Layers;
+using static Utilities.Layer;
 
 // todo rename PlayerMovement, or just Movement
 public class PlayerControls : MonoBehaviour

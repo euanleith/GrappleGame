@@ -2,8 +2,10 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Utils {
-    public static class Layers {
+namespace Utilities {
+
+    public static class Layer {
+
         public const string DEFAULT = "Default";
         public const string TRANSPARENT_FX = "TransparentFX";
         public const string IGNORE_RAYCAST = "IgnoreRaycast";

@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
-using static Utils.Layers;
+using static Utilities.Layer;
 
 public class Health : MonoBehaviour
 {
