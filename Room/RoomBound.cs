@@ -37,8 +37,8 @@ public class RoomBound : MonoBehaviour {
     }
 
     private Vector2 GetNewPlayerPosition(Vector3 currentPlayerPosition, Transform player, Vector2 cardinalDirection) {
-        Vector3 magnitude = (player.GetComponent<CapsuleCollider2D>().size * 1.5f)
-            + this.GetComponent<BoxCollider2D>().size;
+        Vector3 magnitude = (player.transform.localScale * 1.5f)
+            + transform.localScale;
         Vector3 distance = cardinalDirection.x != 0 ?
             (cardinalDirection.x > 0 ?
                 Vector2.left * magnitude.x:
@@ -46,6 +46,7 @@ public class RoomBound : MonoBehaviour {
             (cardinalDirection.y > 0 ?
                 Vector2.down * magnitude.y :
                 Vector2.up * magnitude.y);
+        Debug.Log(magnitude + " " + distance + " " + (currentPlayerPosition + distance));
         return currentPlayerPosition + distance;
     }
 }
