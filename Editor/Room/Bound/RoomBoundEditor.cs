@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 [CustomEditor(typeof(RoomBound))]
-public class RoomBoundEditor : Editor {
+class RoomBoundEditor : Editor {
     private SerializedProperty elementsProperty;
     private Type[] elementTypes;
 
@@ -17,26 +17,6 @@ public class RoomBoundEditor : Editor {
             .SelectMany(assembly => assembly.GetTypes())
             .Where(type => typeof(RoomBoundElement).IsAssignableFrom(type) && !type.IsAbstract)
             .ToArray();
-    }
-
-    public static void DrawGizmos(RoomBound bound) {
-        Gizmos.color = bound.GetColour();
-        Gizmos.DrawWireCube(bound.GetPosition(), bound.GetSize());
-
-        bool hasLoggedErr = false;
-        foreach (RoomBoundElement element in bound.GetElements()) {
-            if (element == null) {
-                if (!bound.HasLoggedErr()) {
-                    hasLoggedErr = true;
-                    bound.LogError();
-                }
-                continue;
-            }
-
-            Gizmos.color = element.GetColour();
-            Gizmos.DrawCube(element.GetPosition(), element.GetSize());
-        }
-        bound.SetHasLoggedErr(hasLoggedErr);
     }
 
     public override void OnInspectorGUI() {

@@ -5,74 +5,10 @@ using Utilities;
 
 [CustomEditor(typeof(RoomBoundElement), true)]
 [CanEditMultipleObjects]
-public class RoomBoundElementEditor : Editor {
-    private float BOUND_WIDTH = 0.1f;
+class RoomBoundElementEditor : Editor {
+    private float BOUND_WIDTH = 0.5f;
 
     private Vector2 clampDirection;
-
-    public static void OnScriptAdded(RoomBoundElement newElement) {
-        RoomBound room = newElement.GetRoom();
-        if (room == null) {
-            Debug.LogError($"{typeof(RoomBoundElement).Name} must a child of a GameObject with a {typeof(RoomBoundElementsFolder).Name} component");
-            DestroyImmediate(newElement);
-            return;
-        }
-        AddToRoom(room, newElement);
-        InitGameObject(newElement);
-        AddComponents(newElement);
-    }
-
-    private static void AddToRoom(RoomBound room, RoomBoundElement newElement) {
-        if (!room.GetElements().Contains(newElement)) {
-            RoomBoundElement[] elements = newElement.GetComponents<RoomBoundElement>();
-            if (elements.Length > 1) {
-                DestroyExistingElement(elements, newElement);
-            }
-            else {
-                newElement.GetRoom().elements.Add(newElement);
-            }
-        }
-    }
-
-    private static void DestroyExistingElement(RoomBoundElement[] elements, RoomBoundElement newElement) {
-        foreach (RoomBoundElement element in elements) {
-            if (element != newElement) {
-                newElement.GetRoom().ReplaceElement(element, newElement);
-                DestroyImmediate(element);
-            }
-        }
-    }
-
-    private static void InitGameObject(RoomBoundElement element) {
-        element.gameObject.name = element.GetType().Name;
-        element.gameObject.layer = element.GetLayer();
-    }
-
-    private static void AddComponents(RoomBoundElement element) {
-        AddCollider(element);
-        AddSpriteRenderer(element);
-    }
-
-    private static void AddCollider(RoomBoundElement element) {
-        if (element.GetComponent<BoxCollider2D>() == null)
-            element.gameObject.AddComponent<BoxCollider2D>();
-    }
-
-    private static void AddSpriteRenderer(RoomBoundElement element) {
-        if (element.GetComponent<SpriteRenderer>() == null)
-            element.gameObject.AddComponent<SpriteRenderer>();
-
-        SpriteRenderer sr = element.GetComponent<SpriteRenderer>();
-        sr.material = new Material(Shader.Find("Sprites/Default"));
-        sr.sprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Packages/com.unity.2d.sprite/Editor/ObjectMenuCreation/DefaultAssets/Textures/v2/Square.png");
-        sr.color = element.GetColour();
-        // sr.enabled is only set false in play mode
-    }
-
-    public static void OnDestroy(RoomBoundElement element) {
-        RoomBound room = element.GetRoom();
-        if (room != null) room.GetElements().Remove(element);
-    }
 
     public void OnSceneGUI() {
         RoomBoundElement element = (RoomBoundElement) target;

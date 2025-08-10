@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 namespace Utilities {
-    class Vector {
+    public static class Vector {
 
         public static Vector3 GetCardinalDirection(Transform a, Transform b) {
             Vector3 direction = a.position - b.position;

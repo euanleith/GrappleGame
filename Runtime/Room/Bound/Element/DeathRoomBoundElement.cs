@@ -9,6 +9,6 @@ public class DeathRoomBoundElement : RoomBoundElement {
     }
 
     public override int GetLayer() {
-        return LayerToInt(UNGRAPPLEABLE_DEATH); // todo player not dying on collision
+        return LayerToInt(UNGRAPPLEABLE_DEATH);
     }
 }
