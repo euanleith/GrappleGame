@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 [CustomEditor(typeof(RoomBound))]
-class RoomBoundEditor : Editor {
+public class RoomBoundEditor : Editor {
     private SerializedProperty elementsProperty;
     private Type[] elementTypes;
 
@@ -26,7 +26,6 @@ class RoomBoundEditor : Editor {
         EditorGUILayout.Space();
         BuildAddElementButton(
             () => ShowTypeChooserMenu());
-        // todo what if element is added or deleted outside of this menu?
 
         serializedObject.ApplyModifiedProperties();
     }
@@ -43,7 +42,6 @@ class RoomBoundEditor : Editor {
         }
     }
 
-    // todo should be protected and have RoomBoundElementEditor be in child namespace Room.Bound.Element
     private void BuildElementField(int i) {
         EditorGUILayout.PropertyField(elementsProperty.GetArrayElementAtIndex(i), GUIContent.none);
     }
@@ -58,9 +56,8 @@ class RoomBoundEditor : Editor {
         return ProcessClickEvent(GUILayout.Button("X", GUILayout.Width(20)), onClick);
     }
 
-    // todo should be protected and have RoomBoundElementEditor be in child namespace Room.Bound.Element
     // note if this was the only element in bound elements folder, deletes bound elements folder too
-    public static void DeleteElement(RoomBound room, int i) {
+    private static void DeleteElement(RoomBound room, int i) {
         List<RoomBoundElement> elements = room.GetElements();
         if (elements[i] != null) {
             Transform boundsFolder = elements[i].transform.parent;

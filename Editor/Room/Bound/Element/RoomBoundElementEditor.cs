@@ -5,24 +5,22 @@ using Utilities;
 
 [CustomEditor(typeof(RoomBoundElement), true)]
 [CanEditMultipleObjects]
-class RoomBoundElementEditor : Editor {
+public class RoomBoundElementEditor : Editor {
     private float BOUND_WIDTH = 0.5f;
 
-    private Vector2 clampDirection;
-
     public void OnSceneGUI() {
-        RoomBoundElement element = (RoomBoundElement) target;
+        RoomBoundElement element = (RoomBoundElement)target;
         if (element == null) return;
 
         RoomBound roomBound = element.GetComponentInParent<RoomBound>();
         if (roomBound == null) return;
 
-        ClampPosition(element, roomBound);
-        ClampSize(element, roomBound);
+        Vector3 clampDirection = ClampPosition(element, roomBound);
+        ClampSize(element, roomBound, clampDirection);
     }
 
-    // clamp room element position to the edge of the room
-    private void ClampPosition(RoomBoundElement element, RoomBound room) {
+    // clamp room element position to (just outside) the edge of the room
+    private Vector3 ClampPosition(RoomBoundElement element, RoomBound room) {
         Vector3 roomCentre = room.transform.position;
         Vector3 roomExtent = room.size / 2f;
         Vector3 elementExtent = element.GetSize() / 2f;
@@ -34,9 +32,12 @@ class RoomBoundElementEditor : Editor {
         Vector3 distance = new Vector2(
             Mathf.Abs(currentOffset.x) / roomExtent.x,
             Mathf.Abs(currentOffset.y) / roomExtent.y);
+        Vector3 currentClampDirection = element.GetSize().y > element.GetSize().x ?
+            (currentOffset.x > 0 ? Vector3.right : Vector3.left) :
+            (currentOffset.y > 0 ? Vector3.up : Vector3.down);
         Vector3 currentDirectionBias = roomExtent;
 
-        bool elementShouldBeHorizontal = clampDirection.x != 0 ?
+        bool elementShouldBeHorizontal = currentClampDirection.x != 0 ?
             distance.x + currentDirectionBias.x > distance.y :
             distance.x > distance.y + currentDirectionBias.y;
         // one axis clamped between the room bounds, the other snapped to the room edge
@@ -52,13 +53,14 @@ class RoomBoundElementEditor : Editor {
             element.transform.position = newPosition;
         }
 
-        clampDirection = (distance.x > distance.y) ?
+        Vector3 newClampDirection = distance.x > distance.y ?
             (currentOffset.x > 0 ? Vector3.right : Vector3.left) :
             (currentOffset.y > 0 ? Vector3.up : Vector3.down);
+        return newClampDirection;
     }
 
     // clamp the size of the room element to a line with the width of the room bound and length of the room element
-    private void ClampSize(RoomBoundElement element, RoomBound room) {
+    private void ClampSize(RoomBoundElement element, RoomBound room, Vector3 clampDirection) {
         // Undo.RecordObject(element.transform, "Clamp RoomBoundElement Size");
         float length = Mathf.Max(
             Mathf.Min(Mathf.Abs(element.GetSize().x), room.GetSize().x),

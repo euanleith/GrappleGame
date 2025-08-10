@@ -4,11 +4,9 @@ using static Utilities.Layer;
 
 public class UngrappleableRoomBoundElement : RoomBoundElement {
 
-    public override Color GetColour() {
-        return Color.white;
-    }
-
-    public override int GetLayer() {
-        return LayerToInt(UNGRAPPLEABLE_GROUND);
+    new private void Reset() {
+        base.Reset();
+        GetComponent<SpriteRenderer>().color = Color.white;
+        gameObject.layer = LayerToInt(UNGRAPPLEABLE_GROUND);
     }
 }

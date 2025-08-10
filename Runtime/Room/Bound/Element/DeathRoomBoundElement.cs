@@ -4,11 +4,9 @@ using static Utilities.Layer;
 
 public class DeathRoomBoundElement : RoomBoundElement {
 
-    public override Color GetColour() {
-        return Color.red;
-    }
-
-    public override int GetLayer() {
-        return LayerToInt(UNGRAPPLEABLE_DEATH);
+    new private void Reset() {
+        base.Reset();
+        GetComponent<SpriteRenderer>().color = Color.red;
+        gameObject.layer = LayerToInt(UNGRAPPLEABLE_DEATH);
     }
 }
