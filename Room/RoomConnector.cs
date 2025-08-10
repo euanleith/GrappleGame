@@ -3,7 +3,7 @@ using UnityEngine;
 using static Utilities.Layer;
 using static Utilities.Vector;
 
-public class RoomBound : MonoBehaviour {
+public class RoomConnector : MonoBehaviour {
     private CameraControls camControls;
     private Spawn[] spawns;
 
@@ -46,7 +46,6 @@ public class RoomBound : MonoBehaviour {
             (cardinalDirection.y > 0 ?
                 Vector2.down * magnitude.y :
                 Vector2.up * magnitude.y);
-        Debug.Log(magnitude + " " + distance + " " + (currentPlayerPosition + distance));
         return currentPlayerPosition + distance;
     }
 }
