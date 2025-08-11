@@ -9,8 +9,6 @@ public class RoomBoundEditor : Editor {
     private SerializedProperty elementsProperty;
     private Type[] elementTypes;
 
-    private const string BOUND_ELEMENTS_FOLDER_NAME = "BoundElements";
-
     void OnEnable() {
         elementsProperty = serializedObject.FindProperty("elements");
         elementTypes = AppDomain.CurrentDomain.GetAssemblies()
@@ -58,17 +56,18 @@ public class RoomBoundEditor : Editor {
 
     // note if this was the only element in bound elements folder, deletes bound elements folder too
     private static void DeleteElement(RoomBound room, int i) {
-        List<RoomBoundElement> elements = room.GetElements();
-        if (elements[i] != null) {
-            Transform boundsFolder = elements[i].transform.parent;
-            if (boundsFolder.childCount > 1) {
-                DestroyImmediate(elements[i].gameObject);
-            } else {
-                DestroyImmediate(boundsFolder.gameObject);
-            }
-        }
-        //elements.RemoveAt(i); // this is done in RoomBoundElementEditor
+        Undo.RecordObject(room, "Delete RoomBoundElement");
+
+        RoomBoundElement toRemove = room.GetElement(i);
+        room.RemoveElement(i);
         EditorUtility.SetDirty(room);
+
+        Transform boundsFolder = toRemove.transform.parent;
+        if (boundsFolder.childCount > 1) {
+            Undo.DestroyObjectImmediate(toRemove.gameObject);
+        } else {
+            Undo.DestroyObjectImmediate(boundsFolder.gameObject);
+        }
     }
 
     // returns true if button is clicked
@@ -80,44 +79,12 @@ public class RoomBoundEditor : Editor {
         GenericMenu menu = new GenericMenu();
         foreach (Type type in elementTypes) {
             CreateTypeChooserMenuItem(menu, type.Name, 
-                () => CreateNewElement(type, (RoomBound)target));
+                () => RoomBoundElementEditorHelper.CreateNewElement(type, (RoomBound)target));
         }
         menu.ShowAsContext();
     }
 
     private void CreateTypeChooserMenuItem(GenericMenu menu, string label, Action onClick) {
         menu.AddItem(new GUIContent(label), false, () => onClick());
-    }
-
-    private void CreateNewElement(Type type, RoomBound room) {
-        Transform boundsFolder = GetOrCreateBoundsFolder(room);
-        CreateNewElement(type, room, boundsFolder);
-        EditorUtility.SetDirty(room);
-    }
-
-    private Transform GetOrCreateBoundsFolder(RoomBound room) {
-        RoomBoundElementsFolder elementsFolder = room.GetComponentInChildren<RoomBoundElementsFolder>();
-        if (elementsFolder == null) {
-            GameObject elementsFolderObj = new GameObject(BOUND_ELEMENTS_FOLDER_NAME);
-            elementsFolderObj.transform.parent = room.transform;
-            InitTransform(elementsFolderObj.transform);
-            elementsFolder = elementsFolderObj.AddComponent<RoomBoundElementsFolder>();
-        }
-        return elementsFolder.transform;
-    }
-
-    private void CreateNewElement(Type type, RoomBound room, Transform boundsFolder) {
-        GameObject newElementObj = new GameObject();
-        newElementObj.transform.parent = boundsFolder;
-        InitTransform(newElementObj.transform);
-        RoomBoundElement newElement = newElementObj.AddComponent(type) as RoomBoundElement;
-        //room.GetElements().Add(newElement); // this is done in RoomBoundElementEditor
-    }
-
-    // todo move to utils?
-    private void InitTransform(Transform transform) {
-        transform.localPosition = Vector3.zero;
-        transform.localRotation = Quaternion.identity;
-        transform.localScale = Vector3.one;
     }
 }

@@ -43,4 +43,6 @@ public class RoomBoundElementsFolder : MonoBehaviour {
         }
         return true;
     }
+
+    // todo enforce can't delete? (done automatically when roombound is deleted)
 }

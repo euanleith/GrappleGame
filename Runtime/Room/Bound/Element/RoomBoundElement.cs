@@ -15,6 +15,16 @@ public abstract class RoomBoundElement : MonoBehaviour {
         return GetComponent<SpriteRenderer>().bounds.size;
     }
 
+    public Vector3 GetExtent() {
+        return GetSize() / 2;
+    }
+
+    public float GetLength() {
+        return Mathf.Max(
+            Mathf.Min(Mathf.Abs(GetSize().x), GetRoom().GetSize().x),
+            Mathf.Min(Mathf.Abs(GetSize().y), GetRoom().GetSize().y));
+    }
+
     public Vector3 GetPosition() {
         return transform.position;
     }

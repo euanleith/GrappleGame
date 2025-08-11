@@ -2,9 +2,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // todo should be an attribute of Room rather than a monobehaviour itself
+[ExecuteAlways]
 public class RoomBound : MonoBehaviour {
     public Vector2 size = new Vector2(48, 27);
-    public List<RoomBoundElement> elements = new List<RoomBoundElement>();
+    [SerializeField] public List<RoomBoundElement> elements = new List<RoomBoundElement>();
     private Color colour = Color.white;
 
     private bool loggedErr = false;
@@ -17,12 +18,49 @@ public class RoomBound : MonoBehaviour {
         return size;
     }
 
-    public List<RoomBoundElement> GetElements() {
-        return elements;
+    public Vector3 GetExtent() {
+        return GetSize() / 2f;
+    }
+
+    public Vector3 GetRightBound() {
+        return new Vector2(GetExtent().x, 0f);
+    }
+
+    public Vector3 GetLeftBound() {
+        return new Vector2(-GetExtent().x, 0f);
+    }
+
+    public Vector3 GetTopBound() {
+        return new Vector2(0f, GetExtent().y);
+    }
+
+    public Vector3 GetBottomBound() {
+        return new Vector2(0f, -GetExtent().y);
+    }
+
+    public RoomBoundElement GetElement(int index) {
+        return elements[index];
+    }
+
+    public void Add(RoomBoundElement element) {
+        elements.Add(element);
+        RoomBoundElementEditorHelper.Clamp(element);
+    }
+
+    public void RemoveElement(int index) {
+        elements.RemoveAt(index);
+    }
+
+    public void Remove(RoomBoundElement element) {
+        elements.Remove(element);
+    }
+
+    public bool Contains(RoomBoundElement element) {
+        return elements.Contains(element);
     }
 
     // todo move to utils?
-    public bool ReplaceElement(RoomBoundElement a, RoomBoundElement b) {
+    public bool Replace(RoomBoundElement a, RoomBoundElement b) {
         int index = elements.IndexOf(a);
         if (index >= 0) {
             elements[index] = b;
@@ -47,7 +85,15 @@ public class RoomBound : MonoBehaviour {
         Debug.LogError("Missing RoomBoundElement " + name + " in room " + transform.parent.name);
     }
 
+    private void Reset() {
+        RoomBoundEditorHelper.OnScriptAdded(this);
+    }
+
     private void OnDrawGizmos() {
         RoomBoundEditorHelper.DrawGizmos(this);
+    }
+
+    private void OnDestroy() {
+        RoomBoundEditorHelper.OnDestroy(this);
     }
 }
