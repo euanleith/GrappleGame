@@ -17,20 +17,39 @@ public class RoomBoundElementEditorHelper : MonoBehaviour {
         Vector3? localPosition = null, float length = DEFAULT_LENGTH, int layer = FOREGROUND_LAYER) 
     {
         GameObject obj = new GameObject();
-        InitTransform(obj.transform, room, localPosition, length, layer);
+        BeforeScriptAdded(obj.transform, room, localPosition, length, layer);
         obj.AddComponent(type);
     }
 
-    private static void InitTransform(Transform element, RoomBound room, 
+    private static void BeforeScriptAdded(Transform element, RoomBound room,
         Vector3? localPosition = null, float length = DEFAULT_LENGTH, int layer = FOREGROUND_LAYER) 
     {
-        Transform elementsFolder = RoomBoundEditorHelper.GetOrCreateElementsFolder(room);
-        element.parent = elementsFolder;
-        element.localPosition = localPosition ?? Vector3.zero;
-        element.localScale = Vector.Full(length);
-        element.localRotation = Quaternion.identity;
-        // todo element sprite renderer.layer = layer
+        InitTransform(element, room, localPosition, length);
+        AddComponents(element, layer);
+        DestroyExistingElementsInGameObject(element);
+
         SetInitialised(element.gameObject);
+    }
+
+    public static void OnScriptAdded(RoomBoundElement newElement) {
+        RoomBound room = newElement.GetRoom();
+        if (room == null) {
+            Debug.LogError($"{typeof(RoomBoundElement).Name} must a child of a GameObject with a {typeof(RoomBoundElementsFolder).Name} component");
+            DestroyImmediate(newElement); // using DestroyImmediate makes this class have to extend MonoBehaviour :(
+            return;
+        }
+
+        if (!IsInitialised(newElement.gameObject)) {
+            BeforeScriptAdded(newElement.transform, room);
+        }
+
+        AfterScriptAdded(newElement);
+    }
+
+    private static void AfterScriptAdded(RoomBoundElement element) {
+        InitGameObject(element);
+        InitSpriteRenderer(element);
+        AddToRoom(element);
     }
 
     private static bool IsInitialised(GameObject obj) {
@@ -41,18 +60,44 @@ public class RoomBoundElementEditorHelper : MonoBehaviour {
         obj.tag = INITIALISED_TAG;
     }
 
-    public static void OnScriptAdded(RoomBoundElement newElement) {
-        RoomBound room = newElement.GetRoom();
-        if (room == null) {
-            Debug.LogError($"{typeof(RoomBoundElement).Name} must a child of a GameObject with a {typeof(RoomBoundElementsFolder).Name} component");
-            DestroyImmediate(newElement); // using DestroyImmediate makes this class have to extend MonoBehaviour :(
-            return;
+    private static void InitTransform(Transform element, RoomBound room,
+        Vector3? localPosition = null, float length = DEFAULT_LENGTH) 
+    {
+        Transform elementsFolder = RoomBoundEditorHelper.GetOrCreateElementsFolder(room);
+        element.parent = elementsFolder;
+        element.localPosition = localPosition ?? Vector3.zero;
+        element.localScale = Vector.Full(length);
+        element.localRotation = Quaternion.identity;
+    }
+
+    private static void AddComponents(Transform element, int layer) {
+        AddCollider(element);
+        AddSpriteRenderer(element, layer);
+    }
+
+    private static void AddCollider(Transform element) {
+        if (element.GetComponent<BoxCollider2D>() == null)
+            element.gameObject.AddComponent<BoxCollider2D>();
+    }
+
+    private static void AddSpriteRenderer(Transform element, int layer) {
+        if (element.GetComponent<SpriteRenderer>() == null)
+            element.gameObject.AddComponent<SpriteRenderer>();
+
+        SpriteRenderer sr = element.GetComponent<SpriteRenderer>();
+        sr.material = new Material(Shader.Find("Sprites/Default"));
+        sr.sprite = Resources.Load<Sprite>("Square");
+        sr.sortingLayerName = FOREGROUND_SORTING_LAYER;
+        sr.sortingOrder = layer;
+    }
+
+    private static void DestroyExistingElementsInGameObject(Transform newElement) {
+        RoomBoundElement[] elements = newElement.GetComponents<RoomBoundElement>();
+        if (elements.Length > 1) {
+            foreach (RoomBoundElement element in elements) {
+                DestroyImmediate(element); // using DestroyImmediate makes this class have to extend MonoBehaviour :(
+            }
         }
-        // todo maybe wrap all of these in IsInitialised(), so then can create the whole element programmatically if i want
-        InitGameObject(newElement);
-        InitTransform(newElement, room);
-        AddComponents(newElement);
-        AddToRoom(room, newElement);
     }
 
     private static void InitGameObject(RoomBoundElement element) {
@@ -60,34 +105,14 @@ public class RoomBoundElementEditorHelper : MonoBehaviour {
         element.gameObject.layer = element.GetLayer();
     }
 
-    private static void InitTransform(RoomBoundElement element, RoomBound room, 
-        Vector3? localPosition = null, float length = DEFAULT_LENGTH, int layer = FOREGROUND_LAYER) 
-    {
-        if (!IsInitialised(element.gameObject)) {
-            InitTransform(element.transform, room, localPosition, length, layer);
-        }
+    private static void InitSpriteRenderer(RoomBoundElement element) {
+        element.GetComponent<SpriteRenderer>().color = element.GetColour();
     }
 
-    private static void AddComponents(RoomBoundElement element) {
-        AddCollider(element);
-        AddSpriteRenderer(element);
+    private static void AddToRoom(RoomBoundElement element) {
+        element.GetRoom().Add(element);
     }
 
-    private static void AddCollider(RoomBoundElement element) {
-        if (element.GetComponent<BoxCollider2D>() == null)
-            element.gameObject.AddComponent<BoxCollider2D>();
-    }
-
-    private static void AddSpriteRenderer(RoomBoundElement element) {
-        if (element.GetComponent<SpriteRenderer>() == null)
-            element.gameObject.AddComponent<SpriteRenderer>();
-
-        SpriteRenderer sr = element.GetComponent<SpriteRenderer>();
-        sr.material = new Material(Shader.Find("Sprites/Default"));
-        sr.sprite = Resources.Load<Sprite>("Square");
-        sr.color = element.GetColour();
-        sr.sortingLayerName = FOREGROUND_SORTING_LAYER;
-    }
 
     public static void Clamp(RoomBoundElement element) {
         if (element == null) return;
@@ -129,24 +154,6 @@ public class RoomBoundElementEditorHelper : MonoBehaviour {
         element.transform.localScale = clampDirection.x != 0 ?
             new Vector2(WIDTH, element.GetLength()) :
             new Vector2(element.GetLength(), WIDTH);
-    }
-
-    private static void AddToRoom(RoomBound room, RoomBoundElement newElement) {
-        if (!room.Contains(newElement)) {
-            RoomBoundElement[] elements = newElement.GetComponents<RoomBoundElement>();
-            if (elements.Length > 1) {
-                DestroyExistingElements(elements, newElement);
-            }
-            newElement.GetRoom().Add(newElement);
-        }
-    }
-
-    private static void DestroyExistingElements(RoomBoundElement[] elements, RoomBoundElement newElement) {
-        foreach (RoomBoundElement element in elements) {
-            if (element != newElement) {
-                DestroyImmediate(element); // using DestroyImmediate makes this class have to extend MonoBehaviour :(
-            }
-        }
     }
 
     public static void OnDestroy(RoomBoundElement element) {
