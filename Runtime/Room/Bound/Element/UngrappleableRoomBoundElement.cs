@@ -1,12 +1,12 @@
 using UnityEngine;
 using System;
 
+using Utilities;
 using static Utilities.Layer;
-using static Utilities.Vector;
 
 public class UngrappleableRoomBoundElement : RoomBoundElement {
 
-    private static readonly Vector3 OVERLAP_WIGGLE_ROOM = Full(0.5f); 
+    private static readonly Vector3 OVERLAP_WIGGLE_ROOM = Vector.Full(0.5f); 
 
     new private void Reset() {
         base.Reset();
@@ -14,7 +14,6 @@ public class UngrappleableRoomBoundElement : RoomBoundElement {
         gameObject.layer = LayerToInt(UNGRAPPLEABLE_GROUND);
     }
 
-    public bool temp = true;
     new private void Update() {
         base.Update();
         // todo move into if UNITY_EDITOR, i just have it here so i can read it better
@@ -24,16 +23,11 @@ public class UngrappleableRoomBoundElement : RoomBoundElement {
             Collider2D[] hits = Physics2D.OverlapBoxAll(GetPosition(), GetExtent() + OVERLAP_WIGGLE_ROOM, 0f);
             foreach (Collider2D hit in hits) {
                 if (IsValidCollision(hit)) {
-                    if (temp) {
-                        Bounds overlap = GetOverlap(collider.bounds, hit.bounds);
-                        Vector3 clampDirection = RoomBoundElementEditorHelper.GetClampDirection(this);
-                        Vector3 offset = clampDirection * -RoomBoundElementEditorHelper.WIDTH/2f;
-                        Vector3 localPosition = overlap.center + offset - room.GetPosition();
-                        float length = Reduce(Mathf.Max, overlap.size);
-                        Type type = typeof(ConnectorRoomBoundElement);
-                        room.AddIfAbsent(type, localPosition, length);
-                        // todo and remove if overlapping with similar
-                    }
+                    Bounds bounds = GetOverlap(hit);
+                    Type type = typeof(ConnectorRoomBoundElement);
+
+                    room.AddIfAbsent(type, bounds);
+                    room.RemoveConflictingElements(type, bounds);
                 }
             }
         }
@@ -47,5 +41,18 @@ public class UngrappleableRoomBoundElement : RoomBoundElement {
 
     private bool AreInTheSameRoom(Transform a, Transform b) {
         return a.parent.parent == b.parent.parent; // todo i guess checking all parents for Room component would be better, but would be slower too
+    }
+
+    private Bounds GetOverlap(Collider2D hit) {
+        Bounds overlap = Vector.GetOverlap(GetComponent<Collider2D>().bounds, hit.bounds);
+        // todo could i just make a Clamp() function which uses bounds instead of element
+        Vector3 clampDirection = RoomBoundElementEditorHelper.GetClampDirection(this);
+        Vector3 offset = clampDirection * -RoomBoundElementEditorHelper.WIDTH / 2f;
+        Vector3 localPosition = overlap.center + offset - GetRoom().GetPosition();
+        float length = Vector.Reduce(Mathf.Max, overlap.size);
+        Vector3 size = clampDirection.x != 0 ?
+            new Vector2(length, RoomBoundElementEditorHelper.WIDTH) :
+            new Vector2(RoomBoundElementEditorHelper.WIDTH, length);
+        return new Bounds(localPosition, size);
     }
 }

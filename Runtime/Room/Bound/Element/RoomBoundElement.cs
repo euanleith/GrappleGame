@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -20,14 +21,23 @@ public abstract class RoomBoundElement : MonoBehaviour {
         return GetComponent<SpriteRenderer>().bounds.size;
     }
 
+    public Bounds GetLocalBounds() {
+        return new Bounds(GetLocalPosition(), GetSize());
+    }
+
     public Vector3 GetExtent() {
         return GetSize() / 2;
     }
 
+    // todo this also clamps it to room size, should rename or something
     public float GetLength() {
         return Mathf.Max(
             Mathf.Min(Mathf.Abs(GetSize().x), GetRoom().GetSize().x),
             Mathf.Min(Mathf.Abs(GetSize().y), GetRoom().GetSize().y));
+    }
+
+    public static float GetLength(Vector3 size) {
+        return Mathf.Max(size.x, size.y);
     }
 
     public Vector3 GetPosition() {
@@ -42,6 +52,12 @@ public abstract class RoomBoundElement : MonoBehaviour {
         Transform boundElementsFolder = transform.parent;
         if (boundElementsFolder.GetComponent<RoomBoundElementsFolder>() == null) return null;
         return boundElementsFolder.parent.GetComponent<RoomBound>();
+    }
+
+    public bool IsLike(Type type, Bounds bounds) {
+        return GetType() == type &&
+            Vector.Approximately(GetLocalPosition(), bounds.center) &&
+            Mathf.Approximately(GetLength(), GetLength(bounds.size));
     }
 
     protected void Reset() {

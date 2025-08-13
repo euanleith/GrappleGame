@@ -1,8 +1,10 @@
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-
-using Utilities;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 // todo should be an attribute of Room rather than a monobehaviour itself
 [ExecuteAlways]
@@ -50,43 +52,51 @@ public class RoomBound : MonoBehaviour {
         RoomBoundElementEditorHelper.Clamp(element);
     }
 
-    public bool AddIfAbsent(Type type, Vector3 localPosition, float length) {
-        if (!ContainsElementLike(type, localPosition, length)) {
+    public bool AddIfAbsent(Type type, Bounds bounds) {
+        if (!elements.Any(element => element.IsLike(type, bounds))) {
             RoomBoundElementEditorHelper.CreateNewElement(
                 type,
                 this,
-                localPosition,
-                length);
+                bounds.center,
+                RoomBoundElement.GetLength(bounds.size));
             return true;
         }
         return false;
     }
 
     public void RemoveElement(int index) {
-        elements.RemoveAt(index);
+        Remove(elements[index]);
     }
 
     public void Remove(RoomBoundElement element) {
         elements.Remove(element);
+#if UNITY_EDITOR
+        Undo.DestroyObjectImmediate(element.gameObject);
+#else
+        Destroy(element.gameObject);
+#endif
+    }
+
+    public void RemoveWithoutDestroying(RoomBoundElement element) {
+        elements.Remove(element);
+    }
+
+    public void RemoveConflictingElements(Type type, Bounds bounds) {
+        for (int i = elements.Count-1; i >= 0; i--) {
+            if (IsConflictingElement(elements[i], type, bounds)) {
+                Remove(elements[i]);
+            }
+        }
+    }
+
+    public bool IsConflictingElement(RoomBoundElement element, Type type, Bounds bounds) {
+        return element.GetType() == type &&
+            element.GetLocalBounds().Intersects(bounds) &&
+            !element.IsLike(type, bounds);
     }
 
     public bool Contains(RoomBoundElement element) {
         return elements.Contains(element);
-    }
-
-    public bool ContainsElementLike(Type type, Vector3 localPosition, float length) {
-        foreach (RoomBoundElement element in elements) {
-            if (element.GetType() == type &&
-                    IsLike(element, localPosition, length)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public bool IsLike(RoomBoundElement element, Vector3 localPosition, float length) {
-        return Vector.Approximately(element.GetLocalPosition(), localPosition) &&
-            Mathf.Approximately(element.GetLength(), length);
     }
 
     // todo move to utils?

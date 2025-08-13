@@ -161,6 +161,6 @@ public class RoomBoundElementEditorHelper : MonoBehaviour {
 
     public static void OnDestroy(RoomBoundElement element) {
         RoomBound room = element.GetRoom();
-        if (room != null) room.Remove(element);
+        if (room != null) room.RemoveWithoutDestroying(element);
     }
 }

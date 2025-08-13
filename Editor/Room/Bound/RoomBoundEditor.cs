@@ -57,16 +57,17 @@ public class RoomBoundEditor : Editor {
     private static void DeleteElement(RoomBound room, int i) {
         Undo.RecordObject(room, "Delete RoomBoundElement");
 
-        RoomBoundElement toRemove = room.GetElement(i);
+        // todo moved this stuff to room.RemoveElement
+        //RoomBoundElement toRemove = room.GetElement(i);
         room.RemoveElement(i);
-        EditorUtility.SetDirty(room);
+        //EditorUtility.SetDirty(room);
 
-        Transform boundsFolder = toRemove.transform.parent;
-        if (boundsFolder.childCount > 1) {
-            Undo.DestroyObjectImmediate(toRemove.gameObject);
-        } else {
-            Undo.DestroyObjectImmediate(boundsFolder.gameObject);
-        }
+        //Transform boundsFolder = toRemove.transform.parent;
+        //if (boundsFolder.childCount > 1) {
+        //    Undo.DestroyObjectImmediate(toRemove.gameObject);
+        //} else {
+        //    Undo.DestroyObjectImmediate(boundsFolder.gameObject);
+        //}
     }
 
     // returns true if button is clicked
