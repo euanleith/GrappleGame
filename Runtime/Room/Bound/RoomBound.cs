@@ -1,5 +1,8 @@
 using System.Collections.Generic;
+using System;
 using UnityEngine;
+
+using Utilities;
 
 // todo should be an attribute of Room rather than a monobehaviour itself
 [ExecuteAlways]
@@ -47,6 +50,18 @@ public class RoomBound : MonoBehaviour {
         RoomBoundElementEditorHelper.Clamp(element);
     }
 
+    public bool AddIfAbsent(Type type, Vector3 localPosition, float length) {
+        if (!ContainsElementLike(type, localPosition, length)) {
+            RoomBoundElementEditorHelper.CreateNewElement(
+                type,
+                this,
+                localPosition,
+                length);
+            return true;
+        }
+        return false;
+    }
+
     public void RemoveElement(int index) {
         elements.RemoveAt(index);
     }
@@ -57,6 +72,21 @@ public class RoomBound : MonoBehaviour {
 
     public bool Contains(RoomBoundElement element) {
         return elements.Contains(element);
+    }
+
+    public bool ContainsElementLike(Type type, Vector3 localPosition, float length) {
+        foreach (RoomBoundElement element in elements) {
+            if (element.GetType() == type &&
+                    IsLike(element, localPosition, length)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public bool IsLike(RoomBoundElement element, Vector3 localPosition, float length) {
+        return Vector.Approximately(element.GetLocalPosition(), localPosition) &&
+            Mathf.Approximately(element.GetLength(), length);
     }
 
     // todo move to utils?

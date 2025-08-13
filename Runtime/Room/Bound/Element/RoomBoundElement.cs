@@ -1,4 +1,9 @@
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
+using Utilities;
 
 [ExecuteAlways]
 public abstract class RoomBoundElement : MonoBehaviour {
@@ -29,6 +34,10 @@ public abstract class RoomBoundElement : MonoBehaviour {
         return transform.position;
     }
 
+    public Vector3 GetLocalPosition() {
+        return transform.localPosition;
+    }
+
     public RoomBound GetRoom() {
         Transform boundElementsFolder = transform.parent;
         if (boundElementsFolder.GetComponent<RoomBoundElementsFolder>() == null) return null;
@@ -37,6 +46,15 @@ public abstract class RoomBoundElement : MonoBehaviour {
 
     protected void Reset() {
         RoomBoundElementEditorHelper.OnScriptAdded(this);
+    }
+
+    protected void Update() {
+#if UNITY_EDITOR
+        // ideally this would be in OnSceneGUI, but that doesn't process physics updates the same frame
+        if (Selection.Contains(gameObject)) {
+            RoomBoundElementEditorHelper.Clamp(this);
+        }
+#endif
     }
 
     private void OnDestroy() {

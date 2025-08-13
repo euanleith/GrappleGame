@@ -1,3 +1,4 @@
+using UnityEngine;
 using UnityEditor;
 
 [CustomEditor(typeof(RoomBoundElement), true)]
@@ -5,6 +6,5 @@ using UnityEditor;
 public class RoomBoundElementEditor : Editor {
 
     public void OnSceneGUI() {
-        RoomBoundElementEditorHelper.Clamp((RoomBoundElement)target);
     }
 }

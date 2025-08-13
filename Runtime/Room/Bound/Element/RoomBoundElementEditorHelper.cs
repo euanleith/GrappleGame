@@ -4,7 +4,7 @@ using UnityEngine;
 using Utilities;
 
 public class RoomBoundElementEditorHelper : MonoBehaviour {
-    private const float WIDTH = 0.5f;
+    public const float WIDTH = 0.5f;
     private const float DEFAULT_LENGTH = 5f;
 
     private const string FOREGROUND_SORTING_LAYER = "Foreground";
@@ -121,14 +121,17 @@ public class RoomBoundElementEditorHelper : MonoBehaviour {
         if (room == null) return;
 
         // must do these functions in this order
+        Collider2D collider = element.GetComponent<Collider2D>();
+        collider.enabled = false;
         Vector3 currentClampDirection = GetClampDirection(element);
         ClampSize(element, currentClampDirection);
         ClampPosition(element, currentClampDirection);
+        collider.enabled = true;
     }
 
-    private static Vector3 GetClampDirection(RoomBoundElement element) {
+    public static Vector3 GetClampDirection(RoomBoundElement element) {
         Vector3 elementLocalPosition = element.transform.localPosition;
-        Vector3 normalisedDirection = Vector.Apply((a, b) => Mathf.Abs(a) / b, elementLocalPosition, element.GetRoom().GetExtent());
+        Vector3 normalisedDirection = Vector.Map((a, b) => Mathf.Abs(a) / b, elementLocalPosition, element.GetRoom().GetExtent());
         return normalisedDirection.x > normalisedDirection.y ?
            (elementLocalPosition.x > 0 ? Vector3.right : Vector3.left) :
            (elementLocalPosition.y > 0 ? Vector3.up : Vector3.down);
@@ -141,8 +144,8 @@ public class RoomBoundElementEditorHelper : MonoBehaviour {
         Vector3 minBound = -element.GetRoom().GetExtent() + element.GetExtent() - Vector.Full(WIDTH);
         Vector3 maxBound = element.GetRoom().GetExtent() - element.GetExtent() + Vector.Full(WIDTH);
 
-        Vector3 clampedPosition = Vector.Apply(Mathf.Clamp, element.transform.localPosition, minBound, maxBound);
-        Vector3 edgePosition = Vector3.Scale(Vector.Apply(Mathf.Sign, element.transform.localPosition), maxBound);
+        Vector3 clampedPosition = Vector.Map(Mathf.Clamp, element.transform.localPosition, minBound, maxBound);
+        Vector3 edgePosition = Vector3.Scale(Vector.Map(Mathf.Sign, element.transform.localPosition), maxBound);
 
         element.transform.localPosition = currentClampDirection.x != 0 ?
             new Vector2(edgePosition.x, clampedPosition.y) :
