@@ -47,6 +47,10 @@ public class RoomBound : MonoBehaviour {
         return elements[index];
     }
 
+    private List<RoomBoundElement> GetElements(Type type) {
+        return elements.FindAll(element => element.GetType() == type);
+    }
+
     public void Add(RoomBoundElement element) {
         elements.Add(element);
         RoomBoundElementEditorHelper.Clamp(element);
@@ -71,7 +75,7 @@ public class RoomBound : MonoBehaviour {
     public void Remove(RoomBoundElement element) {
         elements.Remove(element);
 #if UNITY_EDITOR
-        Undo.DestroyObjectImmediate(element.gameObject);
+        Undo.DestroyObjectImmediate(element.gameObject); // todo this shouldn't be an undo for e.g. auto destroying connector elements
 #else
         Destroy(element.gameObject);
 #endif

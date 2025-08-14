@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -19,6 +20,10 @@ public abstract class RoomBoundElement : MonoBehaviour {
 
     public Vector3 GetSize() {
         return GetComponent<SpriteRenderer>().bounds.size;
+    }
+
+    public Bounds GetBounds() {
+        return GetComponent<SpriteRenderer>().bounds;
     }
 
     public Bounds GetLocalBounds() {
@@ -58,6 +63,28 @@ public abstract class RoomBoundElement : MonoBehaviour {
         return GetType() == type &&
             Vector.Approximately(GetLocalPosition(), bounds.center) &&
             Mathf.Approximately(GetLength(), GetLength(bounds.size));
+    }
+
+    protected RoomBoundElement[] GetElementCollisions() {
+        return Physics2D.OverlapBoxAll(GetPosition(), GetSize(), 0f)
+            .Where(IsValidElementCollision)
+            .Select(hit => hit.GetComponent<RoomBoundElement>())
+            .ToArray();
+    }
+
+    protected bool IsValidElementCollision(Collider2D hit) {
+        return enabled &&
+            hit != null &&
+            hit.enabled &&
+            hit.GetComponent(typeof(RoomBoundElement)) != null;
+    }
+
+    protected bool InSameRoom(RoomBoundElement element) {
+        return GetRoom() == element.GetRoom();
+    }
+
+    protected bool IsSameType(RoomBoundElement element) {
+        return GetType() == element.GetType();
     }
 
     protected void Reset() {
