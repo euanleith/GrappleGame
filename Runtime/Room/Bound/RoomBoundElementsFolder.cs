@@ -28,7 +28,7 @@ public class RoomBoundElementsFolder : MonoBehaviour {
     private bool EnforceHasValidParent() {
         RoomBound room = GetComponentInParent<RoomBound>();
         if (room == null) {
-            Debug.LogError($"{GetType().Name} must be a child of a GameObject with a {typeof(RoomBound).Name} component");
+            Debug.LogError($"{GetType().Name} must be a child of a GameObject with a {typeof(RoomBound).Name} component", gameObject);
             return false;
         }
         return true;
@@ -38,7 +38,7 @@ public class RoomBoundElementsFolder : MonoBehaviour {
         RoomBound room = GetComponentInParent<RoomBound>();
         RoomBoundElementsFolder[] siblings = room.GetComponentsInChildren<RoomBoundElementsFolder>();
         if (siblings.Length > 1) {
-            Debug.LogError($"{typeof(RoomBound).Name} '{room.name}' already has a {GetType().Name}");
+            Debug.LogError($"{typeof(RoomBound).Name} '{room.name}' already has a {GetType().Name}", siblings[0]);
             return false;
         }
         return true;

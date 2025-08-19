@@ -88,7 +88,7 @@ public class Health : MonoBehaviour
 
     public void Respawn() {
         room = spawnRoom;
-        room.Reset();
+        room.CustomReset();
         ResetCamera();
         currentHealth = maxHealth;
         foreach (VisualElement heart in ui.rootVisualElement.ElementAt(0).Children()) {
@@ -97,7 +97,7 @@ public class Health : MonoBehaviour
     }
 
     public void Retry() {
-        room.Reset();
+        room.CustomReset();
     }
 
     public void SetSpawnRoom(Room room) {

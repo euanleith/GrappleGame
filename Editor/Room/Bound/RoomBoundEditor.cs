@@ -53,21 +53,9 @@ public class RoomBoundEditor : Editor {
         return ProcessClickEvent(GUILayout.Button("X", GUILayout.Width(20)), onClick);
     }
 
-    // note if this was the only element in bound elements folder, deletes bound elements folder too
     private static void DeleteElement(RoomBound room, int i) {
         Undo.RecordObject(room, "Delete RoomBoundElement");
-
-        // todo moved this stuff to room.RemoveElement
-        //RoomBoundElement toRemove = room.GetElement(i);
         room.RemoveElement(i);
-        //EditorUtility.SetDirty(room);
-
-        //Transform boundsFolder = toRemove.transform.parent;
-        //if (boundsFolder.childCount > 1) {
-        //    Undo.DestroyObjectImmediate(toRemove.gameObject);
-        //} else {
-        //    Undo.DestroyObjectImmediate(boundsFolder.gameObject);
-        //}
     }
 
     // returns true if button is clicked

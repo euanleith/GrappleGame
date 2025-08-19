@@ -13,7 +13,9 @@ public class RoomBound : MonoBehaviour {
     [SerializeField] public List<RoomBoundElement> elements = new List<RoomBoundElement>();
     private Color colour = Color.white;
 
-    private bool loggedErr = false;
+    public Color GetColour() {
+        return colour;
+    }
 
     public Vector3 GetPosition() {
         return transform.position;
@@ -74,11 +76,7 @@ public class RoomBound : MonoBehaviour {
 
     public void Remove(RoomBoundElement element) {
         elements.Remove(element);
-#if UNITY_EDITOR
-        Undo.DestroyObjectImmediate(element.gameObject); // todo this shouldn't be an undo for e.g. auto destroying connector elements
-#else
-        Destroy(element.gameObject);
-#endif
+        DestroyImmediate(element.gameObject);
     }
 
     public void RemoveWithoutDestroying(RoomBoundElement element) {
@@ -103,30 +101,24 @@ public class RoomBound : MonoBehaviour {
         return elements.Contains(element);
     }
 
-    // todo move to utils?
     public bool Replace(RoomBoundElement a, RoomBoundElement b) {
         int index = elements.IndexOf(a);
         if (index >= 0) {
             elements[index] = b;
+            Remove(a);
             return true;
         } else {
             return false;
         }
     }
 
-    public Color GetColour() {
-        return colour;
-    }
-    public bool HasLoggedErr() {
-        return loggedErr;
-    }
-
-    public void SetHasLoggedErr(bool loggedErr) {
-        this.loggedErr = loggedErr;
-    }
-
-    public void LogError() {
-        Debug.LogError("Missing RoomBoundElement " + name + " in room " + transform.parent.name);
+    public ConnectorRoomBoundElement[] GetConnectedRoomsConnectors() {
+        return elements
+            .Where(element => element.GetType() == typeof(ConnectorRoomBoundElement))
+            .Cast<ConnectorRoomBoundElement>()
+            .Select(element => element.GetConnectedElement())
+            .Where(element => element != null)
+            .ToArray();
     }
 
     private void Reset() {

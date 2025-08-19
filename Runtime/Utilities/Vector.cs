@@ -76,5 +76,19 @@ namespace Utilities {
         public static bool Approximately(Vector3 u, Vector3 v, float epsilon = float.Epsilon) {
             return Vector3.Distance(u, v) < epsilon;
         }
+
+        public static T GetClosest<T, U>(U from, T[] objs) where T : MonoBehaviour where U : MonoBehaviour {
+            if (objs.Length == 0) return null;
+            T closest = objs[0];
+            float minDistance = Vector3.Distance(from.transform.position, objs[0].transform.position);
+            foreach (T obj in objs) {
+                float distance = Vector3.Distance(from.transform.position, obj.transform.position);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closest = obj;
+                }
+            }
+            return closest;
+        }
     }
 }

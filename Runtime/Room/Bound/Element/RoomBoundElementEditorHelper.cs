@@ -34,7 +34,7 @@ public class RoomBoundElementEditorHelper : MonoBehaviour {
     public static void OnScriptAdded(RoomBoundElement newElement) {
         RoomBound room = newElement.GetRoom();
         if (room == null) {
-            Debug.LogError($"{typeof(RoomBoundElement).Name} must a child of a GameObject with a {typeof(RoomBoundElementsFolder).Name} component");
+            Debug.LogError($"{typeof(RoomBoundElement).Name} must be a child of a GameObject with a {typeof(RoomBoundElementsFolder).Name} component", newElement.gameObject);
             DestroyImmediate(newElement); // using DestroyImmediate makes this class have to extend MonoBehaviour :(
             return;
         }
@@ -101,7 +101,7 @@ public class RoomBoundElementEditorHelper : MonoBehaviour {
     }
 
     private static void InitGameObject(RoomBoundElement element) {
-        element.gameObject.name = element.GetType().Name;
+        GameObjectUtilities.SetUniqueName(element);
         element.gameObject.layer = element.GetLayer();
     }
 
@@ -112,7 +112,6 @@ public class RoomBoundElementEditorHelper : MonoBehaviour {
     private static void AddToRoom(RoomBoundElement element) {
         element.GetRoom().Add(element);
     }
-
 
     public static void Clamp(RoomBoundElement element) {
         if (element == null) return;
@@ -137,10 +136,9 @@ public class RoomBoundElementEditorHelper : MonoBehaviour {
            (elementLocalPosition.y > 0 ? Vector3.up : Vector3.down);
     }
 
-    // clamp room element position to (just outside) the edge of the room.
+    // clamp room element position to just outside the edge of the room.
     // one axis of the element is clamped between the room bounds, and the other is snapped to the room edge
     private static void ClampPosition(RoomBoundElement element, Vector3 currentClampDirection) {
-        // Vector3 roomEdgeExtent = Vector.Full(WIDTH) / 2f; // use this isntead of WIDTH if want element to be in the centre of the room bound edge
         Vector3 minBound = -element.GetRoom().GetExtent() + element.GetExtent() - Vector.Full(WIDTH);
         Vector3 maxBound = element.GetRoom().GetExtent() - element.GetExtent() + Vector.Full(WIDTH);
 

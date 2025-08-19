@@ -1,9 +1,6 @@
 using UnityEngine;
 using System;
 using System.Linq;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 using Utilities;
 using static Utilities.Layer;
@@ -12,6 +9,7 @@ public class UngrappleableRoomBoundElement : RoomBoundElement {
 
     new private void Reset() {
         base.Reset();
+        if (this == null) return;
         GetComponent<SpriteRenderer>().color = Color.white;
         gameObject.layer = LayerToInt(UNGRAPPLEABLE_GROUND);
     }
@@ -19,15 +17,17 @@ public class UngrappleableRoomBoundElement : RoomBoundElement {
     new private void Update() {
         base.Update();
 #if UNITY_EDITOR
-        RoomBoundElement[] otherRoomUngrappleableElementCollisions = GetElementCollisions()
-            .Where(hit => IsSameType(hit) && !InSameRoom(hit))
-            .ToArray();
-        for (int i = otherRoomUngrappleableElementCollisions.Length-1; i >= 0; i--) {
-            Bounds bounds = GetOverlap(otherRoomUngrappleableElementCollisions[i].GetBounds());
-            Type type = typeof(ConnectorRoomBoundElement);
+        if (!Application.isPlaying) {
+            RoomBoundElement[] otherRoomUngrappleableElementCollisions = GetElementCollisions()
+                .Where(hit => IsSameType(hit) && !InSameRoom(hit))
+                .ToArray();
+            for (int i = otherRoomUngrappleableElementCollisions.Length-1; i >= 0; i--) {
+                Bounds bounds = GetOverlap(otherRoomUngrappleableElementCollisions[i].GetBounds());
+                Type type = typeof(ConnectorRoomBoundElement);
 
-            GetRoom().AddIfAbsent(type, bounds);
-            GetRoom().RemoveConflictingElements(type, bounds);
+                GetRoom().AddIfAbsent(type, bounds);
+                GetRoom().RemoveConflictingElements(type, bounds);
+            }
         }
 #endif
     }

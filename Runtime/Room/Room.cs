@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
@@ -29,7 +27,12 @@ public class Room : MonoBehaviour
         Disable();
     }
 
-    protected void Update() {}
+    private void Reset() {
+        InitNewBounds();
+    }
+
+    protected void Update() {
+    }
 
     protected void InitBounds() {
         Transform boundsFolder = gameObject.transform.Find("Bounds");
@@ -39,6 +42,10 @@ public class Room : MonoBehaviour
         if (tSpawn) {
             spawn = tSpawn.position;
         }
+    }
+
+    private void InitNewBounds() {
+        gameObject.AddComponent<RoomBound>();
     }
 
     protected void InitElements() {
@@ -75,7 +82,7 @@ public class Room : MonoBehaviour
     }
 
     // todo maybe always do player stuff here
-    public void Reset() {
+    public void CustomReset() {
         // todo move to Reset() function in PlayerControls
         Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
         rb.velocity = new Vector2(0, 0);
@@ -98,5 +105,9 @@ public class Room : MonoBehaviour
 
     public void Unpause() {
         Time.timeScale = 1;
+    }
+
+    public RoomBound GetBounds() {
+        return GetComponent<RoomBound>();
     }
 }

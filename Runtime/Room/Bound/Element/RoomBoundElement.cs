@@ -34,7 +34,6 @@ public abstract class RoomBoundElement : MonoBehaviour {
         return GetSize() / 2;
     }
 
-    // todo this also clamps it to room size, should rename or something
     public float GetLength() {
         return Mathf.Max(
             Mathf.Min(Mathf.Abs(GetSize().x), GetRoom().GetSize().x),
@@ -87,6 +86,10 @@ public abstract class RoomBoundElement : MonoBehaviour {
         return GetType() == element.GetType();
     }
 
+    public string GetName() {
+        return $"{GetRoom().name}.{name}";
+    }
+
     protected void Reset() {
         RoomBoundElementEditorHelper.OnScriptAdded(this);
     }
@@ -94,8 +97,10 @@ public abstract class RoomBoundElement : MonoBehaviour {
     protected void Update() {
 #if UNITY_EDITOR
         // ideally this would be in OnSceneGUI, but that doesn't process physics updates the same frame
-        if (Selection.Contains(gameObject)) {
-            RoomBoundElementEditorHelper.Clamp(this);
+        if (!Application.isPlaying) {
+            if (Selection.Contains(gameObject)) {
+                RoomBoundElementEditorHelper.Clamp(this);
+            }
         }
 #endif
     }
