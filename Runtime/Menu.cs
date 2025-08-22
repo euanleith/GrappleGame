@@ -1,25 +1,27 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 public class Menu : MonoBehaviour
 {
-    public new bool enabled = false;
+    private new bool enabled = false;
     public Transform buttons;
     public Health player;
 
-    void Start() {
+    private void Start() {
         Button resumeButton = buttons.GetChild(0).GetComponent<Button>();
         resumeButton.onClick.AddListener(ResumeOnClick);
+        AddPointerEnterListener(resumeButton);
         Button retryButton = buttons.GetChild(1).GetComponent<Button>();
         retryButton.onClick.AddListener(RetryOnClick);
+        AddPointerEnterListener(retryButton);
         Button respawnButton = buttons.GetChild(2).GetComponent<Button>();
         respawnButton.onClick.AddListener(RespawnOnClick);
+        AddPointerEnterListener(respawnButton);
         Button quitButton = buttons.GetChild(3).GetComponent<Button>();
         quitButton.onClick.AddListener(QuitOnClick);
-        // todo on mouse hover should change selected button to that button
+        AddPointerEnterListener(quitButton);
     }
 
     public void ManualUpdate()
@@ -28,7 +30,7 @@ public class Menu : MonoBehaviour
         if (Input.GetButtonDown("Menu")) {
             if (!enabled) {
                 EnterMenu();
-                SetDefaultButton(buttons.GetChild(0).GetComponent<Button>());
+                SetSelectedButton(buttons.GetChild(0).GetComponent<Button>());
             } else {
                 ExitMenu();
             }
@@ -36,40 +38,60 @@ public class Menu : MonoBehaviour
     }
 
     // todo move these to the buttons themselves, with parent containing OnClick()?
-    void ResumeOnClick() {
+    private void ResumeOnClick() {
         ExitMenu();
     }
 
-    void RetryOnClick() {
+    private void RetryOnClick() {
         player.Retry(); // todo this allows player to retry just before they're going to get hit, maybe should cause player to take 1 damage... I've removed it for now
         ExitMenu();
     }
 
-    void RespawnOnClick() {
+    private void RespawnOnClick() {
         player.Respawn();
         ExitMenu();
     }
 
-    void QuitOnClick() {
-        #if UNITY_EDITOR
+    private void QuitOnClick() {
+#if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
-        #else
+#else
         Application.Quit();
-        #endif
+#endif
     }
 
-    void EnterMenu() {
+    private void EnterMenu() {
         buttons.gameObject.SetActive(true);
         Time.timeScale = 0;
     }
 
-    void ExitMenu() {
+    private void ExitMenu() {
         buttons.gameObject.SetActive(false);
         Time.timeScale = 1; 
     }
 
-    void SetDefaultButton(Button button) {
+    private void SetSelectedButton(Button button) {
+        DeselectCurrentButton();
         button.Select();
         button.OnSelect(new BaseEventData(EventSystem.current));
+    }
+
+    private void DeselectCurrentButton() {
+        GameObject currentButton = EventSystem.current.currentSelectedGameObject;
+        if (currentButton != null) {
+            currentButton.GetComponent<Button>()?.OnDeselect(new BaseEventData(EventSystem.current));
+        }
+    }
+
+    private void AddPointerEnterListener(Button button) {
+        EventTrigger eventTrigger = button.gameObject.GetComponent<EventTrigger>();
+        if (eventTrigger == null) {
+            eventTrigger = button.gameObject.AddComponent<EventTrigger>();
+        }
+        EventTrigger.Entry entry = new EventTrigger.Entry {
+            eventID = EventTriggerType.PointerEnter
+        };
+        entry.callback.AddListener(_ => SetSelectedButton(button));
+        eventTrigger.triggers.Add(entry);
     }
 }
