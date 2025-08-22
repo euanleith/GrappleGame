@@ -119,8 +119,6 @@ public class PlayerControls : MonoBehaviour
 
         rb.velocity = Vector2.ClampMagnitude(rb.velocity, maxSpeed);
         // todo clamp angular velocity too?
-
-        menu.ManualUpdate();
     }
 
     // todo maybe move this to TraversablePlatform

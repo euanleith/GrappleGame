@@ -5,7 +5,6 @@ using UnityEngine.EventSystems;
 
 public class Menu : MonoBehaviour
 {
-    private new bool enabled = false;
     public Transform buttons;
     public Health player;
 
@@ -24,10 +23,10 @@ public class Menu : MonoBehaviour
         AddPointerEnterListener(quitButton);
     }
 
-    public void ManualUpdate()
+    public void Update()
     {
-        enabled = buttons.gameObject.activeSelf;
         if (Input.GetButtonDown("Menu")) {
+            bool enabled = buttons.gameObject.activeSelf;
             if (!enabled) {
                 EnterMenu();
                 SetSelectedButton(buttons.GetChild(0).GetComponent<Button>());
