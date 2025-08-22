@@ -86,7 +86,7 @@ public class PlayerControls : MonoBehaviour
         if (!(Input.GetButton("Fire1") || Input.GetButton("Fire2"))) // todo if not grappling
         {
             // todo would making this a switch make it clearer? or maybe just move the booleans to functions, and maybe also the contents of each if, though idk about the latter
-            if ((isGrounded || (hitWallNormal != 0)) && Input.GetButtonDown("Jump") && !menu.enabled) { // jumping
+            if ((isGrounded || (hitWallNormal != 0)) && Input.GetButtonDown("Jump") && !menu.IsEnabled()) { // jumping
                 if (isGrounded && lastGroundCollision.GetComponent<PlatformEffector2D>() != null && moveY < 0) { // TraversablePlatform layer
                     // todo or holding down while land on TraversablePlatform?
                     StartCoroutine(FallThroughTraversablePlatform(lastGroundCollision.GetComponent<PlatformEffector2D>()));

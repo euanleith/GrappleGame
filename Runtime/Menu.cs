@@ -26,14 +26,17 @@ public class Menu : MonoBehaviour
     public void Update()
     {
         if (Input.GetButtonDown("Menu")) {
-            bool enabled = buttons.gameObject.activeSelf;
-            if (!enabled) {
+            if (!IsEnabled()) {
                 EnterMenu();
                 SetSelectedButton(buttons.GetChild(0).GetComponent<Button>());
             } else {
                 ExitMenu();
             }
         }
+    }
+
+    public bool IsEnabled() {
+        return buttons.gameObject.activeSelf;
     }
 
     // todo move these to the buttons themselves, with parent containing OnClick()?
