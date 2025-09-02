@@ -4,7 +4,7 @@ using UnityEngine;
 public class CameraControls : MonoBehaviour
 {
     public Transform player;
-    public float smoothSpeed;
+    public float smoothSpeed = 10f;
     public Room room;
     public new Camera camera;
     private float height, width;
@@ -51,7 +51,7 @@ public class CameraControls : MonoBehaviour
             0
         );
 
-        return lerp ? Vector3.Lerp(transform.position, camBounds, smoothSpeed) : camBounds;
+        return lerp ? Vector3.Lerp(transform.position, camBounds, smoothSpeed * Time.unscaledDeltaTime) : camBounds;
     }
 
     private bool ShouldMove(Vector3 newPos) {
