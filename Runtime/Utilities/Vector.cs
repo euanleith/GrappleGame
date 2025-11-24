@@ -90,5 +90,11 @@ namespace Utilities {
             }
             return closest;
         }
+
+        // returns true if t1 is within y bounds of t2
+        public static bool WithinBoundsY(Transform t1, Transform t2, float wiggleRoom = 0f) {
+            return t1.position.y + (t1.localScale.y / 2) + wiggleRoom > t2.position.y - (t2.localScale.y / 2) &&
+                t1.position.y - (t1.localScale.y / 2) - wiggleRoom < t2.position.y + (t2.localScale.y / 2);
+        }
     }
 }

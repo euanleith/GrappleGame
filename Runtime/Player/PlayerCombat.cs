@@ -27,6 +27,7 @@ public class PlayerCombat : MonoBehaviour
     public State state;
     public bool hit = false;
     PlayerMovement playerMovement;
+    Player player;
 
     private void Start()
     {
@@ -43,7 +44,7 @@ public class PlayerCombat : MonoBehaviour
         switch (state)
         {
             case State.cooldown:
-                if (Input.GetButton("Fire3") && countdown <= 0 && !playerMovement.stunned)
+                if (Input.GetButton("Fire3") && countdown <= 0 && !player.IsStunned())
                 {
                     countdown = windupDuration;
                     hitbox = GetHitbox();

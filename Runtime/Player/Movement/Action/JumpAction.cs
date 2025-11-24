@@ -9,8 +9,8 @@ public class JumpAction : PlayerMovementAction {
     }
 
     public override bool CanDo() {
-        return (player.isGrounded || (player.hitWallNormal != 0)) &&
-            !player.menu.IsEnabled();
+        return player.isGrounded || 
+            player.hitWallNormal != 0;
     }
 
     public override bool WantsToDo() {
@@ -38,7 +38,7 @@ public class JumpAction : PlayerMovementAction {
                 velocityX = -player.wallJumpSpeed;
                 break;
             case 0:
-                velocityX = player.rb.velocity.x + (player.moveX * player.forwardAirSpeed * Time.deltaTime);
+                velocityX = player.rb.velocity.x + (Controls.getPlayerVelocityX() * player.forwardAirSpeed * Time.deltaTime);
                 break;
         }
         float velocityY = player.rb.velocity.y + player.jumpSpeed;

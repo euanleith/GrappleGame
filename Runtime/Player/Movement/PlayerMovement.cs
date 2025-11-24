@@ -1,16 +1,15 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+
+using static Utilities.ColliderUtilities;
 
 public class PlayerMovement : MonoBehaviour
 {
-    // todo order these
-
     public Rigidbody2D rb;
-    public new Camera camera;
     public GrapplingGun grapple;
-    public Menu menu;
+    private Collider2D playerCollider;
 
     public float groundSpeed = 7f;
     public float jumpSpeed = 7f;
@@ -27,43 +26,24 @@ public class PlayerMovement : MonoBehaviour
     public float grappleMoveSpeedY = 100f;
     public float stdBounceSpeed;
     public Vector2 knockbackSpeed = new Vector2(1, 2);
-
     public float maxSpeed = 20f;
 
-
-    public float moveX;
-    public float moveY;
-
-    public float hitWallNormal; // todo not great name - it's reffering to the normal of the wall currently being collided with, if there is one, and 0 otherwise
-    public float minWallAngle = 0.5f;
-
-    private Collider2D playerCollider;
-
-    private Vector2 previousPos;
-
-    public Vector2 velocityOfGround;
+    public float minWalkableAngle = 0.5f;
+    public float hitWallNormal; // todo not great name - it's referring to the normal of the wall currently being collided with, if there is one, and 0 otherwise
 
     public bool isGrounded = false;
+    public Vector2 velocityOfGround;
 
-    public float minSlope = 0.5f; // todo might need to change this for slopes
-
-    public Collider2D lastGroundCollision; // need this since OnCollisionExit2D doesn't contain collision info of the exited collision
-    int nCurrentCollisions = 0;
-
-    public bool stunned = false;
-    public const float stunDuration = 1f;
-    float stunCnt = 0f;
-
+    // todo could have a Cooldown object and iterate through a list of them in Player.Update
     public const float jumpCooldownDuration = 0.1f;
     public float jumpCooldown = 0f;
 
     bool delayedSwingCollision = false;
 
-    private List<PlayerMovementAction> actions; // ordered by priority
+    private List<PlayerMovementAction> actions; // only first which satisfies action.ShouldDo() will be performed
 
     void Start()
     {
-        previousPos = transform.position;
         rb = GetComponent<Rigidbody2D>();
         playerCollider = GetComponent<Collider2D>();
 
@@ -76,26 +56,12 @@ public class PlayerMovement : MonoBehaviour
         };
     }
 
-    void Update()
-    {
-        if (stunCnt > 0) {
-            stunCnt -= Time.deltaTime;
-            return;
-        } else if (stunned) FinishStun();
+    void Update() {
+        UpdateJumpCooldown();
 
-        if (jumpCooldown > 0) {
-            jumpCooldown -= Time.deltaTime;
-        }
-
-        foreach (PlayerMovementAction action in actions) {
-            if (action.ShouldDo()) {
-                action.Do();
-                break;
-            }
-        }
+        actions.Where(action => action.ShouldDo()).First().Do();
 
         rb.velocity = Vector2.ClampMagnitude(rb.velocity, maxSpeed);
-        // todo clamp angular velocity too?
     }
 
     private void LateUpdate() {
@@ -104,28 +70,24 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    void OnCollisionEnter2D(Collision2D collision)
-    {
-        nCurrentCollisions++;
+    void OnCollisionEnter2D(Collision2D collision) {
+        if (grapple.isEnabled()) return;
         hitWallNormal = 0f;
         ContactPoint2D contact = collision.GetContact(0); // only need 1 contact point as player collider is box
-        if (Math.Abs(contact.normal.x) > minWallAngle)
-        {
+        if (IsCollidingWithWall(contact)) {
             hitWallNormal = contact.normal.x;
-        } else if (contact.normal.y > minSlope) {
-            lastGroundCollision = contact.collider;
-            isGrounded = true;
+        } else {
+            LinkToGround(collision.transform);
             grapple.OnCollisionWithGround();
         }
-        if (!grapple.isEnabled() &&
-            IsAbove(gameObject, collision.gameObject))
-        {
-            if (collision.gameObject.GetComponent<SwingPlatform>() != null) {
-                LinkToSwing(collision.transform);
-            } else {
-                gameObject.transform.parent = collision.gameObject.transform;
-            }
-        }
+    }
+
+    private bool IsCollidingWithWall(ContactPoint2D contact) {
+        return Math.Abs(contact.normal.x) > minWalkableAngle;
+    }
+
+    private bool IsCollidingWithGround(ContactPoint2D contact) {
+        return contact.normal.y > minWalkableAngle;
     }
 
     public Vector2 GetVelocityOfGround(GameObject ground) {
@@ -142,7 +104,6 @@ public class PlayerMovement : MonoBehaviour
 
     void OnCollisionExit2D(Collision2D collision) 
     {
-        nCurrentCollisions--;
         hitWallNormal = 0f;
 
         // todo there's other cases;
@@ -155,17 +116,12 @@ public class PlayerMovement : MonoBehaviour
         } else {
             isGrounded = false;
         }
-
-        //if (nCurrentCollisions <= 0) {
-        //    isGrounded = false;
-        //}
     }
 
     // todo maybe this stuff should be on the swing platform's end?
 
-    private void LinkToSwing(Transform swingPlatform) {
-        // todo idk if i should be doing if checks in here, just terrible code
-        transform.parent = swingPlatform;
+    private void LinkToGround(Transform ground) {
+        transform.parent = ground;
         isGrounded = true;
     }
 
@@ -189,77 +145,26 @@ public class PlayerMovement : MonoBehaviour
         return delayedSwingCollision && (
             !WithinBoundsX(playerCollider, transform.parent.GetComponent<Collider2D>()) || // todo maybe just try with collision box above the platform like in the video?
             //!WithinBoundsY(transform, collision.transform, 0.1f) ||
-            IsAbove(transform.parent.gameObject, gameObject) ||
+            IsAbove(transform.parent.GetComponent<Collider2D>(), playerCollider) ||
             grapple.isEnabled() ||
             jumpCooldown > 0);
     }
 
-    // todo move these to some utils class
-
-    // returns true if a is within bounds of b on x-axis
-    bool WithinBoundsX(Collider2D a, Collider2D b, float wiggleRoom = 0f) {
-        float aMin = a.bounds.min.x - wiggleRoom;
-        float aMax = a.bounds.max.x + wiggleRoom;
-        float bMin = b.bounds.min.x;
-        float bMax = b.bounds.max.x;
-        return aMax > bMin && aMin < bMax;
-    }
-
-    // returns true if t1 is within y bounds of t2
-    bool WithinBoundsY(Transform t1, Transform t2, float wiggleRoom = 0f) {
-        return t1.position.y + (t1.localScale.y / 2) + wiggleRoom > t2.position.y - (t2.localScale.y / 2) &&
-            t1.position.y - (t1.localScale.y / 2) - wiggleRoom < t2.position.y + (t2.localScale.y / 2);
-    }
-
-    // returns true if obj1 is above obj2
-    // requires both objects to have Collider2D's (todo maybe make params Collider2D so don't have to specify this)
-    bool IsAbove(GameObject obj1, GameObject obj2) {
-        return obj1.GetComponent<Collider2D>().bounds.min.y > obj2.GetComponent<Collider2D>().bounds.max.y;
+    private void UpdateJumpCooldown() {
+        if (jumpCooldown > 0) {
+            jumpCooldown -= Time.deltaTime;
+        }
     }
 
     public void Jump() {
-        UnlinkFromSwing(); // todo is this necessary?
-        jumpCooldown = jumpCooldownDuration;
-        grapple.OnJump(); // todo note setting canTransformGrapple=true when doing any jump
-        isGrounded = false;
-        // todo theres a better way than if else / switch
-        float velocityX = 0f;
-        switch (hitWallNormal) {
-            case > 0:
-                velocityX = wallJumpSpeed; 
-                break;
-            case < 0:  
-                velocityX = -wallJumpSpeed;
-                break;
-            case 0:
-                velocityX = rb.velocity.x + (moveX * forwardAirSpeed * Time.deltaTime);
-                break;
-        }
-        float velocityY = rb.velocity.y + jumpSpeed;
-        // todo should i add this?
-        //if (velocityOfGround != Vector2.zero) {
-        //    velocityX = velocityOfGround.x + rb.velocity.x + (moveX * forwardAirSpeed * Time.deltaTime);
-        //    velocityY = velocityOfGround.y + jumpSpeed;
-        //}
-        // todo might want to ignore reverse x movement after wall jump for a few seconds?
-        rb.velocity = new Vector2(velocityX, velocityY); // note not adding rb.velocity.y 
+        actions.Where(action => action is JumpAction).First().Do();
     }
 
     public void Bounce(Vector2 direction) {
         rb.velocity = direction * stdBounceSpeed;
     }
 
-    public void FinishStun() {
-        stunned = false;
-        stunCnt = 0;
-        GetComponent<SpriteRenderer>().color = Color.white;
-    }
-
-    public void Stun(float duration = stunDuration, Vector2 collisionNormal = new Vector2()) {
-        stunned = true;
-        stunCnt = duration;
+    public void Stun(Vector2 collisionNormal) {
         rb.velocity = collisionNormal * knockbackSpeed;
-        GetComponent<SpriteRenderer>().color = Color.cyan;
-        grapple.StopGrappling(); // todo currently this is causing no grapple animation to play
     }
 }

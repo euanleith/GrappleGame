@@ -12,7 +12,7 @@ public class TraversePlatformAction : PlayerMovementAction {
 
     public override bool CanDo() {
         return player.isGrounded &&
-            player.lastGroundCollision.GetComponent<PlatformEffector2D>() != null; // todo check if lastGroundCollision is in TraversablePlatform 
+            player.transform.parent.GetComponent<PlatformEffector2D>() != null;
     }
 
     public override bool WantsToDo() {
@@ -20,7 +20,7 @@ public class TraversePlatformAction : PlayerMovementAction {
     }
 
     public override void Do() {
-        DoAsync(player.lastGroundCollision.GetComponent<PlatformEffector2D>());
+        DoAsync(player.transform.parent.GetComponent<PlatformEffector2D>());
     }
 
     private async void DoAsync(PlatformEffector2D platform) {

@@ -78,7 +78,7 @@ public class GrapplingGun : MonoBehaviour
 
     private void Update()
     {
-        if (health.currentHealth <= 0 || GetComponentInParent<PlayerMovement>().stunned) {
+        if (health.currentHealth <= 0 || GetComponentInParent<Player>().IsStunned()) {
             springJoint.enabled = false;
             return;
         }

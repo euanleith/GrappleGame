@@ -43,7 +43,7 @@ public class Health : MonoBehaviour
             if (alive) Retry(); // respawn at start of room for each platforming death
         } 
         else if (LayerEquals(collision.gameObject.layer, ENEMY)) {
-            GetComponent<PlayerMovement>().Stun(collisionNormal: collision.GetContact(0).normal);
+            GetComponent<Player>().Stun(collisionNormal: collision.GetContact(0).normal);
             GetHit(collision.gameObject.GetComponent<Enemy>().combatController.GetDamage(), new Vector2(0, 1));
         } 
         else if (LayerEquals(collision.gameObject.layer, ENEMY_ATTACK)) {
