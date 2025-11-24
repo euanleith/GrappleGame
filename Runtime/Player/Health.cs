@@ -43,7 +43,7 @@ public class Health : MonoBehaviour
             if (alive) Retry(); // respawn at start of room for each platforming death
         } 
         else if (LayerEquals(collision.gameObject.layer, ENEMY)) {
-            GetComponent<PlayerControls>().Stun(collisionNormal: collision.GetContact(0).normal);
+            GetComponent<PlayerMovement>().Stun(collisionNormal: collision.GetContact(0).normal);
             GetHit(collision.gameObject.GetComponent<Enemy>().combatController.GetDamage(), new Vector2(0, 1));
         } 
         else if (LayerEquals(collision.gameObject.layer, ENEMY_ATTACK)) {
@@ -63,7 +63,7 @@ public class Health : MonoBehaviour
             }
             else 
             {
-                GetComponent<PlayerControls>().Bounce(contactNormal); // todo how do other games do this?
+                GetComponent<PlayerMovement>().Bounce(contactNormal); // todo how do other games do this?
                 grapple.StopGrappling();
                 for (int i = 0; i < damage; i++) {
                     currentHealth--;

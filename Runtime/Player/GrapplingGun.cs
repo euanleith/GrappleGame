@@ -78,7 +78,7 @@ public class GrapplingGun : MonoBehaviour
 
     private void Update()
     {
-        if (health.currentHealth <= 0 || GetComponentInParent<PlayerControls>().stunned) {
+        if (health.currentHealth <= 0 || GetComponentInParent<PlayerMovement>().stunned) {
             springJoint.enabled = false;
             return;
         }
@@ -89,7 +89,7 @@ public class GrapplingGun : MonoBehaviour
         if (Input.GetButtonDown("Fire2") && canTransformGrapple)
         {
             SetGrapplePoint();
-            if (!GetComponentInParent<PlayerControls>().isGrounded) {
+            if (!GetComponentInParent<PlayerMovement>().isGrounded) {
                 canTransformGrapple = false;
                 gunHolder.gameObject.GetComponent<SpriteRenderer>().color = Color.yellow;
             }

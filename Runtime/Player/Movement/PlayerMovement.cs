@@ -1,11 +1,9 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-using static Utilities.Layer;
-
-// todo rename PlayerMovement, or just Movement
-public class PlayerControls : MonoBehaviour
+public class PlayerMovement : MonoBehaviour
 {
     // todo order these
 
@@ -49,7 +47,7 @@ public class PlayerControls : MonoBehaviour
 
     public float minSlope = 0.5f; // todo might need to change this for slopes
 
-    Collider2D lastGroundCollision; // need this since OnCollisionExit2D doesn't contain collision info of the exited collision
+    public Collider2D lastGroundCollision; // need this since OnCollisionExit2D doesn't contain collision info of the exited collision
     int nCurrentCollisions = 0;
 
     public bool stunned = false;
@@ -57,16 +55,25 @@ public class PlayerControls : MonoBehaviour
     float stunCnt = 0f;
 
     public const float jumpCooldownDuration = 0.1f;
-    float jumpCooldown = 0f;
+    public float jumpCooldown = 0f;
 
     bool delayedSwingCollision = false;
 
+    private List<PlayerMovementAction> actions; // ordered by priority
 
     void Start()
     {
         previousPos = transform.position;
         rb = GetComponent<Rigidbody2D>();
         playerCollider = GetComponent<Collider2D>();
+
+        actions = new List<PlayerMovementAction> {
+            new GrappleMovementAction(this),
+            new JumpAction(this),
+            new WallClimbAction(this),
+            new GroundMovementAction(this),
+            new AirMovementAction(this)
+        };
     }
 
     void Update()
@@ -80,52 +87,15 @@ public class PlayerControls : MonoBehaviour
             jumpCooldown -= Time.deltaTime;
         }
 
-        moveX = Input.GetAxis("Horizontal");
-        moveY = Input.GetAxis("Vertical");
-
-        if (!(Input.GetButton("Fire1") || Input.GetButton("Fire2"))) // todo if not grappling
-        {
-            // todo would making this a switch make it clearer? or maybe just move the booleans to functions, and maybe also the contents of each if, though idk about the latter
-            if ((isGrounded || (hitWallNormal != 0)) && Input.GetButtonDown("Jump") && !menu.IsEnabled()) { // jumping
-                if (isGrounded && lastGroundCollision.GetComponent<PlatformEffector2D>() != null && moveY < 0) { // TraversablePlatform layer
-                    // todo or holding down while land on TraversablePlatform?
-                    StartCoroutine(FallThroughTraversablePlatform(lastGroundCollision.GetComponent<PlatformEffector2D>()));
-                    isGrounded = false;
-                }
-                else Jump();
+        foreach (PlayerMovementAction action in actions) {
+            if (action.ShouldDo()) {
+                action.Do();
+                break;
             }
-            else if (isGrounded && 
-                    hitWallNormal != 0 && 
-                    rb.velocity.x * hitWallNormal < 0)
-            {
-                rb.velocity = new Vector2(0, wallClimbSpeed);
-            }
-            else if (isGrounded && jumpCooldown <= 0) { // moving along ground
-                rb.velocity = new Vector2(moveX * groundSpeed, 0f);
-            } else { // moving in air
-                float airSpeedX = moveX * rb.velocity.x > 0 ? forwardAirSpeed : backwardAirSpeed;
-                float airSpeedY;
-                if (hitWallNormal != 0 && moveX * hitWallNormal < 0) {
-                    airSpeedY = moveY < minFastFallThreshold ? wallFastFallSpeed : wallFallSpeed; 
-                } else {
-                    airSpeedY = moveY < minFastFallThreshold ? fastFallSpeed : fallSpeed;
-                }
-                rb.velocity = new Vector2((rb.velocity.x + (moveX * airSpeedX * Time.deltaTime)), rb.velocity.y - (airSpeedY * Time.deltaTime)); // todo is this accelerating fall? i dont want it to - * deltaTime?
-            }
-        } else {
-            // todo make only possible for transform grapple after reaching original destination? otherwise its weird when e.g. you transform grapple straight down while holding down
-            rb.velocity = new Vector2((rb.velocity.x + (Time.deltaTime * moveX * grappleMoveSpeed)), rb.velocity.y);
         }
 
         rb.velocity = Vector2.ClampMagnitude(rb.velocity, maxSpeed);
         // todo clamp angular velocity too?
-    }
-
-    // todo maybe move this to TraversablePlatform
-    private IEnumerator FallThroughTraversablePlatform(PlatformEffector2D platform) {
-        platform.colliderMask = RemoveFromLayerMask(platform.colliderMask, PLAYER);
-        yield return new WaitForSeconds(0.5f);
-        platform.colliderMask = AddToLayerMask(platform.colliderMask, PLAYER);
     }
 
     private void LateUpdate() {
@@ -205,7 +175,7 @@ public class PlayerControls : MonoBehaviour
             isGrounded;
     }
 
-    private void UnlinkFromSwing() {
+    public void UnlinkFromSwing() {
         if (transform.parent != null &&
                 transform.parent.GetComponent<SwingPlatform>() != null) {
             rb.velocity += GetVelocityOfGround(transform.parent.gameObject); // todo maybe have special case for swing, boosting player unnaturally if they jump within the last part of the swing
