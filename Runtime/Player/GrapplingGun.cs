@@ -60,7 +60,7 @@ public class GrapplingGun : MonoBehaviour
     public Vector2 grapplePoint;
     public Vector2 grappleDistanceVector;
 
-    private Health health;
+    private PlayerHealth health;
 
     Vector2 relativeGrapplePoint = new Vector2(0, 0);
 
@@ -73,12 +73,12 @@ public class GrapplingGun : MonoBehaviour
         grappleRope.enabled = false;
         springJoint = gunHolder.GetComponent<SpringJoint2D>();
         springJoint.enabled = false;
-        health = GetComponentInParent<Health>();
+        health = GetComponentInParent<PlayerHealth>();
     }
 
     private void Update()
     {
-        if (health.currentHealth <= 0 || GetComponentInParent<Player>().IsStunned()) {
+        if (health.GetCurrent() <= 0 || GetComponentInParent<Player>().IsStunned()) {
             springJoint.enabled = false;
             return;
         }

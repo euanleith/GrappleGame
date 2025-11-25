@@ -74,8 +74,8 @@ public class ConnectorRoomBoundElement : RoomBoundElement {
 
                 camControls.ChangeRoom(spawn.GetRoom(), spawn.GetPosition()); // todo move to Somewhere.ChangeRoom()
 
-                player.GetComponent<Health>().room = spawn.GetRoom(); // todo move to Somewhere.ChangeRoom()
-                player.GetComponent<Health>().room.spawn = spawn.GetPosition(); // todo move to Somewhere.ChangeRoom()
+                player.GetComponent<PlayerHealth>().room = spawn.GetRoom(); // todo move to Somewhere.ChangeRoom()
+                player.GetComponent<PlayerHealth>().room.spawn = spawn.GetPosition(); // todo move to Somewhere.ChangeRoom()
 
                 player.transform.position = GetNewPlayerPosition(currentPlayerPosition, player.transform, cardinalDirection);
             }

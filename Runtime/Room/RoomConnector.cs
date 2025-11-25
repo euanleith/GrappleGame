@@ -20,8 +20,8 @@ public class RoomConnector : MonoBehaviour {
 
             camControls.ChangeRoom(newSpawn.GetRoom(), newSpawn.GetPosition()); // todo move to Somewhere.ChangeRoom()
 
-            collider.GetComponent<Health>().room = newSpawn.GetRoom(); // todo move to Somewhere.ChangeRoom()
-            collider.GetComponent<Health>().room.spawn = newSpawn.GetPosition(); // todo move to Somewhere.ChangeRoom()
+            collider.GetComponent<PlayerHealth>().room = newSpawn.GetRoom(); // todo move to Somewhere.ChangeRoom()
+            collider.GetComponent<PlayerHealth>().room.spawn = newSpawn.GetPosition(); // todo move to Somewhere.ChangeRoom()
 
             collider.transform.position = GetNewPlayerPosition(currentPlayerPosition, collider.transform, cardinalDirection);
         }

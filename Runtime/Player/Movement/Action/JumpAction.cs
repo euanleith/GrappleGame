@@ -25,7 +25,7 @@ public class JumpAction : PlayerMovementAction {
 
     private void Jump() {
         player.UnlinkFromSwing(); // todo is this necessary?
-        player.jumpCooldown = PlayerMovement.jumpCooldownDuration;
+        player.ActivateJumpCooldown();
         player.grapple.OnJump(); // todo note setting canTransformGrapple=true when doing any jump
         player.isGrounded = false;
         // todo theres a better way than if else / switch

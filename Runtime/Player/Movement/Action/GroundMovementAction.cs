@@ -6,7 +6,7 @@ public class GroundMovementAction : PlayerMovementAction {
     }
 
     public override bool CanDo() {
-        return player.isGrounded && player.jumpCooldown <= 0;
+        return player.isGrounded && player.JumpCooldownIsActive();
     }
 
     public override bool WantsToDo() => true;

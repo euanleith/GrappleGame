@@ -101,8 +101,12 @@ public class CombatController : MonoBehaviour
         }
     }
 
-    public int GetDamage() {
+    public int GetAttackDamage() {
         return currentAttack.damage;
+    }
+
+    public int GetContactDamage() {
+        return currentAttack.damage; // todo should be different from attack damage
     }
 
     public void StartWindup(float windupDuration) {

@@ -1,5 +1,6 @@
-using System;
 using UnityEngine;
+
+using static Utilities.Vector;
 
 public class CameraControls : MonoBehaviour
 {
@@ -72,18 +73,8 @@ public class CameraControls : MonoBehaviour
         isChangingRoom = true;
     }
 
-    // todo these move to utils
-
-    public Vector3 GetDisplacement(Vector3 a, Vector3 b) {
-        return a - b;
-    }
-
-    public float GetVelocity(Vector3 a, Vector3 b) {
-        Vector3 displacement = GetDisplacement(a, b);
-        return displacement.magnitude;
-    }
-
-    public float GetSpeed(Vector3 a, Vector3 b) {
-        return Math.Abs(GetVelocity(a, b));
+    public void CustomReset(Room room) {
+        this.room = room;
+        Move(false);
     }
 }

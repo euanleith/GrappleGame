@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 public class Menu : MonoBehaviour
 {
     public Transform buttons;
-    public Health player;
+    public PlayerHealth player;
 
     private void Start() {
         Button resumeButton = buttons.GetChild(0).GetComponent<Button>();

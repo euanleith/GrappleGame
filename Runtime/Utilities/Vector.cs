@@ -91,10 +91,22 @@ namespace Utilities {
             return closest;
         }
 
-        // returns true if t1 is within y bounds of t2
         public static bool WithinBoundsY(Transform t1, Transform t2, float wiggleRoom = 0f) {
             return t1.position.y + (t1.localScale.y / 2) + wiggleRoom > t2.position.y - (t2.localScale.y / 2) &&
                 t1.position.y - (t1.localScale.y / 2) - wiggleRoom < t2.position.y + (t2.localScale.y / 2);
+        }
+
+        public static Vector3 GetDisplacement(Vector3 a, Vector3 b) {
+            return a - b;
+        }
+
+        public static float GetVelocity(Vector3 a, Vector3 b) {
+            Vector3 displacement = GetDisplacement(a, b);
+            return displacement.magnitude;
+        }
+
+        public static float GetSpeed(Vector3 a, Vector3 b) {
+            return Math.Abs(GetVelocity(a, b));
         }
     }
 }

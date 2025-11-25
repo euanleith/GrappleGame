@@ -34,16 +34,13 @@ public class PlayerMovement : MonoBehaviour
     public bool isGrounded = false;
     public Vector2 velocityOfGround;
 
-    // todo could have a Cooldown object and iterate through a list of them in Player.Update
-    public const float jumpCooldownDuration = 0.1f;
-    public float jumpCooldown = 0f;
+    [SerializeField] private Decay jumpCooldown = new Cooldown(0.1f);
 
     bool delayedSwingCollision = false;
 
     private List<PlayerMovementAction> actions; // only first which satisfies action.ShouldDo() will be performed
 
-    void Start()
-    {
+    private void Start() {
         rb = GetComponent<Rigidbody2D>();
         playerCollider = GetComponent<Collider2D>();
 
@@ -56,8 +53,8 @@ public class PlayerMovement : MonoBehaviour
         };
     }
 
-    void Update() {
-        UpdateJumpCooldown();
+    private void Update() {
+        jumpCooldown.Update();
 
         actions.Where(action => action.ShouldDo()).First().Do();
 
@@ -70,7 +67,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    void OnCollisionEnter2D(Collision2D collision) {
+    private void OnCollisionEnter2D(Collision2D collision) {
         if (grapple.isEnabled()) return;
         hitWallNormal = 0f;
         ContactPoint2D contact = collision.GetContact(0); // only need 1 contact point as player collider is box
@@ -93,23 +90,13 @@ public class PlayerMovement : MonoBehaviour
     public Vector2 GetVelocityOfGround(GameObject ground) {
         try {
             return ground.GetComponent<Rigidbody2D>().velocity;
-            // todo im pretty sure animations change the velocity, so this should work for both
-            //Animator anim = ground.gameObject.GetComponent<Animator>();
-            //return anim.velocity;
-            // todo can i also convert rotation velocity to velocity? https://gamedev.stackexchange.com/questions/167428/how-to-convert-rotatearound-speed-to-directional-speed-in-unity?
         } catch {
             return Vector2.zero;
         }
     }
 
-    void OnCollisionExit2D(Collision2D collision) 
-    {
+    private void OnCollisionExit2D(Collision2D collision) {
         hitWallNormal = 0f;
-
-        // todo there's other cases;
-        //  on hit by enemy..?
-        //  on land on swing then die?
-        // if player is within horizontal bounds of platform and hasnt jumped/grappled
 
         if (IsLinkedToSwing()) {
             delayedSwingCollision = true;
@@ -118,7 +105,10 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    // todo maybe this stuff should be on the swing platform's end?
+    public void OnHit(Vector2 contactNormal) {
+        Bounce(contactNormal);
+        grapple.StopGrappling();
+    }
 
     private void LinkToGround(Transform ground) {
         transform.parent = ground;
@@ -134,7 +124,7 @@ public class PlayerMovement : MonoBehaviour
     public void UnlinkFromSwing() {
         if (transform.parent != null &&
                 transform.parent.GetComponent<SwingPlatform>() != null) {
-            rb.velocity += GetVelocityOfGround(transform.parent.gameObject); // todo maybe have special case for swing, boosting player unnaturally if they jump within the last part of the swing
+            rb.velocity += GetVelocityOfGround(transform.parent.gameObject);
             transform.parent = null;
             isGrounded = false;
         }
@@ -143,24 +133,26 @@ public class PlayerMovement : MonoBehaviour
 
     private bool ShouldUnlinkFromSwing() {
         return delayedSwingCollision && (
-            !WithinBoundsX(playerCollider, transform.parent.GetComponent<Collider2D>()) || // todo maybe just try with collision box above the platform like in the video?
+            !WithinBoundsX(playerCollider, transform.parent.GetComponent<Collider2D>()) ||
             //!WithinBoundsY(transform, collision.transform, 0.1f) ||
             IsAbove(transform.parent.GetComponent<Collider2D>(), playerCollider) ||
             grapple.isEnabled() ||
-            jumpCooldown > 0);
+            jumpCooldown.IsActive());
     }
 
-    private void UpdateJumpCooldown() {
-        if (jumpCooldown > 0) {
-            jumpCooldown -= Time.deltaTime;
-        }
+    public void ActivateJumpCooldown() {
+        jumpCooldown.Activate();
+    }
+
+    public bool JumpCooldownIsActive() {
+        return jumpCooldown.IsActive();
     }
 
     public void Jump() {
         actions.Where(action => action is JumpAction).First().Do();
     }
 
-    public void Bounce(Vector2 direction) {
+    private void Bounce(Vector2 direction) {
         rb.velocity = direction * stdBounceSpeed;
     }
 

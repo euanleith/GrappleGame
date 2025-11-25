@@ -14,7 +14,7 @@ public class SpawnPoint : MonoBehaviour, RoomElement
 
     void OnTriggerEnter2D(Collider2D collider) {
         if (LayerEqualsAny(collider.gameObject.layer, PLAYER)) {
-            collider.gameObject.GetComponent<Health>().SetSpawnRoom(room);
+            collider.gameObject.GetComponent<PlayerHealth>().SetSpawnRoom(room);
             GetComponent<SpriteRenderer>().color = Color.green;
         }
     }

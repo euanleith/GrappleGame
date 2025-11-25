@@ -23,8 +23,8 @@ public class BoundsEnter : MonoBehaviour
 
             Vector2 spawn = transform.Find("Spawn").position;
             camControls.ChangeRoom(room, spawn);
-            collider.GetComponent<Health>().room = room;
-            collider.GetComponent<Health>().room.spawn = spawn;
+            collider.GetComponent<PlayerHealth>().room = room;
+            collider.GetComponent<PlayerHealth>().room.spawn = spawn;
 
             Vector2 direction = GetCardinalDirection(collider.transform, transform);
             if (direction.x != 0) playerNewPosition.x = spawn.x; 
