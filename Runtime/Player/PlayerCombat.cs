@@ -1,9 +1,8 @@
 using UnityEngine;
-using System;
-
-using static Utilities.Layer;
 using System.Collections.Generic;
 using System.Linq;
+
+using static Utilities.Layer;
 
 public class PlayerCombat : MonoBehaviour {
     // todo this and EnemyCombat are basically identical, can they be generalised?
@@ -29,7 +28,6 @@ public class PlayerCombat : MonoBehaviour {
 
     // todo could maybe be a map from a key to an action. in playercombat key would be state; for playermovement key would be input?
     //  and could always return a specified type. in playercombat this would be the next state; for playermovement this would be the velocity to set rb to
-    //      note that in both cases, the key and the result are the same type. all of this could be strictly defined and therefore enforced, if desired
     //  and could have player extend from Actor, which implements actions in Update. and then could access the contents of player from within each action without having to have each action have a Player attribute?
     private List<PlayerCombatAction> actions; // only first which satisfies action.ShouldDo() will be performed
 
@@ -53,7 +51,7 @@ public class PlayerCombat : MonoBehaviour {
     }
 
     private void Update() {
-        actions.Where(action => action.ShouldDo()).First().Do(); 
+        actions.Where(action => action.ShouldDo()).FirstOrDefault()?.Do(); 
         attackDecay.Update();
     }
 
