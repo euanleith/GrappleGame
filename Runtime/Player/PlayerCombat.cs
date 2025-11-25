@@ -2,133 +2,70 @@ using UnityEngine;
 using System;
 
 using static Utilities.Layer;
+using System.Collections.Generic;
+using System.Linq;
 
-public class PlayerCombat : MonoBehaviour
-{
+public class PlayerCombat : MonoBehaviour {
     // todo this and EnemyCombat are basically identical, can they be generalised?
 
     public int damage = 1;
-    private Animator anim;
     public float windupDuration;
     public float cooldownDuration;
-    public float countdown;
+    [SerializeField] public Decay attackDecay = new Cooldown(-1);
     public Transform hitbox;
     public Transform rightHitbox;
     public Transform leftHitbox; // todo something wrong with this one, always changing while running, and animation goes on too long
     public Transform upHitbox;
     public Transform downHitbox;
-    public LayerMask enemyLayer;
-    public enum State
-    {
+    public enum State {
         windup,
         attacking,
         cooldown
     }
     public State state;
     public bool hit = false;
-    PlayerMovement playerMovement;
-    Player player;
+    public PlayerMovement playerMovement;
+    public Player player;
 
-    private void Start()
-    {
+    // todo could maybe be a map from a key to an action. in playercombat key would be state; for playermovement key would be input?
+    //  and could always return a specified type. in playercombat this would be the next state; for playermovement this would be the velocity to set rb to
+    //      note that in both cases, the key and the result are the same type. all of this could be strictly defined and therefore enforced, if desired
+    //  and could have player extend from Actor, which implements actions in Update. and then could access the contents of player from within each action without having to have each action have a Player attribute?
+    private List<PlayerCombatAction> actions; // only first which satisfies action.ShouldDo() will be performed
+
+    private void Start() {
         state = State.cooldown;
+        DisableAttackHitboxes();
+        playerMovement = GetComponent<PlayerMovement>();
+        player = GetComponent<Player>();
+        actions = new List<PlayerCombatAction> {
+            new WindupAction(this),
+            new AttackAction(this),
+            new AttackCooldownAction(this)
+        };
+    }
+
+    private void DisableAttackHitboxes() {
         rightHitbox.GetComponent<BoxCollider2D>().enabled = false;
         leftHitbox.GetComponent<BoxCollider2D>().enabled = false;
         upHitbox.GetComponent<BoxCollider2D>().enabled = false;
         downHitbox.GetComponent<BoxCollider2D>().enabled = false;
-        playerMovement = GetComponent<PlayerMovement>();
     }
 
-    void Update()
-    {
-        switch (state)
-        {
-            case State.cooldown:
-                if (Input.GetButton("Fire3") && countdown <= 0 && !player.IsStunned())
-                {
-                    countdown = windupDuration;
-                    hitbox = GetHitbox();
-                    state = State.windup;
-                }
-                break;
-            case State.attacking:
-                float normalisedAnimTime = hitbox.GetComponent<Animator>()
-                    .GetCurrentAnimatorStateInfo(0)
-                    .normalizedTime;  // todo would be nice to use cooldown = animationLength and iteratively subtract, but can't get animationLength :(
-                if (normalisedAnimTime <= 1f) // if still attacking
-                {
-                    //bool hit = HitEnemies(hitbox);
-                    if (hit && hitbox.position.Equals(downHitbox.position)) // todo use enums?
-                    {
-                        playerMovement.Jump();
-                    }
-                }
-                else 
-                {
-                    countdown = cooldownDuration;
-                    hitbox.GetComponent<SpriteRenderer>().enabled = false;
-                    hitbox.GetComponent<BoxCollider2D>().enabled = false;
-                    hitbox.GetComponent<Animator>().StopPlayback();
-                    hit = false;
-                    state = State.cooldown;
-                }
-                break;
-            case State.windup:
-                if (countdown <= 0)
-                {
-                    hitbox.GetComponent<SpriteRenderer>().enabled = true;
-                    hitbox.GetComponent<BoxCollider2D>().enabled = true;
-                    hitbox.GetComponent<Animator>().Play(0);
-                    state = State.attacking;
-                }
-                break;
-        }
-        if (countdown > 0) {
-            countdown -= Time.deltaTime;
-        }
+    private void Update() {
+        actions.Where(action => action.ShouldDo()).First().Do(); 
+        attackDecay.Update();
     }
 
-    private Transform GetHitbox() 
-    {
-        float moveX = Input.GetAxis("Horizontal");
-        float moveY = Input.GetAxis("Vertical");
-        Transform hitbox;
-        if (moveX > 0 && Math.Abs(moveX) > Math.Abs(moveY))
-        {
-            hitbox = rightHitbox;
-        }
-        else if (moveX < 0 && Math.Abs(moveX) > Math.Abs(moveY)) 
-        {
-            hitbox = leftHitbox;
-        }
-        else if (moveY > 0 && Math.Abs(moveY) > Math.Abs(moveX)) 
-        {
-            hitbox = upHitbox;
-        } 
-        else if (moveY < 0 && Math.Abs(moveY) > Math.Abs(moveX))
-        {
-            hitbox = downHitbox;
-        }
-        else
-        {
-            hitbox = rightHitbox; // todo do based on player direction - do like player.direction and deal with in player movement (most recent left/right) // or do i want nair?
-        }
-        return hitbox;
-    }
-
-    // todo something should happen to player after hitting enemy
-    public void OnTriggerEnter2D(Collider2D collider) {
+    private void OnTriggerEnter2D(Collider2D collider) {
         if (hit) return; // only hit one object per attack
-        if (LayerEqualsAny(collider.gameObject.layer, ENEMY, ENEMY_TRAVERSABLE)) {
-            if (!collider.gameObject.GetComponent<EnemyLayer>()) {
-                collider.gameObject.GetComponentInParent<Enemy>().OnHit(damage);
-            } else {
+        if (IsEnemyLayer(collider.gameObject.layer)) {
+            hit = true;
+            if (collider.gameObject.GetComponent<EnemyLayer>()) {
                 collider.gameObject.GetComponent<EnemyLayer>().OnHit(damage);
+            } else if (!LayerEquals(collider.gameObject.layer, ENEMY_INVULNERABLE)) {
+                collider.gameObject.GetComponentInParent<Enemy>().OnHit(damage);
             }
-            hit = true;
-        } 
-        else if (LayerEquals(collider.gameObject.layer, ENEMY_INVULNERABLE)) {
-            hit = true;
         }
     }
 }

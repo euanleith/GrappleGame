@@ -8,12 +8,12 @@ public class GrappleMovementAction : PlayerMovementAction {
     public override bool CanDo() => true;
 
     public override bool WantsToDo() {
-        return Controls.isGrappling();
+        return Controls.IsGrappling();
     }
 
     public override void Do() {
         player.rb.velocity = new Vector2(
-            player.rb.velocity.x + (Time.deltaTime * Controls.getPlayerVelocityX() * player.grappleMoveSpeed), 
+            player.rb.velocity.x + (Time.deltaTime * Controls.GetMovementX() * player.grappleMoveSpeed), 
             player.rb.velocity.y);
     }
 

@@ -8,7 +8,7 @@ public class WallSlideAction : PlayerMovementAction {
     }
 
     public override bool WantsToDo() {
-        return Controls.getPlayerVelocityX() * player.hitWallNormal < 0;
+        return Controls.GetMovementX() * player.hitWallNormal < 0;
     }
 
     public override void Do() {

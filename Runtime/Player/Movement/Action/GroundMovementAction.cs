@@ -12,7 +12,7 @@ public class GroundMovementAction : PlayerMovementAction {
     public override bool WantsToDo() => true;
 
     public override void Do() {
-        player.rb.velocity = new Vector2(Controls.getPlayerVelocityX() * player.groundSpeed, 0f);
+        player.rb.velocity = new Vector2(Controls.GetMovementX() * player.groundSpeed, 0f);
     }
 
 }

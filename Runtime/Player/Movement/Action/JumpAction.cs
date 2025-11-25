@@ -14,7 +14,7 @@ public class JumpAction : PlayerMovementAction {
     }
 
     public override bool WantsToDo() {
-        return Controls.isJumping();
+        return Controls.IsJumping();
     }
 
     public override void Do() {
@@ -38,7 +38,7 @@ public class JumpAction : PlayerMovementAction {
                 velocityX = -player.wallJumpSpeed;
                 break;
             case 0:
-                velocityX = player.rb.velocity.x + (Controls.getPlayerVelocityX() * player.forwardAirSpeed * Time.deltaTime);
+                velocityX = player.rb.velocity.x + (Controls.GetMovementX() * player.forwardAirSpeed * Time.deltaTime);
                 break;
         }
         float velocityY = player.rb.velocity.y + player.jumpSpeed;

@@ -38,6 +38,15 @@ namespace Utilities {
             );
         }
 
+        public static bool IsEnemyLayer(int layer) {
+            return LayerEqualsAny(layer,
+                ENEMY,
+                ENEMY_ATTACK,
+                ENEMY_INVULNERABLE,
+                ENEMY_TRAVERSABLE
+            );
+        }
+
         public static int LayerToInt(string layer) {
             return LayerMask.NameToLayer(layer);
         }

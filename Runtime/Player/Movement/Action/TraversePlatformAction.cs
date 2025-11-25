@@ -16,7 +16,7 @@ public class TraversePlatformAction : PlayerMovementAction {
     }
 
     public override bool WantsToDo() {
-        return Controls.getPlayerVelocityY() < 0;
+        return Controls.GetMovementY() < 0;
     }
 
     public override void Do() {

@@ -13,7 +13,7 @@ public class AirMovementAction : PlayerMovementAction {
     public override bool WantsToDo() => true;
 
     public override void Do() {
-        Vector2 inputVelocity = Controls.getPlayerVelocity();
+        Vector2 inputVelocity = Controls.GetMovement();
         Vector2 airVelocity = new();
         airVelocity.x = inputVelocity.x * player.rb.velocity.x > 0 ? player.forwardAirSpeed : player.backwardAirSpeed;
         if (wallSlideAction.ShouldDo()) {
