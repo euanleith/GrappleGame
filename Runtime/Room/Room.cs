@@ -10,7 +10,7 @@ public class Room : MonoBehaviour
     [HideInInspector] public Vector2 minPos;
     [HideInInspector] public Vector2 maxPos;
 
-    private bool hasLoggedNoDefaultSpawn = false;
+    private bool hasLoggedNoDefaultSpawn = false; // todo could generalise to Latch object
 
     // todo camera clamping to bounds isn't working for (some) non-rectangular shapes
     //  honestly i dont know how it was working before
@@ -44,16 +44,18 @@ public class Room : MonoBehaviour
 
     protected void InitBounds() {
         Transform boundsFolder = gameObject.transform.Find("Bounds");
-        // todo is boundsFolder is null, use new system
-        //if (boundsFolder != null) {
+        if (boundsFolder != null) { // todo remove once migrated to new system
             minPos = boundsFolder.Find("MinPos").position;
             maxPos = boundsFolder.Find("MaxPos").position;
             Transform tSpawn = boundsFolder.Find("Spawn");
             if (tSpawn && tSpawn.gameObject.activeSelf) {
                 spawn = tSpawn.position;
             }
-        //} else {
-        //}
+        } else {
+            RoomBound bound = GetComponent<RoomBound>();
+            minPos = bound.GetGlobalMinBound();
+            maxPos = bound.GetGlobalMaxBound();
+        }
     }
 
     private void InitNewBounds() {

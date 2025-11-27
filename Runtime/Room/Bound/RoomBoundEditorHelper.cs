@@ -17,10 +17,10 @@ public class RoomBoundEditorHelper : MonoBehaviour {
         //  or just put them in layer 0 and everything else in layer 1
         //  the latter would be easier but less cool
 
-        RoomBoundElementEditorHelper.CreateNewElement(typeof(UngrappleableRoomBoundElement), room, room.GetRightBound(), room.GetSize().y, RoomBoundElementEditorHelper.BACKGROUND_LAYER);
-        RoomBoundElementEditorHelper.CreateNewElement(typeof(UngrappleableRoomBoundElement), room, room.GetLeftBound(), room.GetSize().y, RoomBoundElementEditorHelper.BACKGROUND_LAYER);
-        RoomBoundElementEditorHelper.CreateNewElement(typeof(UngrappleableRoomBoundElement), room, room.GetTopBound(), room.GetSize().x, RoomBoundElementEditorHelper.BACKGROUND_LAYER);
-        RoomBoundElementEditorHelper.CreateNewElement(typeof(UngrappleableRoomBoundElement), room, room.GetBottomBound(), room.GetSize().x, RoomBoundElementEditorHelper.BACKGROUND_LAYER);
+        RoomBoundElementEditorHelper.CreateNewElement(typeof(UngrappleableRoomBoundElement), room, room.GetLocalRightBound(), room.GetSize().y, RoomBoundElementEditorHelper.BACKGROUND_LAYER);
+        RoomBoundElementEditorHelper.CreateNewElement(typeof(UngrappleableRoomBoundElement), room, room.GetLocalLeftBound(), room.GetSize().y, RoomBoundElementEditorHelper.BACKGROUND_LAYER);
+        RoomBoundElementEditorHelper.CreateNewElement(typeof(UngrappleableRoomBoundElement), room, room.GetLocalTopBound(), room.GetSize().x, RoomBoundElementEditorHelper.BACKGROUND_LAYER);
+        RoomBoundElementEditorHelper.CreateNewElement(typeof(UngrappleableRoomBoundElement), room, room.GetLocalBottomBound(), room.GetSize().x, RoomBoundElementEditorHelper.BACKGROUND_LAYER);
     }
 
     private static RoomBoundElementsFolder GetElementsFolder(RoomBound room) {

@@ -29,20 +29,28 @@ public class RoomBound : MonoBehaviour {
         return GetSize() / 2f;
     }
 
-    public Vector3 GetRightBound() {
+    public Vector3 GetLocalRightBound() {
         return new Vector2(GetExtent().x, 0f);
     }
 
-    public Vector3 GetLeftBound() {
+    public Vector3 GetLocalLeftBound() {
         return new Vector2(-GetExtent().x, 0f);
     }
 
-    public Vector3 GetTopBound() {
+    public Vector3 GetLocalTopBound() {
         return new Vector2(0f, GetExtent().y);
     }
 
-    public Vector3 GetBottomBound() {
+    public Vector3 GetLocalBottomBound() {
         return new Vector2(0f, -GetExtent().y);
+    }
+
+    public Vector2 GetGlobalMinBound() {
+        return transform.position + new Vector3(GetLocalLeftBound().x, GetLocalBottomBound().y);
+    }
+
+    public Vector2 GetGlobalMaxBound() {
+        return transform.position + new Vector3(GetLocalRightBound().x, GetLocalTopBound().y);
     }
 
     public RoomBoundElement GetElement(int index) {
