@@ -111,11 +111,11 @@ public class Room : MonoBehaviour
     }
 
     public void UpdateDefaultSpawn(Spawn spawn) {
-        if (spawn.IsDefaultSpawn()) {
+        if (spawn.IsDefaultSpawn() && defaultSpawn != spawn) {
             if (defaultSpawn != null) defaultSpawn.RemoveAsDefaultSpawn();
             defaultSpawn = spawn;
             this.spawn = spawn.transform.position;
-        } else if (defaultSpawn == spawn) {
+        } else if (!spawn.IsDefaultSpawn() && defaultSpawn == spawn) {
             defaultSpawn = null;
             this.spawn = new(0, 0);
         }
