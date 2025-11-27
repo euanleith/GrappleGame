@@ -8,19 +8,32 @@ using UnityEditor;
 public class Spawn : MonoBehaviour 
 {
     private Vector3 cardinalDirection;
-    public Room room;
+    private Room room;
     private bool associatedWithConnector;
+    [SerializeField] private bool isDefaultSpawn;
 
     [SerializeField][ReadOnly]
     private ConnectorRoomBoundElement connector;
 
     private void Start() {
         cardinalDirection = Vector.GetCardinalDirection(transform.parent, transform);
-        // todo can i get room just from location?
+    }
+
+    private void OnValidate() {
+        if (room == null) room = GetComponentInParent<Room>();
+        room.UpdateDefaultSpawn(this);
     }
 
     private void OnEnable() {
         associatedWithConnector = true;
+    }
+
+    public bool IsDefaultSpawn() {
+        return isDefaultSpawn;
+    }
+
+    public void RemoveAsDefaultSpawn() {
+        isDefaultSpawn = false;
     }
 
     public Vector3 GetDirection() {
