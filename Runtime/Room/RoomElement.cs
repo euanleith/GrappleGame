@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 public interface RoomElement
 {
     // todo maybe make this abstract, since not all elements will require init/reset/disable

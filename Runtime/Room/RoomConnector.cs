@@ -1,8 +1,10 @@
+using System;
 using UnityEngine;
 
 using static Utilities.Layer;
 using static Utilities.Vector;
 
+[Obsolete("Use ConnectorRoomBoundElement instead")]
 public class RoomConnector : MonoBehaviour {
     private CameraControls camControls;
     private Spawn[] spawns;
