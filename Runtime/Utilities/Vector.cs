@@ -108,5 +108,13 @@ namespace Utilities {
         public static float GetSpeed(Vector3 a, Vector3 b) {
             return Math.Abs(GetVelocity(a, b));
         }
+
+        public static Vector3 Fill(float x) {
+            return new Vector3(x, x, x);
+        }
+
+        public static Vector3 Add(float f, Vector3 v) {
+            return Fill(f) + v;
+        }
     }
 }

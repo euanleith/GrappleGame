@@ -82,9 +82,9 @@ public class ConnectorRoomBoundElement : RoomBoundElement {
         }
     }
 
+    private const float SHIFT_WIGGLE_ROOM = 0.1f;
     private Vector2 GetNewPlayerPosition(Vector3 currentPlayerPosition, Transform player, Vector2 cardinalDirection) {
-        Vector3 magnitude = (player.transform.localScale * 1.5f)
-            + (transform.localScale * 2f);
+        Vector3 magnitude = Add(2*RoomBoundElementEditorHelper.WIDTH + SHIFT_WIGGLE_ROOM, player.transform.lossyScale);
         Vector3 distance = cardinalDirection.x != 0 ?
             (cardinalDirection.x > 0 ?
                 Vector2.left * magnitude.x :
