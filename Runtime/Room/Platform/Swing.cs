@@ -12,11 +12,14 @@ public class Swing : MonoBehaviour, RoomElement {
     public bool breakable = false;
     public LayerMask breakerLayers;
 
+    public Decay timeOffset = new(0);
+
     public bool collidableRope = false; // todo maybe just want to set this automatically = !platform.enabled
 
     public SwingPlatform platform;
     public SwingRopeRotation ropeRotation;
     public SwingRope rope;
+
 
     public void Start() {
         activatorLayers = ToLayerMask(PLAYER);
@@ -28,15 +31,22 @@ public class Swing : MonoBehaviour, RoomElement {
         //ropeRotation = GetComponentInChildren<SwingRopeRotation>();
         //rope = GetComponentInChildren<SwingRope>();
         ropeRotation.Init(IsInitActivated());
+        timeOffset.SetOnFinished(() => ropeRotation.Reset(IsInitActivated()));
+        timeOffset.Activate();
         if (platform) platform.Init();
         rope.Init(collidableRope);
         Reset();
     }
 
     public void Reset() {
+        timeOffset.Activate();
         ropeRotation.Reset(IsInitActivated());
         if (platform) platform.Reset();
         rope.Reset();
+    }
+
+    public void Update() {
+        timeOffset.Update();
     }
 
     public void Disable() { }
@@ -54,6 +64,8 @@ public class Swing : MonoBehaviour, RoomElement {
     }
 
     bool IsInitActivated() {
-        return !(platformTouchActivated || ropeTouchActivated);
+        return !platformTouchActivated &&
+            !ropeTouchActivated &&
+            timeOffset.IsActive();
     }
 }
