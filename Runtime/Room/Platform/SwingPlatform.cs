@@ -9,11 +9,12 @@ public class SwingPlatform : MonoBehaviour
     Vector2 prevPos;
     Vector2 velocity;
     bool broken;
+    private Quaternion initialRotation;
 
     public void Init() {
+        initialRotation = transform.rotation;
         //swing = GetComponentInParent<Swing>();
         //rb = GetComponent<Rigidbody2D>();
-        transform.rotation = Quaternion.identity;
         prevPos = rb.position;
         broken = false;
     }
@@ -24,8 +25,8 @@ public class SwingPlatform : MonoBehaviour
     }
 
     void Update() {
-        transform.rotation = Quaternion.Euler(0, 0, 0);
-        rb.rotation = 0;
+        transform.rotation = initialRotation;
+        //rb.rotation = 0;
         if (!broken) rb.velocity = velocity;
     }
 
